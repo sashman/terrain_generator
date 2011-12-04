@@ -1,1 +1,16 @@
 A program to generate simple terrain with variable formats
+
+usage:
+
+-s prints standard heights with a width and height values as the first two ints
+-x prints the following xml
+
+	<map width=int height=int>
+
+	[
+	<tile x=int y=int>
+	<height>int</height>
+	</tile>
+	]+
+
+	</map>
