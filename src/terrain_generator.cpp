@@ -4,10 +4,7 @@
 // Version     : 0.0.0.1
 //============================================================================
 
-#include <iostream>
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
+
 
 /*
  include "boost/program_options/options_description.hpp"
@@ -15,8 +12,8 @@
  include "boost/program_options/variables_map.hpp"
  */
 
-//must be (power of 2) + 1
-#define DEFAULT_SIZE 129
+#include "terrain_generator.hpp"
+
 
 //namespace po = boost::program_options;
 
@@ -63,16 +60,22 @@ int get_dia_avg(int x, int y, int l) {
 	return (int) (sum / n + get_val(x, y));
 }
 
+
+//standard print
 void print_map() {
+	//TODO: add actual height and width values
+	printf("%i %i ", tmap_size, tmap_size);
 	for (int i = 0; i < tmap_size; ++i) {
 		for (int j = 0; j < tmap_size; ++j) {
 			printf("%i ", tmap[i][j]);
 		}
-		//printf("\n");
 	}
 }
 
+//xml print
 void print_map_xml() {
+	//TODO: add actual height and width values
+	//TODO: add tile type value
 	printf("<map width='%d' height='%d'>\n", tmap_size, tmap_size);
 	for (int i = 0; i < tmap_size; ++i) {
 		for (int j = 0; j < tmap_size; ++j) {
@@ -193,7 +196,7 @@ int main(int argc, char** argv) {
 	//std::cout << "Finished square diamond" << std::endl;
 
 	if (output_format == STANDRARD_HEIGHTS) {
-		std::cout << tmap_size << " " << tmap_size << " ";
+
 		print_map();
 	} else if (output_format == STANDARD_XML) {
 		print_map_xml();
