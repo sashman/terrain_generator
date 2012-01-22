@@ -4,25 +4,19 @@
 // Version     : 0.0.0.1
 //============================================================================
 
-
-
-/*
- include "boost/program_options/options_description.hpp"
- include "boost/program_options/parsers.hpp"
- include "boost/program_options/variables_map.hpp"
- */
-
 #include "terrain_generator.hpp"
-
-
-//namespace po = boost::program_options;
 
 enum OutFormat {
 	STANDRARD_HEIGHTS, STANDARD_XML
 };
 int output_format = STANDRARD_HEIGHTS;
 
+/* Whether to display verbose messages.  */
+int verbose = 0;
+
 int tmap_size = DEFAULT_SIZE;
+int crop_height = 0;
+int crop_width = 0;
 int** tmap;
 
 int seed = 0;
@@ -60,13 +54,12 @@ int get_dia_avg(int x, int y, int l) {
 	return (int) (sum / n + get_val(x, y));
 }
 
-
 //standard print
 void print_map() {
 	//TODO: add actual height and width values
-	printf("%i %i ", tmap_size, tmap_size);
-	for (int i = 0; i < tmap_size; ++i) {
-		for (int j = 0; j < tmap_size; ++j) {
+	printf("%i %i ", crop_width, crop_height);
+	for (int i = 0; i < crop_height; ++i) {
+		for (int j = 0; j < crop_width; ++j) {
 			printf("%i ", tmap[i][j]);
 		}
 	}
@@ -76,9 +69,9 @@ void print_map() {
 void print_map_xml() {
 	//TODO: add actual height and width values
 	//TODO: add tile type value
-	printf("<map width='%d' height='%d'>\n", tmap_size, tmap_size);
-	for (int i = 0; i < tmap_size; ++i) {
-		for (int j = 0; j < tmap_size; ++j) {
+	printf("<map width='%d' height='%d'>\n", crop_width, crop_height);
+	for (int i = 0; i < crop_height; ++i) {
+		for (int j = 0; j < crop_width; ++j) {
 			printf("<tile x='%d' y='%d'>\n\t<height>%i</height>\n</tile>\n", i,
 					j, tmap[i][j]);
 		}
@@ -146,57 +139,132 @@ int square_diamond() {
 
 }
 
-void check_out_format(int argc, char** argv) {
-	if (argc < 2)
-		return;
-
-	if (strcmp(argv[1], "-s") == 0) {
-		output_format = STANDRARD_HEIGHTS;
-	} else if (strcmp(argv[1], "-x") == 0) {
-		output_format = STANDARD_XML;
-	}
+void print_usage(FILE* stream, int exit_code, char* program_name) {
+	fprintf(stream, "A program to generate simple terrain with variable formats.\n\n");
+	fprintf(stream, "Usage:  %s options\n", program_name);
+	fprintf(
+			stream,
+					"  -h  --help             Display this usage information.\n"
+					"  -v  --verbose          Print verbose messages.\n"
+					"      --height <value>   Crop the map down to specified positive integer height.\n"
+					"      --width <value>    Crop the map down to specified positive integer width.\n"
+					"  -s  --standard         Use standard output: width, height and a set of height values all separated by a space.\n"
+					"  -x  --xml              Use the following xml output:\n"
+					"                           <map width=int height=int>\n"
+					"                           [\n"
+					"                           <tile x=int y=int>\n"
+					"                           <height>int</height>\n"
+					"                           </tile>\n"
+					"                           ]+\n"
+					"                           </map>\n");
+	exit(exit_code);
 }
 
+//TODO: custom height and width
+//TODO: specify offset reduction ratio
 int main(int argc, char** argv) {
 
-	//TODO: remove
-	check_out_format(argc, argv);
+	//TODO: remove and replace with arg parser
+	//check_out_format(argc, argv);
 
-	/*
-	 //argument parser
-	 po::options_description desc("Usage");
-	 desc.add_options()
-	 ("help", "produce help message")
-	 ("size", po::value<int>(), "set map size must be a (power of 2) + 1, e.g.: 129, 257")
-	 ;
+	int next_option;
 
-	 po::variables_map vm;
-	 po::store(po::parse_command_line(argc, argv, desc), vm);
-	 po::notify(vm);
+	/* A string listing valid short options letters.  */
+	const char* const short_options = "hsxv";
+	/* An array describing valid long options.  */
+	const struct option long_options[] = { { "help", 0, NULL, 'h' }, {
+			"standard", 0, NULL, 's' }, { "xml", 0, NULL, 'x' }, { "verbose", 0,
+			NULL, 'v' },
+			{"height", 0, NULL, 'e'},
+			{"width", 0, NULL, 'w'},
+			{ NULL, 0, NULL, 0 } /* Required at end of array.  */
+	};
 
-	 if(vm.count("help")){
-	 std::cout << desc << "\n";
-	 return 1;
-	 }
+	/* The name of the file to receive program output, or NULL for
+	 standard output.  */
+	const char* output_filename = NULL;
 
-	 if (vm.count("size")){
-	 tmap_size = vm["size"].as<int>();
-	 }
-	 */
+	/* Remember the name of the program, to incorporate in messages.
+	 The name is stored in argv[0].  */
+	char* program_name = argv[0];
 
-	//std::cout << "Started" << std::endl;
-	//std::cout << "Size = " << tmap_size << std::endl;
+	do {
+
+		next_option = getopt_long(argc, argv, short_options, long_options,
+				NULL);
+		switch (next_option) {
+		case 'h': /* -h or --help */
+			/* User has requested usage information.  Print it to standard
+			 output, and exit with exit code zero (normal termination).  */
+			print_usage(stdout, 0, program_name);
+			break;
+		case 's': /* -s --standard */
+
+			//Use default output format
+			//do nothing
+			break;
+
+		case 'x': /* -x --xml*/
+
+			//Use xml output format
+			output_format = STANDARD_XML;
+			break;
+
+		case 'v': /* -v or --verbose */
+			verbose = 1;
+			break;
+
+		case 'e': /* --height use next argument as crop height */
+
+			crop_height = atoi(optarg);
+			if(crop_height < 1)
+				print_usage(stderr, 1, program_name);
+
+			break;
+
+		case 'w': /* --height use next argument as crop width */
+
+			crop_width = atoi(optarg);
+			if(crop_width < 1)
+				print_usage(stderr, 1, program_name);
+
+			break;
+		case '?': /* The user specified an invalid option.  */
+			/* Print usage information to standard error, and exit with exit
+			 code one (indicating abnormal termination).  */
+			print_usage(stderr, 1, program_name);
+			break;
+		case -1: /* Done with options.  */
+			break;
+
+		default: /* Something else: unexpected.  */
+			abort();
+		}
+	} while (next_option != -1);
+
 	//init map array
 	tmap = new int*[tmap_size];
 	for (int i = 0; i < tmap_size; ++i) {
 		tmap[i] = new int[tmap_size];
 	}
 	//fill the array with values
+
+	if(crop_height<1) crop_height = tmap_size;
+	if(crop_width<1) crop_width= tmap_size;
+
+	if (verbose) {
+		std::cout << "Staring square diamond" << std::endl;
+		std::cout << "Size: " << crop_width << " x " << crop_height << std::endl;
+		std::cout << "Starting seed value " << seed << std::endl;
+		std::cout << "Starting random offset " << random_offset << std::endl;
+		std::cout << "Random offset decrease ratio " << offset_dr << std::endl;
+	}
 	square_diamond();
-	//std::cout << "Finished square diamond" << std::endl;
+	if (verbose)
+		std::cout << "Finished square diamond" << std::endl;
+
 
 	if (output_format == STANDRARD_HEIGHTS) {
-
 		print_map();
 	} else if (output_format == STANDARD_XML) {
 		print_map_xml();

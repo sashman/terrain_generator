@@ -11,10 +11,13 @@
 #include <iostream>
 #include <string.h>
 #include <stdio.h>
+
+
+#include <getopt.h>
 #include <stdlib.h>
 
 //must be (power of 2) + 1
-#define DEFAULT_SIZE 129
+#define DEFAULT_SIZE 33
 
 
 
