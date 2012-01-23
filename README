@@ -14,3 +14,15 @@ Usage:  ./../src/a.out options
                            </tile>
                            ]+
                            </map>
+
+
+TODO:
+- add tile type value
+- specify offset reduction ratio
+- specify seed value
+- specify allowance of negative height values
+- create visualisation tool
+- create config file
+- generate tile types
+- generate voronoi diagram
+- interpolate voronoi diagram
