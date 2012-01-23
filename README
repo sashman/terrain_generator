@@ -1,6 +1,6 @@
 A program to generate simple terrain with variable formats.
 
-Usage:  ./src/a.out options
+Usage:  ./../src/a.out options
   -h  --help             Display this usage information.
   -v  --verbose          Print verbose messages.
       --height <value>   Crop the map down to specified positive integer height.

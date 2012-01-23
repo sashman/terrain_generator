@@ -58,7 +58,6 @@ int get_dia_avg(int x, int y, int l) {
 
 //standard print
 void print_map() {
-	//TODO: add actual height and width values
 	printf("%i %i ", crop_width, crop_height);
 	for (int i = 0; i < crop_height; ++i) {
 		for (int j = 0; j < crop_width; ++j) {
@@ -69,7 +68,6 @@ void print_map() {
 
 //xml print
 void print_map_xml() {
-	//TODO: add actual height and width values
 	//TODO: add tile type value
 	printf("<map width='%d' height='%d'>\n", crop_width, crop_height);
 	for (int i = 0; i < crop_height; ++i) {
@@ -162,17 +160,19 @@ void print_usage(FILE* stream, int exit_code, char* program_name) {
 	exit(exit_code);
 }
 
-//TODO: custom height and width
 //TODO: specify offset reduction ratio
+//TODO: specify seed value
+//TODO: specify allowance of negative height values
+//TODO: create visualisation tool
+//TODO: create config file
+
 int main(int argc, char** argv) {
 
-	//TODO: remove and replace with arg parser
-	//check_out_format(argc, argv);
 
 	int next_option;
 
 	/* A string listing valid short options letters.  */
-	const char* const short_options = "hsxvew";
+	const char* const short_options = "hsxv";
 	/* An array describing valid long options.  */
 	const struct option long_options[] = { { "help", 0, NULL, 'h' }, {
 			"standard", 0, NULL, 's' }, { "xml", 0, NULL, 'x' }, { "verbose", 0,
@@ -283,8 +283,13 @@ int main(int argc, char** argv) {
 
 	//fill the array with values
 	square_diamond();
+
 	if (verbose)
 		std::cout << "Finished square diamond" << std::endl;
+
+	//TODO: generate tile types
+	//TODO: generate voronoi diagram
+	//TODO: interpolate voronoi diagram
 
 
 	if (output_format == STANDRARD_HEIGHTS) {
