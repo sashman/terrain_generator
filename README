@@ -7,6 +7,9 @@ Usage:  ./../src/a.out [options]
       --width <value>    Crop the map down to specified positive integer width.
       --rough <value>    Define smoothness of the terrain as a float (0.0 < v < 1.0).
                          Lower values produce smoother terrain, smaller difference in adjacent tiles.
+      --seed <value>     Set the initial positive integer height for the algorithm to be generate values from.
+      --offset <value>   Set the initial offset positive integer height (seed+offset=max possible height).
+  -n  --negative         Allow for negative height values.
   -s  --standard         Use standard output (used as default output):
                          width, height and a set of height values all separated by a space.
   -x  --xml              Use the following xml output:
@@ -21,8 +24,6 @@ Usage:  ./../src/a.out [options]
 
 TODO:
 - add tile type value
-- specify seed value
-- specify allowance of negative height values
 - create visualisation tool
 - create config file
 - generate tile types
