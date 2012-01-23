@@ -1,24 +1,11 @@
-A program to generate simple terrain with variable formats
+A program to generate simple terrain with variable formats.
 
-usage:
-
--h  --help             Display this usage information.
--v  --verbose          Print verbose messages.
-
--s  --standard         Use standard output: width, height and a set of height values all separated by a space
--x  --xml              Use the following xml output:
-                           <map width=int height=int>
-                           [
-                           <tile x=int y=int>
-                           <height>int</height>
-                           </tile>
-                           ]+
-                           </map>A program to generate simple terrain with variable formats.
-
-Usage:  ./a.out options
+Usage:  ./src/a.out options
   -h  --help             Display this usage information.
   -v  --verbose          Print verbose messages.
-  -s  --standard         Use standard output: width, height and a set of height values all separated by a space
+      --height <value>   Crop the map down to specified positive integer height.
+      --width <value>    Crop the map down to specified positive integer width.
+  -s  --standard         Use standard output: width, height and a set of height values all separated by a space.
   -x  --xml              Use the following xml output:
                            <map width=int height=int>
                            [
