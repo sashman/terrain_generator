@@ -141,14 +141,17 @@ int square_diamond() {
 
 void print_usage(FILE* stream, int exit_code, char* program_name) {
 	fprintf(stream, "A program to generate simple terrain with variable formats.\n\n");
-	fprintf(stream, "Usage:  %s options\n", program_name);
+	fprintf(stream, "Usage:  %s [options]\n", program_name);
 	fprintf(
 			stream,
 					"  -h  --help             Display this usage information.\n"
 					"  -v  --verbose          Print verbose messages.\n"
 					"      --height <value>   Crop the map down to specified positive integer height.\n"
 					"      --width <value>    Crop the map down to specified positive integer width.\n"
-					"  -s  --standard         Use standard output: width, height and a set of height values all separated by a space.\n"
+					"      --rough <value>    Define smoothness of the terrain as a float (0.0 < v < 1.0).\n"
+					"                         Lower values produce smoother terrain.\n"
+					"  -s  --standard         Use standard output (used as default output):\n"
+					"                         width, height and a set of height values all separated by a space.\n"
 					"  -x  --xml              Use the following xml output:\n"
 					"                           <map width=int height=int>\n"
 					"                           [\n"
@@ -160,7 +163,6 @@ void print_usage(FILE* stream, int exit_code, char* program_name) {
 	exit(exit_code);
 }
 
-//TODO: specify offset reduction ratio
 //TODO: specify seed value
 //TODO: specify allowance of negative height values
 //TODO: create visualisation tool
@@ -179,6 +181,7 @@ int main(int argc, char** argv) {
 			NULL, 'v' },
 			{"height", 1, NULL, 'e'},
 			{"width", 1, NULL, 'w'},
+			{"rough", 1, NULL, 'r'},
 			{ NULL, 0, NULL, 0 } /* Required at end of array.  */
 	};
 
@@ -224,11 +227,20 @@ int main(int argc, char** argv) {
 
 			break;
 
-		case 'w': /* --height use next argument as crop width */
+		case 'w': /* --width use next argument as crop width */
 
 			crop_width = atoi(optarg);
 			if(crop_width < 1)
 				print_usage(stderr, 1, program_name);
+
+			break;
+
+		case 'r': /* --rough roughness ratio */
+
+			offset_dr = atof(optarg);
+			if(offset_dr<0 || offset_dr>1){
+				print_usage(stderr, 1, program_name);
+			}
 
 			break;
 		case '?': /* The user specified an invalid option.  */

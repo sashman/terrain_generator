@@ -1,11 +1,14 @@
 A program to generate simple terrain with variable formats.
 
-Usage:  ./../src/a.out options
+Usage:  ./../src/a.out [options]
   -h  --help             Display this usage information.
   -v  --verbose          Print verbose messages.
       --height <value>   Crop the map down to specified positive integer height.
       --width <value>    Crop the map down to specified positive integer width.
-  -s  --standard         Use standard output: width, height and a set of height values all separated by a space.
+      --rough <value>    Define smoothness of the terrain as a float (0.0 < v < 1.0).
+                         Lower values produce smoother terrain.
+  -s  --standard         Use standard output (used as default output):
+                         width, height and a set of height values all separated by a space.
   -x  --xml              Use the following xml output:
                            <map width=int height=int>
                            [
@@ -18,7 +21,6 @@ Usage:  ./../src/a.out options
 
 TODO:
 - add tile type value
-- specify offset reduction ratio
 - specify seed value
 - specify allowance of negative height values
 - create visualisation tool
