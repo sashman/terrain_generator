@@ -6,6 +6,8 @@
 
 #include "terrain_generator.hpp"
 
+
+
 enum OutFormat {
 	STANDRARD_HEIGHTS, STANDARD_XML
 };
@@ -170,13 +172,13 @@ int main(int argc, char** argv) {
 	int next_option;
 
 	/* A string listing valid short options letters.  */
-	const char* const short_options = "hsxv";
+	const char* const short_options = "hsxvew";
 	/* An array describing valid long options.  */
 	const struct option long_options[] = { { "help", 0, NULL, 'h' }, {
 			"standard", 0, NULL, 's' }, { "xml", 0, NULL, 'x' }, { "verbose", 0,
 			NULL, 'v' },
-			{"height", 0, NULL, 'e'},
-			{"width", 0, NULL, 'w'},
+			{"height", 1, NULL, 'e'},
+			{"width", 1, NULL, 'w'},
 			{ NULL, 0, NULL, 0 } /* Required at end of array.  */
 	};
 
@@ -239,26 +241,47 @@ int main(int argc, char** argv) {
 
 		default: /* Something else: unexpected.  */
 			abort();
+			break;
 		}
 	} while (next_option != -1);
+
+
+
+
+	//set crop height and width
+	if(crop_height<1) crop_height = tmap_size;
+	if(crop_width<1) crop_width = tmap_size;
+
+	//if a crop value is set
+	//set tmap_size to fit the cropped values
+	int max_size = std::max(crop_height,crop_width);
+	int max_size_tmp = max_size-1;
+
+	if((max_size_tmp & (max_size_tmp - 1)) == 0){
+		//leave set size as highest crop value
+		tmap_size = max_size;
+	} else {
+		//find smallest value such that (value is power of 2) + 1 and value > max_size
+		int t = ceil(log2(max_size))+1;
+		tmap_size = (1<<t)+1;
+	}
+
+	//display info
+	if (verbose) {
+		std::cout << "Staring square diamond" << std::endl;
+		std::cout << "Size: " << crop_width << " x " << crop_height << " original size " << tmap_size << std::endl;
+		std::cout << "Starting seed value " << seed << std::endl;
+		std::cout << "Starting random offset " << random_offset << std::endl;
+		std::cout << "Random offset decrease ratio " << offset_dr << std::endl;
+	}
 
 	//init map array
 	tmap = new int*[tmap_size];
 	for (int i = 0; i < tmap_size; ++i) {
 		tmap[i] = new int[tmap_size];
 	}
+
 	//fill the array with values
-
-	if(crop_height<1) crop_height = tmap_size;
-	if(crop_width<1) crop_width= tmap_size;
-
-	if (verbose) {
-		std::cout << "Staring square diamond" << std::endl;
-		std::cout << "Size: " << crop_width << " x " << crop_height << std::endl;
-		std::cout << "Starting seed value " << seed << std::endl;
-		std::cout << "Starting random offset " << random_offset << std::endl;
-		std::cout << "Random offset decrease ratio " << offset_dr << std::endl;
-	}
 	square_diamond();
 	if (verbose)
 		std::cout << "Finished square diamond" << std::endl;

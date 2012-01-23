@@ -11,8 +11,7 @@
 #include <iostream>
 #include <string.h>
 #include <stdio.h>
-
-
+#include <cmath>
 #include <getopt.h>
 #include <stdlib.h>
 
