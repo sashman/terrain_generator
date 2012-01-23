@@ -149,7 +149,7 @@ void print_usage(FILE* stream, int exit_code, char* program_name) {
 					"      --height <value>   Crop the map down to specified positive integer height.\n"
 					"      --width <value>    Crop the map down to specified positive integer width.\n"
 					"      --rough <value>    Define smoothness of the terrain as a float (0.0 < v < 1.0).\n"
-					"                         Lower values produce smoother terrain.\n"
+					"                         Lower values produce smoother terrain, smaller difference in adjacent tiles.\n"
 					"  -s  --standard         Use standard output (used as default output):\n"
 					"                         width, height and a set of height values all separated by a space.\n"
 					"  -x  --xml              Use the following xml output:\n"
