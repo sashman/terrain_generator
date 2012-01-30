@@ -16,7 +16,26 @@
 #include <stdlib.h>
 
 //must be (power of 2) + 1
-#define DEFAULT_SIZE 33
+#define DEFAULT_SIZE 5
+
+#define DEFAULT_VORONOI_SIZE 10
+
+
+int get_val(int x, int y);
+
+int get_sqr_avg(int x, int y, int l);
+
+int get_dia_avg(int x, int y, int l);
+
+int square_diamond();
+
+void clear_neg();
+
+//standard print
+void print_map();
+
+//xml print
+void print_map_xml();
 
 
 

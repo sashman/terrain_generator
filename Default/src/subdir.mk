@@ -3,16 +3,16 @@
 ################################################################################
 
 # Add inputs and outputs from these tool invocations to the build variables 
-O_SRCS += \
-../src/terrain_generator.o 
-
 CPP_SRCS += \
+../src/midpoint_displacement.cpp \
 ../src/terrain_generator.cpp 
 
 OBJS += \
+./src/midpoint_displacement.o \
 ./src/terrain_generator.o 
 
 CPP_DEPS += \
+./src/midpoint_displacement.d \
 ./src/terrain_generator.d 
 
 
