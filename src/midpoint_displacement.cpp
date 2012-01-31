@@ -7,13 +7,15 @@
 
 #include "terrain_generator.hpp"
 
+
+
 int tmap_size = DEFAULT_SIZE;
 int crop_height = 0;
 int crop_width = 0;
 int** tmap;
 
-int seed = 0;
-int random_offset = 100;
+int seed = 100;
+int random_offset = 500;
 float offset_dr = .8; //offset decrease ratio
 
 
@@ -21,7 +23,11 @@ float offset_dr = .8; //offset decrease ratio
 int voronoi_size = DEFAULT_VORONOI_SIZE;
 int** voronoi_points;
 
+float voronoi_alpha = 0.9;
+
 bool neg = false;
+
+
 
 int get_val(int x, int y) {
 	return ((int) rand() % random_offset * 2) - (int) rand() % random_offset;
@@ -115,8 +121,64 @@ int square_diamond() {
 
 }
 
+void setup_voronoi_points(){
+
+	voronoi_points = new int*[voronoi_size];
+	for(int i = 0; i < voronoi_size; i++){
+		voronoi_points [i] = new int[2];
+		voronoi_points [i][0] = (int) rand() % tmap_size; //random x coord
+		voronoi_points [i][1] = (int) rand() % tmap_size; //random y coord
+	}
+
+}
+
+void interpolate_voronoi(){
+
+	// using h = -d1 + d2 for voronoi value
+	// where d1 is the nearest point to the current coordinate
+	// d2 is the second nearest
+
+
+	int min_d1 = tmap_size+1;
+	int min_d2 = tmap_size+1;
+	for(int i = 0; i < tmap_size; ++i){
+		for (int j = 0; j < tmap_size; ++j) {
+
+			for(int k = 0; k < voronoi_size; ++k){
+
+				int d = sqrt(pow((voronoi_points[k][0]-j),2) + pow((voronoi_points[k][1]-i),2));
+
+				if(d<min_d2) min_d2 = d;
+				if(d<min_d1){
+					min_d2 = min_d1;
+					min_d1 = d;
+				}
+			}
+
+			int val = min_d2 - min_d1;
+
+			tmap[i][j] = (int)((1.0 - voronoi_alpha) * (float)tmap[i][j]) + (int)(voronoi_alpha * (float)(val));
+			min_d1 = tmap_size+1;
+			min_d2 = tmap_size+1;
+
+		}
+	}
+
+
+
+
+
+
+}
+
 void voronoi(){
 
+
+	//create points in a voronoi set
+	setup_voronoi_points();
+
+	//interpolate values w.t.r to the points in the set
+	interpolate_voronoi();
 
 }
 
@@ -157,7 +219,3 @@ void print_map_xml() {
 	}
 	printf("</map>");
 }
-
-
-
-

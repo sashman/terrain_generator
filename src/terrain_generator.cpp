@@ -25,6 +25,9 @@ extern int seed;
 extern int random_offset;
 extern float offset_dr;
 
+extern int voronoi_size;
+extern int** voronoi_points;
+
 extern bool neg;
 
 
@@ -203,6 +206,7 @@ int main(int argc, char** argv) {
 		std::cout << "Starting seed value " << seed << std::endl;
 		std::cout << "Starting random offset " << random_offset << std::endl;
 		std::cout << "Random offset decrease ratio " << offset_dr << std::endl;
+
 	}
 
 	//init map array
@@ -213,6 +217,15 @@ int main(int argc, char** argv) {
 
 	//fill the array with values
 	square_diamond();
+
+	voronoi();
+
+	if(verbose){
+		std::cout << "Voronoi points" << std::endl;
+		for (int i = 0; i < voronoi_size; ++i) {
+			std::cout << "\t" << voronoi_points[i][0] << "," << voronoi_points[i][1] << std::endl;
+		}
+	}
 
 	if(!neg)
 		clear_neg();

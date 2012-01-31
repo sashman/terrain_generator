@@ -18,7 +18,7 @@
 //must be (power of 2) + 1
 #define DEFAULT_SIZE 5
 
-#define DEFAULT_VORONOI_SIZE 10
+#define DEFAULT_VORONOI_SIZE 200
 
 
 int get_val(int x, int y);
@@ -28,6 +28,8 @@ int get_sqr_avg(int x, int y, int l);
 int get_dia_avg(int x, int y, int l);
 
 int square_diamond();
+
+void voronoi();
 
 void clear_neg();
 
