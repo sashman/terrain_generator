@@ -1,6 +1,6 @@
 A program to generate simple terrain with variable formats.
 
-Usage:  ./../src/a.out [options]
+Usage:  ./../Default/terrain_generator [options]
   -h  --help             Display this usage information.
   -v  --verbose          Print verbose messages.
       --height <value>   Crop the map down to specified positive integer height.
@@ -23,9 +23,6 @@ Usage:  ./../src/a.out [options]
 
 
 TODO:
-- add tile type value
 - create visualisation tool
 - create config file
 - generate tile types
-- generate voronoi diagram
-- interpolate voronoi diagram

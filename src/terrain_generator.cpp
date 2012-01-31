@@ -234,8 +234,6 @@ int main(int argc, char** argv) {
 		std::cout << "Finished square diamond" << std::endl;
 
 	//TODO: generate tile types
-	//TODO: generate voronoi diagram
-	//TODO: interpolate voronoi diagram
 
 
 	if (output_format == STANDRARD_HEIGHTS) {

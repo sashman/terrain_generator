@@ -1,6 +1,6 @@
 #!/bin/bash
 
-./../src/a.out -h > ../README
+./../Default/terrain_generator -h > ../README
 
 echo TODO: > ../TODO
 echo "" >> ../README
