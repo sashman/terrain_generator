@@ -18,7 +18,7 @@
 //must be (power of 2) + 1
 #define DEFAULT_SIZE 5
 
-#define DEFAULT_VORONOI_SIZE 200
+#define DEFAULT_VORONOI_SIZE 100
 
 
 int get_val(int x, int y);

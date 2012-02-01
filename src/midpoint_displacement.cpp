@@ -14,8 +14,8 @@ int crop_height = 0;
 int crop_width = 0;
 int** tmap;
 
-int seed = 100;
-int random_offset = 500;
+int seed = 10;
+int random_offset = 40;
 float offset_dr = .8; //offset decrease ratio
 
 
@@ -23,7 +23,7 @@ float offset_dr = .8; //offset decrease ratio
 int voronoi_size = DEFAULT_VORONOI_SIZE;
 int** voronoi_points;
 
-float voronoi_alpha = 0.9;
+float voronoi_alpha = 0;
 
 bool neg = false;
 
@@ -155,19 +155,16 @@ void interpolate_voronoi(){
 				}
 			}
 
+			//line defines the shape of the voronoi diagram
 			int val = min_d2 - min_d1;
 
 			tmap[i][j] = (int)((1.0 - voronoi_alpha) * (float)tmap[i][j]) + (int)(voronoi_alpha * (float)(val));
+
 			min_d1 = tmap_size+1;
 			min_d2 = tmap_size+1;
 
 		}
 	}
-
-
-
-
-
 
 }
 
@@ -180,6 +177,8 @@ void voronoi(){
 	//interpolate values w.t.r to the points in the set
 	interpolate_voronoi();
 
+	//add pertrubation
+	//pertrubate();
 }
 
 

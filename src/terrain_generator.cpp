@@ -218,8 +218,11 @@ int main(int argc, char** argv) {
 	//fill the array with values
 	square_diamond();
 
+	//interpolate voronoi diagram
+	//TODO: add noise to voronoi
 	voronoi();
 
+	//TODO: add erosion algorithm
 	if(verbose){
 		std::cout << "Voronoi points" << std::endl;
 		for (int i = 0; i < voronoi_size; ++i) {
@@ -227,11 +230,9 @@ int main(int argc, char** argv) {
 		}
 	}
 
-	if(!neg)
-		clear_neg();
+	if(!neg) clear_neg();
 
-	if (verbose)
-		std::cout << "Finished square diamond" << std::endl;
+	if (verbose) std::cout << "Finished square diamond" << std::endl;
 
 	//TODO: generate tile types
 

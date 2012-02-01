@@ -25,4 +25,6 @@ Usage:  ./../Default/terrain_generator [options]
 TODO:
 - create visualisation tool
 - create config file
+- add noise to voronoi
+- add erosion algorithm
 - generate tile types
