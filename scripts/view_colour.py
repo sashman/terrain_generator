@@ -21,8 +21,10 @@ for i in range(0,h):
 			draw.point((i,j), fill=(0,0,100+v))
 		elif(v<160):
 			draw.point((i,j), fill=(v,v,0))
+		elif(v<210):
+			draw.point((i,j), fill=(0,200-(v/2),0))
 		else:
-			draw.point((i,j), fill=(0,230-(v/2),0))
+			draw.point((i,j), fill=(v-60,v-10,v-60))
 
 del draw
 img.save("out.png")

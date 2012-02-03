@@ -222,13 +222,16 @@ int main(int argc, char** argv) {
 	//TODO: add noise to voronoi
 	voronoi();
 
-	//TODO: add erosion algorithm
 	if(verbose){
 		std::cout << "Voronoi points" << std::endl;
 		for (int i = 0; i < voronoi_size; ++i) {
 			std::cout << "\t" << voronoi_points[i][0] << "," << voronoi_points[i][1] << std::endl;
 		}
 	}
+
+	//TODO: add erosion algorithm
+	erosion();
+
 
 	if(!neg) clear_neg();
 

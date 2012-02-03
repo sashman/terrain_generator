@@ -23,7 +23,13 @@ float offset_dr = .8; //offset decrease ratio
 int voronoi_size = DEFAULT_VORONOI_SIZE;
 int** voronoi_points;
 
-float voronoi_alpha = 0;
+float voronoi_alpha = 0.33;
+
+
+//erosion
+int thermal_talus = 4/tmap_size;
+float thermal_shift = 0.5;
+
 
 bool neg = false;
 
@@ -177,8 +183,80 @@ void voronoi(){
 	//interpolate values w.t.r to the points in the set
 	interpolate_voronoi();
 
-	//add pertrubation
-	//pertrubate();
+}
+
+
+void thermal(){
+
+
+
+
+	int n_count = 4;
+	int** neighbours = new int*[n_count];
+	for(int i = 0; i <n_count; i++){
+		neighbours[i] = new int[2];
+	}
+
+	//looping ensures to always have 4 neighbours
+	for(int i = 1; i < tmap_size-1; ++i){
+			for (int j = 1; j < tmap_size-1; ++j) {
+
+				//north
+				neighbours[0][0] = i-1;
+				neighbours[0][1] = j;
+
+				//east
+				neighbours[1][0] = i;
+				neighbours[1][1] = j+1;
+
+				//south
+				neighbours[2][0] = i+1;
+				neighbours[2][1] = j;
+
+				//west
+				neighbours[3][0] = i;
+				neighbours[3][1] = j-1;
+
+				int d_totoal = 0;
+				int d_max = tmap[neighbours[0][0]][neighbours[0][1]];
+
+				int min_n = 0;
+
+
+				//find the shortest neighbour
+				for (int k = 0; k < n_count; ++k) {
+
+					int d = tmap[i][j] - tmap[neighbours[k][0]][neighbours[k][1]];
+					if(tmap[neighbours[min_n][0]][neighbours[min_n][1]] > tmap[neighbours[k][0]][neighbours[k][1]]) min_n = k;
+
+					if(d > thermal_talus){
+						d_totoal += d;
+						if(d>d_max) d_max = d;
+					}
+				}
+
+
+				//add a fraction of the height to the shortest neighbour
+				int min_h = tmap[neighbours[min_n][0]][neighbours[min_n][1]];
+				int change = (int)(thermal_shift*(tmap[i][j] - min_h - thermal_talus));
+				int new_h = min_h + change;
+				tmap[neighbours[min_n][0]][neighbours[min_n][1]] = new_h;
+
+				//remove from centre
+				tmap[i][j] -= (int)(thermal_shift*(tmap[i][j] - min_h - thermal_talus));
+
+
+			}
+	}
+
+}
+
+
+void erosion(){
+
+	for (int i = 0; i < 1; ++i)
+		thermal();
+
 }
 
 

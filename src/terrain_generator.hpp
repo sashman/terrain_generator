@@ -31,6 +31,8 @@ int square_diamond();
 
 void voronoi();
 
+void erosion();
+
 void clear_neg();
 
 //standard print
