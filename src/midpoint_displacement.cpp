@@ -27,7 +27,7 @@ float voronoi_alpha = 0.33;
 
 
 //erosion
-int thermal_talus = 4/tmap_size;
+int thermal_talus = random_offset/40;//4/tmap_size;
 float thermal_shift = 0.5;
 
 
@@ -218,11 +218,12 @@ void thermal(){
 				neighbours[3][1] = j-1;
 
 				int d_totoal = 0;
-				int d_max = tmap[neighbours[0][0]][neighbours[0][1]];
+				int d_max =tmap[i][j] - tmap[neighbours[0][0]][neighbours[0][1]];
 
 				int min_n = 0;
 
 
+				bool move = true;
 				//find the shortest neighbour
 				for (int k = 0; k < n_count; ++k) {
 
@@ -230,21 +231,23 @@ void thermal(){
 					if(tmap[neighbours[min_n][0]][neighbours[min_n][1]] > tmap[neighbours[k][0]][neighbours[k][1]]) min_n = k;
 
 					if(d > thermal_talus){
+						move = true;
 						d_totoal += d;
 						if(d>d_max) d_max = d;
 					}
 				}
 
 
-				//add a fraction of the height to the shortest neighbour
-				int min_h = tmap[neighbours[min_n][0]][neighbours[min_n][1]];
-				int change = (int)(thermal_shift*(tmap[i][j] - min_h - thermal_talus));
-				int new_h = min_h + change;
-				tmap[neighbours[min_n][0]][neighbours[min_n][1]] = new_h;
+				if(move){
+					//add a fraction of the height to the shortest neighbour
+					int min_h = tmap[neighbours[min_n][0]][neighbours[min_n][1]];
+					int change = (int)(thermal_shift*((tmap[i][j] - min_h) - thermal_talus));//* ((tmap[i][j] - min_h)/d_totoal));
+					int new_h = min_h + change;
+					tmap[neighbours[min_n][0]][neighbours[min_n][1]] = new_h;
 
-				//remove from centre
-				tmap[i][j] -= (int)(thermal_shift*(tmap[i][j] - min_h - thermal_talus));
-
+					//remove from centre
+					tmap[i][j] -= change;
+				}
 
 			}
 	}
@@ -254,8 +257,10 @@ void thermal(){
 
 void erosion(){
 
-	for (int i = 0; i < 1; ++i)
+
+	for (int i = 0; i < 5; ++i)
 		thermal();
+
 
 }
 

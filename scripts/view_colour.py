@@ -13,7 +13,7 @@ xsize,ysize = w,h
 draw = ImageDraw.Draw(img)
 
 for i in range(0,h):
-	for j in range(0,w):
+	for j in range(2,w):
 		v = int(map_vals[i*h + j])
 		v = int(float(v)/float(max_val) * 255)
 		
