@@ -61,6 +61,7 @@ void print_usage(FILE* stream, int exit_code, char* program_name) {
 					"                           [\n"
 					"                           <tile x=int y=int>\n"
 					"                           <height>int</height>\n"
+					"							<type>grass</type>\n"
 					"                           </tile>\n"
 					"                           ]+\n"
 					"                           </map>\n");

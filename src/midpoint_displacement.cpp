@@ -296,7 +296,9 @@ void print_map_xml() {
 	printf("<map width='%d' height='%d'>\n", crop_width, crop_height);
 	for (int i = 0; i < crop_height; ++i) {
 		for (int j = 0; j < crop_width; ++j) {
-			printf("<tile x='%d' y='%d'>\n\t<height>%i</height>\n</tile>\n", i,
+			printf("<tile x='%d' y='%d'>\n\t<height>%i</height>\n"
+					"<type>grass</type>"
+					"</tile>\n", i,
 					j, tmap[i][j]);
 		}
 		//printf("\n");
