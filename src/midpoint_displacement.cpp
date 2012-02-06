@@ -30,6 +30,8 @@ float voronoi_alpha = 0.33;
 int thermal_talus = random_offset/40;//4/tmap_size;
 float thermal_shift = 0.5;
 
+int erosion_steps = 5;
+
 
 bool neg = false;
 
@@ -258,7 +260,7 @@ void thermal(){
 void erosion(){
 
 
-	for (int i = 0; i < 5; ++i)
+	for (int i = 0; i < erosion_steps; ++i)
 		thermal();
 
 

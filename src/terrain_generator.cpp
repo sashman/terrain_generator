@@ -28,6 +28,10 @@ extern float offset_dr;
 extern int voronoi_size;
 extern int** voronoi_points;
 
+extern float voronoi_alpha;
+
+extern int erosion_steps;
+
 extern bool neg;
 
 
@@ -45,6 +49,10 @@ void print_usage(FILE* stream, int exit_code, char* program_name) {
 					"                         Lower values produce smoother terrain, smaller difference in adjacent tiles.\n"
 					"      --seed <value>     Set the initial positive integer height for the algorithm to be generate values from.\n"
 					"      --offset <value>   Set the initial offset positive integer height (seed+offset=max possible height).\n"
+					"      --plate <value>    Set the fraction of the tectonic plates appearance.\n"
+					"                         Higher values will give a more 'ripped apart' look, values too close to 1 are not\n"
+					"                         recommended for realistic terrain. (0.0 < v < 1.0)\n"
+					"      --erosion <value>  Number of erosion iterations over the terrain. Must be a positive integer.\n"
 					"  -n  --negative         Allow for negative height values.\n"
 					"  -s  --standard         Use standard output (used as default output):\n"
 					"                         width, height and a set of height values all separated by a space.\n"
@@ -80,6 +88,8 @@ int main(int argc, char** argv) {
 			{"rough", 1, NULL, 'r'},
 			{"seed", 1, NULL, 'd'},
 			{"offset", 1, NULL, 'f'},
+			{"plate", 1, NULL, 'p'},
+			{"erosion", 1, NULL, 'o'},
 			{"negative", 0, NULL, 'n'},
 			{ NULL, 0, NULL, 0 } /* Required at end of array.  */
 	};
@@ -151,7 +161,7 @@ int main(int argc, char** argv) {
 
 			break;
 
-		case 'f':
+		case 'f': /* --offset value */
 
 			random_offset = atoi(optarg);
 			if(random_offset<0)
@@ -159,7 +169,25 @@ int main(int argc, char** argv) {
 
 			break;
 
-		case 'n':
+		case 'p': /* --plate  vonornoi interpolation value */
+
+
+			voronoi_alpha = atof(optarg);
+			if(voronoi_alpha<0 || voronoi_alpha>1){
+				print_usage(stderr, 1, program_name);
+			}
+
+			break;
+
+		case 'o': /* --erosion number of erosion iterations */
+
+			erosion_steps = atoi(optarg);
+			if(erosion_steps<0)
+				print_usage(stderr, 1, program_name);
+
+			break;
+
+		case 'n': /* allow negative values */
 
 			neg = true;
 			break;
@@ -214,6 +242,14 @@ int main(int argc, char** argv) {
 	for (int i = 0; i < tmap_size; ++i) {
 		tmap[i] = new int[tmap_size];
 	}
+
+
+	 /* initialize random seed:
+	  * use for generating a random map every time
+	  TODO: create random map argument
+	  TODO: create random-seed argument value */
+	  //srand ( time(NULL) );
+
 
 	//fill the array with values
 	square_diamond();
