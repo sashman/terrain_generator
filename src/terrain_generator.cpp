@@ -9,7 +9,7 @@
 
 
 enum OutFormat {
-	STANDRARD_HEIGHTS, STANDARD_XML
+	STANDRARD_HEIGHTS, STANDARD_XML, OPENGL_VIEW
 };
 int output_format = STANDRARD_HEIGHTS;
 
@@ -56,6 +56,7 @@ void print_usage(FILE* stream, int exit_code, char* program_name) {
 					"  -n  --negative         Allow for negative height values.\n"
 					"  -s  --standard         Use standard output (used as default output):\n"
 					"                         width, height and a set of height values all separated by a space.\n"
+					"  -g  --graphical        Display the height map using a 3D OpenGL view.\n"
 					"  -x  --xml              Use the following xml output:\n"
 					"                           <map width=int height=int>\n"
 					"                           [\n"
@@ -79,10 +80,10 @@ int main(int argc, char** argv) {
 	int next_option;
 
 	/* A string listing valid short options letters.  */
-	const char* const short_options = "hsxvn";
+	const char* const short_options = "hsxgvn";
 	/* An array describing valid long options.  */
 	const struct option long_options[] = { { "help", 0, NULL, 'h' }, {
-			"standard", 0, NULL, 's' }, { "xml", 0, NULL, 'x' }, { "verbose", 0,
+			"standard", 0, NULL, 's' }, { "xml", 0, NULL, 'x' }, { "graphic", 0, NULL, 'g' }, { "verbose", 0,
 			NULL, 'v' },
 			{"height", 1, NULL, 'e'},
 			{"width", 1, NULL, 'w'},
@@ -122,6 +123,12 @@ int main(int argc, char** argv) {
 
 			//Use xml output format
 			output_format = STANDARD_XML;
+			break;
+
+		case 'g': /* -g --graphical*/
+
+			//Display the map as 3d opengl representation
+			output_format = OPENGL_VIEW;
 			break;
 
 		case 'v': /* -v or --verbose */
@@ -277,11 +284,16 @@ int main(int argc, char** argv) {
 	//TODO: generate tile types
 
 
+
 	if (output_format == STANDRARD_HEIGHTS) {
 		print_map();
 	} else if (output_format == STANDARD_XML) {
 		print_map_xml();
+	} else if (output_format == OPENGL_VIEW) {
+		run_view();
 	}
+
+
 
 	return 0;
 }

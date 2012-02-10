@@ -41,6 +41,10 @@ void print_map();
 //xml print
 void print_map_xml();
 
+#ifndef _COMPACT
+	void run_view();
+#endif
+
 
 
 #endif /* TERRAIN_GENERATOR_HPP_ */

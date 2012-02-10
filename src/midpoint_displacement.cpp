@@ -1,6 +1,9 @@
 /*
  * midpoint_displacement.cpp
  *
+ * This module creates a height map matrix using a midpoint displacement (diamond square) algorithm.
+ * It also supplies functionality to make alteration to give the generated terrain a more realistic appearance.
+ *
  *  Created on: 29 Jan 2012
  *      Author: sash
  */
