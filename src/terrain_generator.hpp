@@ -24,10 +24,9 @@
 
 #define DEFAULT_NO_OF_RIVERS 10
 
-#define DEFAULT_NO_OF_SETTLEMENTS 100
+#define DEFAULT_NO_OF_SETTLEMENTS 10
 
 #define DEAFULT_SETTLEMENTS_FILE "settlements.txt"
-
 
 
 

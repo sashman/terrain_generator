@@ -7,6 +7,7 @@
 
 #include "terrain_generator.hpp"
 #include <string>
+#include <locale>
 
 int n_settlements = DEFAULT_NO_OF_SETTLEMENTS;
 
@@ -48,6 +49,7 @@ void get_name(std::string *name){
 
 	FILE* fprefix = fopen("location_prefix", "r");
 	FILE* fsuffix = fopen("location_suffix", "r");
+
 	if (fprefix == NULL || fsuffix == NULL)
 		perror("Error opening file");
 	else {
@@ -73,6 +75,8 @@ void get_name(std::string *name){
 		//*name-> = toupper(*name->at(0));
 
 	}
+	fclose(fprefix);
+	fclose(fsuffix);
 
 
 }
@@ -105,21 +109,21 @@ void print_settlements(FILE* stream) {
 		perror("Error opening file");
 	else {
 
-		/*
+
 		fprintf(stream, "<settlements>\n");
 		for (int i = 0; i < n_settlements; ++i) {
 			fprintf(stream, "<settlement x='%d' y='%d'>\n", locations[i][0],
 					locations[i][1]);
-			fprintf(stream, "<name>%s</name>\n", names[i].c_str());
+
+			char* name = (char*)names[i].c_str();
+			name[0] = toupper(name[0]);
+
+			fprintf(stream, "<name>%s</name>\n", name);
 			fprintf(stream, "</settlement>\n");
 		}
 		fprintf(stream, "<settlements>\n");
-		*
-		*/
 
 
-		for (int i = 0; i < n_settlements; ++i)
-		fprintf(stream, "%s\n", names[i].c_str());
 	}
 }
 
