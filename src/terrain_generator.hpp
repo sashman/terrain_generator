@@ -16,9 +16,19 @@
 #include <stdlib.h>
 
 //must be (power of 2) + 1
-#define DEFAULT_SIZE 5
+#define DEFAULT_SIZE 512
 
 #define DEFAULT_VORONOI_SIZE 100
+
+#define DEFAULT_SEA_LEVEL 150
+
+#define DEFAULT_NO_OF_RIVERS 10
+
+#define DEFAULT_NO_OF_SETTLEMENTS 100
+
+#define DEAFULT_SETTLEMENTS_FILE "settlements.txt"
+
+
 
 
 int get_val(int x, int y);
@@ -46,5 +56,7 @@ void print_map_xml();
 #endif
 
 
+void settlements();
+void print_settlements(FILE* stream);
 
 #endif /* TERRAIN_GENERATOR_HPP_ */

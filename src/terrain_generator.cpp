@@ -71,8 +71,10 @@ void print_usage(FILE* stream, int exit_code, char* program_name) {
 
 
 
-//TODO: create visualisation tool
 //TODO: create config file
+//TODO: Add fresh water source creation
+//TODO: Add forests
+//TODO: Add settlement generation
 
 int main(int argc, char** argv) {
 
@@ -293,7 +295,8 @@ int main(int argc, char** argv) {
 		run_view();
 	}
 
-
+	settlements();
+	print_settlements(0);
 
 	return 0;
 }
