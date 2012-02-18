@@ -295,8 +295,12 @@ int main(int argc, char** argv) {
 		run_view();
 	}
 
+	rivers();
+	print_rivers(0);
+
 	settlements();
 	print_settlements(0);
+
 
 	return 0;
 }

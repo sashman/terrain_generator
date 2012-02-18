@@ -16,12 +16,12 @@ extern int crop_height;
 extern int crop_width;
 extern int** tmap;
 
+extern int sea_level;
+
 bool* settlement_found;
 int** locations;
 std::string* names;
 
-int sea_level = DEFAULT_SEA_LEVEL;
-int snowtop_level = DEFAULT_SNOW_TOP_LEVEL;
 
 /*
  * attempts to find a location above sea level
@@ -35,7 +35,6 @@ bool get_above_sea_level(int location_index) {
 	int y = rand() % crop_height;
 
 	//TODO: change to a set sea level!
-	sea_level = 0.588 * 126;
 
 	while (tmap[y][x] <= sea_level) {
 		x = rand() % crop_width;
@@ -48,13 +47,7 @@ bool get_above_sea_level(int location_index) {
 	return true;
 }
 
-bool point_above_sealevel(int x, int y) {
-	return tmap[y][x] > sea_level;
-}
 
-bool point_below_snow_top_level(int x, int y) {
-	return tmap[y][x] < snowtop_level;
-}
 
 bool point_at_min_distance(int x, int y, int index) {
 

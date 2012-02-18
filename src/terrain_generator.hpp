@@ -20,11 +20,13 @@
 
 #define DEFAULT_VORONOI_SIZE 100
 
-#define DEFAULT_SEA_LEVEL 0.6 * 126
+#define DEFAULT_SEA_LEVEL 0.588 * 126
 
-#define DEFAULT_SNOW_TOP_LEVEL 0.8 *126
+#define DEFAULT_SNOW_TOP_LEVEL 0.8 * 126
 
-#define DEFAULT_NO_OF_RIVERS 10
+#define DEFAULT_NO_OF_RIVERS 6
+
+#define DEAFULT_RIVERS_FILE "rivers.txt"
 
 #define DEFAULT_NO_OF_SETTLEMENTS 15
 
@@ -58,8 +60,14 @@ void print_map_xml();
 	void run_view();
 #endif
 
+bool point_above_sealevel(int x, int y);
+
+bool point_below_snow_top_level(int x, int y);
 
 void settlements();
 void print_settlements(FILE* stream);
+
+void rivers();
+void print_rivers(FILE* stream);
 
 #endif /* TERRAIN_GENERATOR_HPP_ */

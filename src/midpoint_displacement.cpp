@@ -38,6 +38,19 @@ int erosion_steps = 5;
 
 bool neg = false;
 
+int sea_level = DEFAULT_SEA_LEVEL;
+int snowtop_level = DEFAULT_SNOW_TOP_LEVEL;
+
+
+//constraint helper methods
+bool point_above_sealevel(int x, int y) {
+	return tmap[y][x] > sea_level;
+}
+
+bool point_below_snow_top_level(int x, int y) {
+	return tmap[y][x] < snowtop_level;
+}
+
 
 
 int get_val(int x, int y) {
