@@ -77,11 +77,11 @@ for s in settlements:
 	x_pos = int(s.x) - 10
 	y_pos = int(s.y) + 5
 
-	if(int(s.y) > 500):
+	if(int(s.y) > h-20):
 		x_pos = int(s.x)+6
 		y_pos = int(s.y)-10
-	if(int(s.x) > 420):
-		x_pos = int(s.x)-25	
+	if(int(s.x) > w-100):
+		x_pos = int(s.x)-50	
 
 	draw.text((x_pos, y_pos), s.name, fill=(0), font=font)
 		

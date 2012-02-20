@@ -72,7 +72,7 @@ bool get_settelement(int location_index) {
 	int x = rand() % crop_width;
 	int y = rand() % crop_height;
 
-	while (!point_above_sealevel(x, y) || !point_below_snow_top_level(x, y)
+	while (!point_above_sandlevel(x, y) || !point_below_snow_top_level(x, y)
 			|| !point_at_min_distance(x, y, location_index)) {
 		x = rand() % crop_width;
 		y = rand() % crop_height;

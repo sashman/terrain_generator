@@ -22,13 +22,15 @@
 
 #define DEFAULT_SEA_LEVEL 0.588 * 126
 
+#define DEAFULT_SAND_LEVEL 0.7 * 126
+
 #define DEFAULT_SNOW_TOP_LEVEL 0.8 * 126
 
-#define DEFAULT_NO_OF_RIVERS 6
+#define DEFAULT_NO_OF_RIVERS 40
 
 #define DEAFULT_RIVERS_FILE "rivers.txt"
 
-#define DEFAULT_NO_OF_SETTLEMENTS 15
+#define DEFAULT_NO_OF_SETTLEMENTS 5
 
 #define DEAFULT_SETTLEMENTS_FILE "settlements.txt"
 
@@ -61,6 +63,8 @@ void print_map_xml();
 #endif
 
 bool point_above_sealevel(int x, int y);
+
+bool point_above_sandlevel(int x, int y);
 
 bool point_below_snow_top_level(int x, int y);
 

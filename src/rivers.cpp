@@ -8,6 +8,7 @@
  */
 
 #include "terrain_generator.hpp"
+#include <vector>
 
 extern int crop_height;
 extern int crop_width;
@@ -18,6 +19,7 @@ extern int snowtop_level;
 
 int n_rivers = DEFAULT_NO_OF_RIVERS;
 
+std::vector<std::vector<int> > candidate_souce_location;
 int** source_location;
 
 class RiverPoint {
@@ -33,6 +35,9 @@ public:
 		river_id = river_id_;
 		next = 0;
 	}
+	~RiverPoint() {
+		//delete next;
+	}
 };
 
 RiverPoint** source_river_points;
@@ -43,7 +48,9 @@ bool get_river_source(int river_index) {
 	int x = rand() % crop_width;
 	int y = rand() % crop_height;
 
-	while (point_below_snow_top_level(x, y)) {
+	while (point_below_snow_top_level(x, y)
+
+	) {
 		x = rand() % crop_width;
 		y = rand() % crop_height;
 	}
@@ -53,18 +60,32 @@ bool get_river_source(int river_index) {
 
 }
 
-int cutoff_thresh = 100;
-int cutoff_count = 0;
+bool get_river_source_from_candidates(int river_index) {
+
+	if (candidate_souce_location.empty())
+		return false;
+
+	int y = rand() % candidate_souce_location.size();
+	int x = rand() % candidate_souce_location[y].size();
+
+	source_location[river_index][0] = candidate_souce_location[y][x];
+	source_location[river_index][1] = y;
 
 
-int get_tile_river_id(int x, int y){
+
+
+	return true;
+}
+
+int get_tile_river_id(int x, int y) {
 
 	for (int i = 0; i < n_rivers; ++i) {
 		RiverPoint *rp = source_river_points[i];
-		do{
-			if(rp!=0 && rp->x == x && rp->y == y) return i;
+		do {
+			if (rp != 0 && rp->x == x && rp->y == y)
+				return i;
 			rp = rp->next;
-		}while(rp!=0);
+		} while (rp != 0);
 	}
 	return -1;
 
@@ -84,7 +105,6 @@ void grow(RiverPoint *rp) {
 	//TODO: needs inf value
 	int min = 999;
 	int min_id = 0;
-
 
 	//north
 	int n_count = 8;
@@ -125,50 +145,105 @@ void grow(RiverPoint *rp) {
 	neighbours[7][0] = rp->x - 1;
 	neighbours[7][1] = rp->y - 1;
 
-	for (int i = 0; i < n_count; ++i){
+	for (int i = 0; i < n_count; ++i) {
 		//check bounds
-		if(neighbours[i][0]<0 || neighbours[i][0]>=crop_width) continue;
-		if(neighbours[i][1]<0 || neighbours[i][1]>=crop_height) continue;
-		if(get_tile_river_id(neighbours[i][0], neighbours[i][1]) == rp->river_id) continue;
-		if(get_tile_river_id(neighbours[i][0], neighbours[i][1]) > -1) return;
+		if (neighbours[i][0] < 0 || neighbours[i][0] >= crop_width)
+			continue;
+		if (neighbours[i][1] < 0 || neighbours[i][1] >= crop_height)
+			continue;
+		if (get_tile_river_id(neighbours[i][0], neighbours[i][1])
+				== rp->river_id)
+			continue;
+		if (get_tile_river_id(neighbours[i][0], neighbours[i][1]) > -1)
+			return;
 
-
-		if(tmap[neighbours[i][0]][neighbours[i][1]] < true_min){
+		if (tmap[neighbours[i][0]][neighbours[i][1]] < true_min) {
 			true_min_id = i;
 			true_min = tmap[neighbours[i][0]][neighbours[i][1]];
 		}
 
-		if(tmap[neighbours[i][0]][neighbours[i][1]] < min){
+		if (tmap[neighbours[i][0]][neighbours[i][1]] < min) {
 			min_id = i;
 			min = tmap[neighbours[i][0]][neighbours[i][1]];
 		}
 	}
 
-	if(true_min_id > -1){ //no local minimum
+	if (true_min_id > -1) { //no local minimum
+
+		if (neighbours[true_min_id][0] == 0
+				|| neighbours[true_min_id][0] == crop_width)
+			return;
+		if (neighbours[true_min_id][1] == 0
+				|| neighbours[true_min_id][1] == crop_height)
+			return;
 
 		//add new RiverPoint
-		RiverPoint* new_rp = new RiverPoint(neighbours[true_min_id][0], neighbours[true_min_id][1], rp->river_id);
+		RiverPoint* new_rp = new RiverPoint(neighbours[true_min_id][0],
+				neighbours[true_min_id][1], rp->river_id);
 		rp->next = new_rp;
 
 		grow(new_rp);
 	} else {
 
-		RiverPoint* new_rp = new RiverPoint(neighbours[min_id][0], neighbours[min_id][1], rp->river_id);
+		if (neighbours[min_id][0] == 0 || neighbours[min_id][0] == crop_width)
+			return;
+		if (neighbours[min_id][1] == 0 || neighbours[min_id][1] == crop_height)
+			return;
+
+		RiverPoint* new_rp = new RiverPoint(neighbours[min_id][0],
+				neighbours[min_id][1], rp->river_id);
 		rp->next = new_rp;
 
 		grow(new_rp);
 
 	}
-	cutoff_count++;
-	if(cutoff_count> cutoff_thresh){
-		cutoff_count = 0;
-		return;
+
+}
+
+bool river_source_candidate_constraint(int x, int y) {
+
+	bool result = true;
+	result = result && !point_below_snow_top_level(x, y);
+	return result;
+}
+
+void calculate_candiates() {
+
+	candidate_souce_location.resize(crop_height);
+
+	for (int i = 0; i < crop_height; ++i) {
+
+		for (int j = 0; j < crop_width; ++j) {
+
+			if (river_source_candidate_constraint(j, i)) {
+				candidate_souce_location[i].push_back(j);
+			}
+
+		}
+
 	}
+
+
+	std::vector<std::vector<int> >::iterator itr;
+	for (itr = candidate_souce_location.begin(); itr != candidate_souce_location.end();) {
+
+//		std::cout << (*itr).empty() << std::endl;
+		if ((*itr).empty()) {
+					itr = candidate_souce_location.erase(itr);
+		} else itr++;
+	}
+
+
+
 
 
 }
 
+int source_cutoff = 100;
+int source_cutoff_count = 0;
 void rivers() {
+
+	calculate_candiates();
 
 	source_location = new int*[n_rivers];
 	source_river_points = new RiverPoint*[n_rivers];
@@ -178,19 +253,25 @@ void rivers() {
 		source_location[i] = new int[2];
 
 		//create source
-		std::cout << "Finding source for " << i << std::endl;
-		while (!get_river_source(i));
+		//std::cout << "Finding source for " << i << std::endl;
+		//while (!get_river_source(i));
+
+		if (!get_river_source_from_candidates(i))
+			return;
+
 		source_river_points[i] = new RiverPoint(source_location[i][0],
 				source_location[i][1], i);
-		std::cout << "Source "<< i << " done" << std::endl;
+		//std::cout << "Source "<< i << " done" << std::endl;
 
 	}
-	for (int i = 0; i < n_rivers; ++i) {
 
+	for (int j = 0; j < 1; ++j) {
 
-		//grow river
-		grow(source_river_points[i]);
-		std::cout << "River " << i << " grown" << std::endl;
+		for (int i = 0; i < n_rivers; ++i)
+			//grow river
+			grow(source_river_points[i]);
+		//std::cout << "River " << i << " grown" << std::endl;
+
 	}
 
 }
@@ -206,18 +287,23 @@ void print_rivers(FILE* stream) {
 		fprintf(stream, "<rivers>\n");
 		for (int i = 0; i < n_rivers; ++i) {
 
-			fprintf(stream, "<river id = '%d' source_x='%d' source_y='%d'>\n",
-					i, source_location[i][0], source_location[i][1]);
+			fprintf(
+					stream,
+					"<river id = '%d' source_x='%d' source_y='%d' alt = '%d'>\n",
+					i, source_location[i][0], source_location[i][1],
+					tmap[source_location[i][0]][source_location[i][1]]);
 
 			RiverPoint* rp = source_river_points[i];
-			do{
+			do {
 
-				if(rp!=0){
-					fprintf(stream, "<river_point x = '%d' y = '%d'></river_point>\n", rp->x, rp->y);
+				if (rp != 0) {
+					fprintf(stream,
+							"<river_point x = '%d' y = '%d'></river_point>\n",
+							rp->x, rp->y);
 				}
 
-				rp=rp->next;
-			}while(rp!=0);
+				rp = rp->next;
+			} while (rp != 0);
 
 			fprintf(stream, "</river>\n");
 		}
