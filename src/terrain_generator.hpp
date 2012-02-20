@@ -15,7 +15,6 @@
 #include <getopt.h>
 #include <stdlib.h>
 
-//must be (power of 2) + 1
 #define DEFAULT_SIZE 512
 
 #define DEFAULT_VORONOI_SIZE 100
@@ -26,9 +25,9 @@
 
 #define DEFAULT_SNOW_TOP_LEVEL 0.8 * 126
 
-#define DEFAULT_NO_OF_RIVERS 10
+#define DEFAULT_NO_OF_RIVERS 70
 
-#define DEFAULT_MAX_RIVER_BRANCHES 2
+#define DEFAULT_MAX_RIVER_BRANCHES 30
 
 #define DEAFULT_RIVERS_FILE "rivers.txt"
 

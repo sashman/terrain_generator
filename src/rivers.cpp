@@ -69,18 +69,29 @@ bool get_river_source_from_candidates(int river_index) {
 	if (candidate_souce_location.empty())
 		return false;
 
-
-
-
 	int i = rand() % candidate_souce_location.size();
 
 	source_location[river_index][0] = candidate_souce_location[i][0];
 	source_location[river_index][1] = candidate_souce_location[i][1];
 
-	candidate_souce_location.erase(candidate_souce_location.begin()+i);
+	candidate_souce_location.erase(candidate_souce_location.begin() + i);
 
 	//std::cout<< "Source point " << source_location[river_index][0] << "," << source_location[river_index][1] <<std::endl;
 	return true;
+}
+
+int get_branch_id(RiverPoint* rp, int x, int y) {
+
+	do {
+//		std::cout << "Branch " << rp->x << "," << rp->y << " ~ " << x << ","
+//				<< y << std::endl;
+		if (rp != 0 && rp->x == x && rp->y == y)
+			return rp->river_id;
+
+		rp = rp->next;
+	} while (rp != 0);
+
+	return -1;
 }
 
 int get_tile_river_id(int x, int y) {
@@ -91,21 +102,26 @@ int get_tile_river_id(int x, int y) {
 			if (rp != 0 && rp->x == x && rp->y == y)
 				return i;
 			//check branches
-			if(rp->branch!=0){
-				int r = get_tile_river_id(rp->branch->x, rp->branch->y);
-				if(r>-1) return r;
-			}
+			if (rp->branch != 0) {
+				//std::cout << "Checking branch on river " << rp->river_id << " " << rp->x << "," << rp->y << std::endl;
+				int r = get_branch_id(rp->branch, x, y);
+				if (r > -1) {
 
+					return r;
+				}
+			}
 
 			rp = rp->next;
 		} while (rp != 0);
 	}
 	return -1;
-
 }
 
-void grow(RiverPoint *rp) {
 
+int branch_chance = 2; //1 in branch_chance chance to branch on available equal heights
+void grow(RiverPoint *rp, bool branch) {
+
+	//std::cout << "Growing id " << rp->river_id << " " << rp->x << "," << rp->y<< std::endl;
 	//if at sea level stop
 	if (!point_above_sealevel(rp->x, rp->y))
 		return;
@@ -118,6 +134,8 @@ void grow(RiverPoint *rp) {
 	//TODO: needs inf value
 	int min = 999;
 	int min_id = 0;
+
+	int branch_id = -1;
 
 	//north
 	int n_count = 8;
@@ -158,6 +176,9 @@ void grow(RiverPoint *rp) {
 	neighbours[7][0] = rp->x - 1;
 	neighbours[7][1] = rp->y - 1;
 
+	//check if ALL neighbours are part of teh same river
+	int surrounded_count = 0;
+
 	for (int i = 0; i < n_count; ++i) {
 		//check bounds
 		if (neighbours[i][0] < 0 || neighbours[i][0] >= crop_width)
@@ -166,12 +187,17 @@ void grow(RiverPoint *rp) {
 			continue;
 
 		//check if joining river
-		if (get_tile_river_id(neighbours[i][0], neighbours[i][1])
-				== rp->river_id)
-			continue;
-		if (get_tile_river_id(neighbours[i][0], neighbours[i][1]) > -1)
-			return;
 
+		int tile_id = get_tile_river_id(neighbours[i][0], neighbours[i][1]);
+//		std::cout << "Tile id " << tile_id << std::endl;
+
+		if (tile_id == rp->river_id) {
+			if(branch) return;
+			surrounded_count++;
+			continue;
+		}
+		if (tile_id > -1)
+			return;
 
 		if (tmap[neighbours[i][0]][neighbours[i][1]] < true_min) {
 			true_min_id = i;
@@ -181,6 +207,22 @@ void grow(RiverPoint *rp) {
 		if (tmap[neighbours[i][0]][neighbours[i][1]] < min) {
 			min_id = i;
 			min = tmap[neighbours[i][0]][neighbours[i][1]];
+		}
+	}
+
+	if (branch && surrounded_count == n_count - 1) {
+		//the river/branch has locked itself in
+		//std::cout << "Surrounded!" << std::endl;
+		return;
+	}
+
+	//check for equal height to branch to
+	if (true_min_id > -1) {
+		for (int i = 0; i < n_count; ++i) {
+			if (tmap[neighbours[i][0]][neighbours[i][1]] == true_min
+					&& true_min != i) {
+				branch_id = i;
+			}
 		}
 	}
 
@@ -198,7 +240,28 @@ void grow(RiverPoint *rp) {
 				neighbours[true_min_id][1], rp->river_id);
 		rp->next = new_rp;
 
-		grow(new_rp);
+		grow(new_rp, false);
+
+		int height_above_sealevel = (int)(tmap[rp->y][rp->x]- sea_level);
+
+
+		if (rand() % (branch_chance + abs(height_above_sealevel - 10)) == 0 &&
+				branch_id > -1 &&
+				n_river_branches[rp->river_id] > 0) {
+
+//			std::cout << "Branching from " << rp->x << "," << rp->y
+//					<< std::endl;
+			RiverPoint* branch_source = new RiverPoint(neighbours[branch_id][0],
+					neighbours[branch_id][1], rp->river_id);
+
+			rp->branch = branch_source;
+//			std::cout << "Growing branch on river " << rp->river_id
+//					<< std::endl;
+			grow(branch_source, true);
+//			std::cout << "Branch done" << std::endl;
+			n_river_branches[rp->river_id]--;
+
+		}
 
 	} else {
 
@@ -211,20 +274,7 @@ void grow(RiverPoint *rp) {
 				neighbours[min_id][1], rp->river_id);
 		rp->next = new_rp;
 
-		grow(new_rp);
-
-
-		/*
-		if(n_river_branches[rp->river_id]>0){
-			RiverPoint* branch_source = new RiverPoint(neighbours[min_id][0], neighbours[min_id][1], rp->river_id);
-			rp->branch = branch_source;
-			std::cout<<"Growing branch on river " << rp->river_id<<std::endl;
-			grow(branch_source);
-			std::cout<<"Branch done"<<std::endl;
-			n_river_branches[rp->river_id]--;
-
-		}
-		*/
+		grow(new_rp, false);
 
 	}
 
@@ -263,8 +313,6 @@ void rivers() {
 
 	calculate_candiates();
 
-
-
 	source_location = new int*[n_rivers];
 	n_river_branches = new int[n_rivers];
 	source_river_points = new RiverPoint*[n_rivers];
@@ -289,7 +337,7 @@ void rivers() {
 
 		for (int i = 0; i < n_rivers; ++i)
 			//grow river
-			grow(source_river_points[i]);
+			grow(source_river_points[i], false);
 
 	}
 
@@ -317,8 +365,23 @@ void print_rivers(FILE* stream) {
 
 				if (rp != 0) {
 					fprintf(stream,
-							"<river_point x = '%d' y = '%d'></river_point>\n",
+							"<river_point x = '%d' y = '%d' is_branch = 'false'></river_point>\n",
 							rp->x, rp->y);
+
+					if (rp->branch != 0) {
+						RiverPoint* rpb = rp->branch;
+						do {
+							if (rpb != 0) {
+								fprintf(
+										stream,
+										"<river_point x = '%d' y = '%d' is_branch = 'true'></river_point>\n",
+										rpb->x, rpb->y);
+
+								rpb = rpb->next;
+							}
+						} while (rpb != 0);
+
+					}
 				}
 
 				rp = rp->next;
