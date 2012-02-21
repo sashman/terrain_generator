@@ -322,7 +322,7 @@ void print_map_xml() {
 					"</tile>\n", i,
 					j, tmap[i][j]);
 		}
-		//printf("\n");
+		printf("\n");
 	}
 	printf("</map>");
 }

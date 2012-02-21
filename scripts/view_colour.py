@@ -26,6 +26,16 @@ for i in range(0,h):
 		else:
 			draw.point((i,j), fill=(v-60,v-10,v-60))
 
+if(len(sys.argv)>2):
+	scale = int(sys.argv[2])
+	for i in range(0,h):
+		if(i%scale==0):
+			draw.line((0,i,w,i), fill=(0))
+	for i in range(0,w):
+		if(i%scale==0):
+			draw.line((i,0,i,h), fill=(0))
+
+
 del draw
 img.save("out.png")
 img.show()
