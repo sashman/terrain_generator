@@ -19,7 +19,7 @@
 
 #define DEFAULT_VORONOI_SIZE 100
 
-#define DEFAULT_SEA_LEVEL 0.588 * 126
+#define DEFAULT_SEA_LEVEL 47//0.588 * 126
 
 #define DEAFULT_SAND_LEVEL 0.7 * 126
 
@@ -37,6 +37,7 @@
 
 #define DEFAULT_MIN_DISTANCE_BETWEEN_SETTLEMENTS 400
 
+#define DEFAULT_CONTOUR_FILE "contour.txt"
 
 
 int get_val(int x, int y);
@@ -74,5 +75,9 @@ void print_settlements(FILE* stream);
 
 void rivers();
 void print_rivers(FILE* stream);
+
+void contour_map();
+void print_contour(FILE* stream);
+void print_kf(FILE* stream);
 
 #endif /* TERRAIN_GENERATOR_HPP_ */

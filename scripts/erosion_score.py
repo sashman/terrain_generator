@@ -33,4 +33,6 @@ print "avg value " + str(avg_v)
 print "dev value " + str(dv_v)
 print "dev/avg   " + str(float(dv_v)/float(avg_v))
 
-		
+print "sea level " + str(float(150)/float(255) * max_v)
+print "snow level " + str(float(210)/float(255) * max_v)
+	

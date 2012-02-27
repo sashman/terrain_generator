@@ -295,11 +295,16 @@ int main(int argc, char** argv) {
 		run_view();
 	}
 
-	rivers();
-	print_rivers(0);
+	//rivers();
+	//print_rivers(0);
 
-	settlements();
-	print_settlements(0);
+	//settlements();
+	//print_settlements(0);
+
+	//std::cout<<"Drawing contours"<<std::endl;
+	contour_map();
+	print_contour(0);
+	//print_kf(0);
 
 
 	return 0;
