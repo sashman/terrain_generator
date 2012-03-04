@@ -15,6 +15,12 @@
 #include <getopt.h>
 #include <stdlib.h>
 
+
+
+#define DEFAULT_CONFIG_FILE "config.yaml"
+
+#define DEAFULT_TERRAIN_FILE "terrain.txt"
+
 #define DEFAULT_SIZE 512
 
 #define DEFAULT_VORONOI_SIZE 100
@@ -38,6 +44,8 @@
 #define DEFAULT_MIN_DISTANCE_BETWEEN_SETTLEMENTS 400
 
 #define DEFAULT_CONTOUR_FILE "contour.txt"
+
+#define DEFAULT_CONTOUR_KF_FILE "contour_kf.txt"
 
 
 int get_val(int x, int y);

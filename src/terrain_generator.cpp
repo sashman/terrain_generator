@@ -7,6 +7,7 @@
 #include "terrain_generator.hpp"
 
 
+#include <yaml.h>
 
 enum OutFormat {
 	STANDRARD_HEIGHTS, STANDARD_XML, OPENGL_VIEW
@@ -71,15 +72,165 @@ void print_usage(FILE* stream, int exit_code, char* program_name) {
 
 
 
-//TODO: create config file
 //TODO: Add fresh water source creation
 //TODO: Add forests
 //TODO: Add settlement generation
+
+
+/* Set a generic reader. */
+void *ext = 0;
+int read_handler(void *ext, char *buffer, int size, int *length) {
+    /* ... */
+
+	std::cout << buffer << " " << size << " " << *length << std::endl;
+
+    //*buffer = ...;
+    //*length = ...;
+    /* ... */
+    return 1;
+}
+
+void read_config(){
+
+	yaml_parser_t parser;
+	yaml_event_t event;
+
+	int done = 0;
+
+
+	/* Create the Parser object. */
+	yaml_parser_initialize(&parser);
+
+	/* Set a file input. */
+	FILE *input = fopen(DEFAULT_CONFIG_FILE, "rb");
+
+	yaml_parser_set_input_file(&parser, input);
+
+	yaml_parser_set_input_file(&parser, input);
+
+	/* Read the event sequence. */
+	while (!done) {
+
+	    /* Get the next event. */
+	    if (!yaml_parser_parse(&parser, &event))
+
+	    	yaml_parser_delete(&parser);
+
+	    /*
+	      ...
+	      Process the event.
+	      ...
+	    */
+
+	    /* Are we finished? */
+	    done = (event.type == YAML_STREAM_END_EVENT);
+
+	    /* The application is responsible for destroying the event object. */
+	    yaml_event_delete(&event);
+
+	}
+
+	yaml_parser_delete(&parser);
+}
+
+
+
+void generate(){
+	//set crop height and width
+		if(crop_height<1) crop_height = tmap_size;
+		if(crop_width<1) crop_width = tmap_size;
+
+		//if a crop value is set
+		//set tmap_size to fit the cropped values
+		int max_size = std::max(crop_height,crop_width);
+		int max_size_tmp = max_size-1;
+
+		if((max_size_tmp & (max_size_tmp - 1)) == 0){
+			//leave set size as highest crop value
+			tmap_size = max_size;
+		} else {
+			//find smallest value such that (value is power of 2) + 1 and value > max_size
+			int t = ceil(log2(max_size))+1;
+			tmap_size = (1<<t)+1;
+		}
+
+		//if(tmap_size < 513) tmap_size = 513;
+		//display info
+		if (verbose) {
+			std::cout << "Staring square diamond" << std::endl;
+			std::cout << "Size: " << crop_width << " x " << crop_height << " original size " << tmap_size << std::endl;
+			std::cout << "Starting seed value " << seed << std::endl;
+			std::cout << "Starting random offset " << random_offset << std::endl;
+			std::cout << "Random offset decrease ratio " << offset_dr << std::endl;
+
+		}
+
+		//init map array
+		tmap = new int*[tmap_size];
+		for (int i = 0; i < tmap_size; ++i) {
+			tmap[i] = new int[tmap_size];
+		}
+
+
+		 /* initialize random seed:
+		  * use for generating a random map every time
+		  TODO: create random map argument
+		  TODO: create random-seed argument value */
+		  //srand ( time(NULL) );
+
+
+		//fill the array with values
+		square_diamond();
+
+		//interpolate voronoi diagram
+		//TODO: add noise to voronoi
+		voronoi();
+
+		if(verbose){
+			std::cout << "Voronoi points" << std::endl;
+			for (int i = 0; i < voronoi_size; ++i) {
+				std::cout << "\t" << voronoi_points[i][0] << "," << voronoi_points[i][1] << std::endl;
+			}
+		}
+
+		erosion();
+
+
+		if(!neg) clear_neg();
+
+		if (verbose) std::cout << "Finished square diamond" << std::endl;
+
+		//TODO: generate tile types
+
+
+
+		if (output_format == STANDRARD_HEIGHTS) {
+			print_map();
+		} else if (output_format == STANDARD_XML) {
+			print_map_xml();
+		} else if (output_format == OPENGL_VIEW) {
+			run_view();
+		}
+
+		rivers();
+		print_rivers(0);
+
+		settlements();
+		print_settlements(0);
+
+		//std::cout<<"Drawing contours"<<std::endl;
+		//contour_map();
+		//print_contour(0);
+		//print_kf(0);
+
+
+}
 
 int main(int argc, char** argv) {
 
 
 	int next_option;
+
 
 	/* A string listing valid short options letters.  */
 	const char* const short_options = "hsxgvn";
@@ -217,95 +368,8 @@ int main(int argc, char** argv) {
 	} while (next_option != -1);
 
 
-
-
-	//set crop height and width
-	if(crop_height<1) crop_height = tmap_size;
-	if(crop_width<1) crop_width = tmap_size;
-
-	//if a crop value is set
-	//set tmap_size to fit the cropped values
-	int max_size = std::max(crop_height,crop_width);
-	int max_size_tmp = max_size-1;
-
-	if((max_size_tmp & (max_size_tmp - 1)) == 0){
-		//leave set size as highest crop value
-		tmap_size = max_size;
-	} else {
-		//find smallest value such that (value is power of 2) + 1 and value > max_size
-		int t = ceil(log2(max_size))+1;
-		tmap_size = (1<<t)+1;
-	}
-
-	//display info
-	if (verbose) {
-		std::cout << "Staring square diamond" << std::endl;
-		std::cout << "Size: " << crop_width << " x " << crop_height << " original size " << tmap_size << std::endl;
-		std::cout << "Starting seed value " << seed << std::endl;
-		std::cout << "Starting random offset " << random_offset << std::endl;
-		std::cout << "Random offset decrease ratio " << offset_dr << std::endl;
-
-	}
-
-	//init map array
-	tmap = new int*[tmap_size];
-	for (int i = 0; i < tmap_size; ++i) {
-		tmap[i] = new int[tmap_size];
-	}
-
-
-	 /* initialize random seed:
-	  * use for generating a random map every time
-	  TODO: create random map argument
-	  TODO: create random-seed argument value */
-	  //srand ( time(NULL) );
-
-
-	//fill the array with values
-	square_diamond();
-
-	//interpolate voronoi diagram
-	//TODO: add noise to voronoi
-	voronoi();
-
-	if(verbose){
-		std::cout << "Voronoi points" << std::endl;
-		for (int i = 0; i < voronoi_size; ++i) {
-			std::cout << "\t" << voronoi_points[i][0] << "," << voronoi_points[i][1] << std::endl;
-		}
-	}
-
-	//TODO: add erosion algorithm
-	erosion();
-
-
-	if(!neg) clear_neg();
-
-	if (verbose) std::cout << "Finished square diamond" << std::endl;
-
-	//TODO: generate tile types
-
-
-
-	if (output_format == STANDRARD_HEIGHTS) {
-		print_map();
-	} else if (output_format == STANDARD_XML) {
-		print_map_xml();
-	} else if (output_format == OPENGL_VIEW) {
-		run_view();
-	}
-
-	//rivers();
-	//print_rivers(0);
-
-	//settlements();
-	//print_settlements(0);
-
-	//std::cout<<"Drawing contours"<<std::endl;
-	contour_map();
-	print_contour(0);
-	//print_kf(0);
-
+	//read_config();
+	generate();
 
 	return 0;
 }

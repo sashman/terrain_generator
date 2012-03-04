@@ -22,6 +22,8 @@ int** cmap;
 //TODO: change using tile types
 enum TILE_CASE {
 
+	HIGH_GRASS,
+
 	//convex cliff corners
 	CLIFF_NE_SN, //north -> east turn, south->north increasing incline
 	/*
@@ -118,73 +120,73 @@ void set_contour_values() {
 
 				break;
 			case 1:
-				set_cmap(i, j, GRASS, CLIFF_WE_SN, CLIFF_NW_SN, CLIFF_NS_EW);
+				set_cmap(i, j, HIGH_GRASS, CLIFF_WE_SN, CLIFF_NW_SN, CLIFF_NS_EW);
 				break;
 
 			case 2:
-				set_cmap(i, j, CLIFF_NS_WE, CLIFF_NE_SN, CLIFF_WE_SN, GRASS);
+				set_cmap(i, j, CLIFF_NS_WE, CLIFF_NE_SN, CLIFF_WE_SN, HIGH_GRASS);
 				break;
 
 			case 3:
-				set_cmap(i, j, GRASS, CLIFF_WE_SN, CLIFF_WE_SN, GRASS);
+				set_cmap(i, j, HIGH_GRASS, CLIFF_WE_SN, CLIFF_WE_SN, HIGH_GRASS);
 
 				break;
 
 			case 4:
-				set_cmap(i, j, CLIFF_SE_NS, CLIFF_WE_SN, CLIFF_WE_SN, GRASS);
+				set_cmap(i, j, CLIFF_SE_NS, CLIFF_WE_SN, CLIFF_WE_SN, HIGH_GRASS);
 				break;
 
 			case 5:
-				set_cmap(i, j, GRASS, CLIFF_SW_NS, GRASS, CLIFF_NE_SN);
+				set_cmap(i, j, HIGH_GRASS, CLIFF_SW_NS, HIGH_GRASS, CLIFF_NE_SN);
 				break;
 
 			case 6:
-				set_cmap(i, j, CLIFF_NS_WE, CLIFF_NS_WE, GRASS, GRASS);
+				set_cmap(i, j, CLIFF_NS_WE, CLIFF_NS_WE, HIGH_GRASS, HIGH_GRASS);
 
 				break;
 
 			case 7:
-				set_cmap(i, j, GRASS, CLIFF_SW_SN, GRASS, GRASS);
+				set_cmap(i, j, HIGH_GRASS, CLIFF_SW_SN, HIGH_GRASS, HIGH_GRASS);
 
 				break;
 
 			case 8:
-				set_cmap(i, j, CLIFF_WE_NS, GRASS, CLIFF_NS_EW, CLIFF_SW_NS);
+				set_cmap(i, j, CLIFF_WE_NS, HIGH_GRASS, CLIFF_NS_EW, CLIFF_SW_NS);
 
 				break;
 
 			case 9:
-				set_cmap(i, j, GRASS, GRASS, CLIFF_NS_EW, CLIFF_SW_NS);
+				set_cmap(i, j, HIGH_GRASS, HIGH_GRASS, CLIFF_NS_EW, CLIFF_SW_NS);
 
 				break;
 
 			case 10:
-				set_cmap(i, j, CLIFF_NW_SN, GRASS, CLIFF_SE_NS, GRASS);
+				set_cmap(i, j, CLIFF_NW_SN, HIGH_GRASS, CLIFF_SE_NS, HIGH_GRASS);
 
 				break;
 
 			case 11:
-				set_cmap(i, j, GRASS, GRASS, CLIFF_SE_SN, GRASS);
+				set_cmap(i, j, HIGH_GRASS, HIGH_GRASS, CLIFF_SE_SN, HIGH_GRASS);
 
 				break;
 
 			case 12:
-				set_cmap(i, j, CLIFF_WE_NS, GRASS, GRASS, CLIFF_WE_NS);
+				set_cmap(i, j, CLIFF_WE_NS, HIGH_GRASS, HIGH_GRASS, CLIFF_WE_NS);
 
 				break;
 
 			case 13:
-				set_cmap(i, j, GRASS, GRASS, GRASS, CLIFF_NE_NS);
+				set_cmap(i, j, HIGH_GRASS, HIGH_GRASS, HIGH_GRASS, CLIFF_NE_NS);
 
 				break;
 
 			case 14:
-				set_cmap(i, j, CLIFF_NW_NS, GRASS, GRASS, GRASS);
+				set_cmap(i, j, CLIFF_NW_NS, HIGH_GRASS, HIGH_GRASS, HIGH_GRASS);
 
 				break;
 
 			case 15:
-				set_cmap(i, j, GRASS, GRASS, GRASS, GRASS);
+				set_cmap(i, j, HIGH_GRASS, HIGH_GRASS, HIGH_GRASS, HIGH_GRASS);
 
 				break;
 
@@ -199,16 +201,33 @@ void round_tmap() {
 
 	for (int i = 0; i < crop_height; ++i) {
 		for (int j = 0; j < crop_width; ++j) {
-			tmap[i][j] = (int) (tmap[i][j] / 10 * 10);
+
+			//nearest 10
+			//tmap[i][j] = (int) (tmap[i][j] / 10 * 10);
+
+			tmap[i][j] = (int) (tmap[i][j] / 5 * 5);
 
 		}
 	}
 
 }
 
+void reset_grass() {
+
+	for (int i = 0; i < crop_height; ++i) {
+		for (int j = 0; j < crop_width; ++j) {
+
+			if(cmap[i][j] == HIGH_GRASS) cmap[i][j] = GRASS;
+
+		}
+	}
+
+}
+
+
 void contour_map() {
 
-	//round_tmap();
+	round_tmap();
 
 	max = tmap[0][0];
 	//set up contour map array
@@ -227,10 +246,13 @@ void contour_map() {
 		}
 	}
 
+	std::cout << "\n" << std::endl;
 	for (threshold = sea_level; threshold < max; threshold +=
 			threshhold_increment) {
+		std::cout << "T= " << threshold << std::endl;
 		//threshold = 65;
 		set_contour_values();
+		reset_grass();
 	}
 }
 
@@ -255,7 +277,7 @@ void print_contour(FILE* stream) {
 
 				int t = cmap[i][j];
 
-				if (t == GRASS)
+				if (t == GRASS || t == HIGH_GRASS)
 					fprintf(stream, ". ");
 				else if (t == CLIFF_NS_EW || t == CLIFF_NS_WE)
 					fprintf(stream, "| ");
@@ -296,7 +318,7 @@ void print_contour(FILE* stream) {
 void print_kf(FILE* stream) {
 
 	if (stream == 0) {
-		stream = fopen(DEFAULT_CONTOUR_FILE, "w");
+		stream = fopen(DEFAULT_CONTOUR_KF_FILE, "w");
 	}
 	if (stream == NULL)
 		perror("Error opening file");
@@ -351,10 +373,12 @@ void print_kf(FILE* stream) {
 						"<pass>false</pass>"
 						"</tile>"
 
-				//grass
 						"<tile tag = \"m\">"
-						"<pass>true</pass>"
+						"<pass>false</pass>"
 						"</tile>"
+
+				//grass
+
 						"<tile tag = \"n\">"
 						"<pass>true</pass>"
 						"</tile>"
