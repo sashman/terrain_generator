@@ -1,2 +1,55 @@
-hello: world
 
+
+# Dimentions
+###########
+#Note if any of the below values are less than 256, rivers, settlements, and vegetation will not be generated
+height : 512
+width : 512
+
+# scale, amount of detail per tile
+# 0 = tile is smaller than a character, one tile represents part of an object, a tree make take up multiple tiles
+# 1 = tile is around the size of a character, a tile represets one object present in it, e.g. tree per tile
+# 2 = tile is  bigger than a character, a tile may hold multiple objects, but is constrained by the generator to represent only, e.g. a tile holding a tree would represent a group of trees, or one tile may hold an entire settlement in it
+
+scale : 1
+
+
+# Map height
+############
+
+seed : 10
+offset : 40
+rough : 0.8
+
+normalise : true
+normalise_min : 0
+normalise_max : 150
+
+
+# Map attributes
+################
+
+sea_level : 88
+sand_level : 105
+snow_level : 120
+
+cliff_height_difference : 3
+
+
+# Rivers
+########
+number_of_river_sources : 50
+max_branches_per_source : 20
+
+
+#Settlements
+############
+
+number_of_settlements : 30
+min_distance_between_settlements : 400
+
+
+#Vegetation
+###########
+
+number_of_vegetation : 300

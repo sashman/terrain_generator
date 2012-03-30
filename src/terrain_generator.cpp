@@ -1,6 +1,6 @@
 //============================================================================
 // Name        : terrain_generator.cpp
-// Author      : os63
+// Author      : sash
 // Version     : 0.0.0.1
 //============================================================================
 
@@ -12,6 +12,10 @@
 enum OutFormat {
 	STANDRARD_HEIGHTS, STANDARD_XML, OPENGL_VIEW
 };
+
+enum
+
+
 int output_format = STANDRARD_HEIGHTS;
 
 /* Whether to display verbose messages.  */
@@ -72,63 +76,70 @@ void print_usage(FILE* stream, int exit_code, char* program_name) {
 
 
 
-//TODO: Add fresh water source creation
 //TODO: Add forests
-//TODO: Add settlement generation
 
-
-/* Set a generic reader. */
-void *ext = 0;
-int read_handler(void *ext, char *buffer, int size, int *length) {
-    /* ... */
-
-	std::cout << buffer << " " << size << " " << *length << std::endl;
-
-    //*buffer = ...;
-    //*length = ...;
-    /* ... */
-    return 1;
-}
 
 void read_config(){
 
 	yaml_parser_t parser;
-	yaml_event_t event;
+	yaml_token_t  token;
 
 	int done = 0;
 
-
-	/* Create the Parser object. */
 	yaml_parser_initialize(&parser);
 
-	/* Set a file input. */
 	FILE *input = fopen(DEFAULT_CONFIG_FILE, "rb");
 
 	yaml_parser_set_input_file(&parser, input);
 
-	yaml_parser_set_input_file(&parser, input);
 
-	/* Read the event sequence. */
-	while (!done) {
-
-	    /* Get the next event. */
-	    if (!yaml_parser_parse(&parser, &event))
-
-	    	yaml_parser_delete(&parser);
-
-	    /*
-	      ...
-	      Process the event.
-	      ...
+	bool key = false;
+	bool value = false;
+	do {
+	    yaml_parser_scan(&parser, &token);
+	    switch(token.type)
+	    {
+	    /* Stream start/end
+	    case YAML_STREAM_START_TOKEN: puts("STREAM START"); break;
+	    case YAML_STREAM_END_TOKEN:   puts("STREAM END");   break;
 	    */
 
-	    /* Are we finished? */
-	    done = (event.type == YAML_STREAM_END_EVENT);
+	    /* Token types (read before actual token) */
+	    case YAML_KEY_TOKEN:
+	    	//printf("(Key token)   ");
+	    	key = true;
+	    break;
+	    case YAML_VALUE_TOKEN:
+//	    	printf("(Value token) ");
+	    	value = true;
+	    break;
 
-	    /* The application is responsible for destroying the event object. */
-	    yaml_event_delete(&event);
 
-	}
+	    /* Block delimeters */
+	    case YAML_BLOCK_SEQUENCE_START_TOKEN: puts("<b>Start Block (Sequence)</b>"); break;
+	    case YAML_BLOCK_ENTRY_TOKEN:          puts("<b>Start Block (Entry)</b>");    break;
+	    case YAML_BLOCK_END_TOKEN:            puts("<b>End block</b>");              break;
+
+
+	    /* Data */
+	    case YAML_BLOCK_MAPPING_START_TOKEN:  puts("[Block mapping]");            break;
+
+	    case YAML_SCALAR_TOKEN:
+	    	if(key){
+
+	    	}
+	    	printf("scalar %s \n", token.data.scalar.value);
+
+
+	    break;
+
+	    /* Others */
+	    default:
+	      printf("Got token of type %d\n", token.type);
+	    }
+	    if(token.type != YAML_STREAM_END_TOKEN) yaml_token_delete(&token);
+	  } while(token.type != YAML_STREAM_END_TOKEN);
+	  yaml_token_delete(&token);
 
 	yaml_parser_delete(&parser);
 }
@@ -212,11 +223,13 @@ void generate(){
 			run_view();
 		}
 
+		/*
 		rivers();
 		print_rivers(0);
 
 		settlements();
 		print_settlements(0);
+		*/
 
 		//std::cout<<"Drawing contours"<<std::endl;
 		//contour_map();
@@ -368,7 +381,7 @@ int main(int argc, char** argv) {
 	} while (next_option != -1);
 
 
-	//read_config();
+	read_config();
 	generate();
 
 	return 0;
