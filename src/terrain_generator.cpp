@@ -160,23 +160,23 @@ void read_config(){
 
 	    		if(key_type.compare("height")) crop_height = atoi((char*)token.data.scalar.value);
 
-				else if(key_type.compare("width")) crop_width = atoi((char*)token.data.scalar.value);
-				else if(key_type.compare("scale")) scale = atoi((char*)token.data.scalar.value);
-				else if(key_type.compare("seed")) seed = atoi((char*)token.data.scalar.value);
-				else if(key_type.compare("offset")) random_offset = atoi((char*)token.data.scalar.value);
-				else if(key_type.compare("rough")) offset_dr = atof((char*)token.data.scalar.value);
-				else if(key_type.compare("normalise")) normalise = (strcmp((char*)token.data.scalar.value, "true") == 0);
-				else if(key_type.compare("normalise_min")) normalise_min = atoi((char*)token.data.scalar.value);
-				else if(key_type.compare("normalise_max")) normalise_max = atoi((char*)token.data.scalar.value);
-				else if(key_type.compare("sea_level")) sea_level = atoi((char*)token.data.scalar.value);
-				else if(key_type.compare("sand_level")) sand_level = atoi((char*)token.data.scalar.value);
-				else if(key_type.compare("snow_level")) snowtop_level= atoi((char*)token.data.scalar.value);
-				else if(key_type.compare("cliff_height_difference")) cliff_difference = atoi((char*)token.data.scalar.value);
-				else if(key_type.compare("number_of_river_sources")) n_rivers = atoi((char*)token.data.scalar.value);
-				else if(key_type.compare("max_branches_per_source")) max_branches = atoi((char*)token.data.scalar.value);
-				else if(key_type.compare("number_of_settlements")) n_settlements = atoi((char*)token.data.scalar.value);
-				else if(key_type.compare("min_distance_between_settlements")) min_distance = atoi((char*)token.data.scalar.value);
-				else if(key_type.compare("number_of_vegetation")) n_vegetation = atoi((char*)token.data.scalar.value);
+				else if(key_type.compare("width")==0) crop_width = atoi((char*)token.data.scalar.value);
+				else if(key_type.compare("scale")==0) scale = atoi((char*)token.data.scalar.value);
+				else if(key_type.compare("seed")==0) seed = atoi((char*)token.data.scalar.value);
+				else if(key_type.compare("offset")==0) random_offset = atoi((char*)token.data.scalar.value);
+				else if(key_type.compare("rough")==0) offset_dr = atof((char*)token.data.scalar.value);
+				else if(key_type.compare("normalise")==0) normalise = (strcmp((char*)token.data.scalar.value, "true") == 0);
+				else if(key_type.compare("normalise_min")==0) normalise_min = atoi((char*)token.data.scalar.value);
+				else if(key_type.compare("normalise_max")==0) normalise_max = atoi((char*)token.data.scalar.value);
+				else if(key_type.compare("sea_level")==0) sea_level = atoi((char*)token.data.scalar.value);
+				else if(key_type.compare("sand_level")==0) sand_level = atoi((char*)token.data.scalar.value);
+				else if(key_type.compare("snow_level")==0) snowtop_level= atoi((char*)token.data.scalar.value);
+				else if(key_type.compare("cliff_height_difference")==0) cliff_difference = atoi((char*)token.data.scalar.value);
+				else if(key_type.compare("number_of_river_sources")==0) n_rivers = atoi((char*)token.data.scalar.value);
+				else if(key_type.compare("max_branches_per_source")==0) max_branches = atoi((char*)token.data.scalar.value);
+				else if(key_type.compare("number_of_settlements")==0) n_settlements = atoi((char*)token.data.scalar.value);
+				else if(key_type.compare("min_distance_between_settlements")==0) min_distance = atoi((char*)token.data.scalar.value);
+				else if(key_type.compare("number_of_vegetation")==0) n_vegetation = atoi((char*)token.data.scalar.value);
 
 
 	    	}
