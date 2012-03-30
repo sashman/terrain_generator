@@ -41,6 +41,7 @@ bool neg = false;
 int sea_level = DEFAULT_SEA_LEVEL;
 int sand_level = DEAFULT_SAND_LEVEL;
 int snowtop_level = DEFAULT_SNOW_TOP_LEVEL;
+int cliff_difference = 100;
 
 
 //constraint helper methods

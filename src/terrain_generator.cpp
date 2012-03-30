@@ -13,7 +13,15 @@ enum OutFormat {
 	STANDRARD_HEIGHTS, STANDARD_XML, OPENGL_VIEW
 };
 
-enum
+enum ConfigTags{
+	HEIGHT, WIDTH, SCALE,
+	SEED, OFFSET, ROUGH,
+	NORMALISE,NORMALISE_MIN,NORMALISE_MAX,
+	SEA_LEVEL, SAND_LEVEL, SNOW_LEVEL, CLIFF_HEIGHT_DIFFERENCE,
+	NUMBER_OF_RIVER_SOURCES, MAX_BRANCHES_PER_SOURCE,
+	NUMBER_OF_SETTELMENTS, MIN_DISTANCE_BETWEEN_SETTLEMENTS,
+	NUMBER_OF_VEGETATION
+};
 
 
 int output_format = STANDRARD_HEIGHTS;
@@ -25,6 +33,8 @@ extern int tmap_size;
 extern int crop_height;
 extern int crop_width;
 extern int** tmap;
+
+int scale = 1;
 
 extern int seed;
 extern int random_offset;
@@ -39,6 +49,22 @@ extern int erosion_steps;
 
 extern bool neg;
 
+bool normalise = false;
+int normalise_min = 0;
+int normalise_max = 150;
+
+extern int sea_level;
+extern int sand_level;
+extern int snowtop_level;
+extern int cliff_difference;
+
+extern int n_rivers;
+extern int max_branches;
+
+extern int n_settlements;
+extern int min_distance;
+
+extern int n_vegetation;
 
 
 void print_usage(FILE* stream, int exit_code, char* program_name) {
@@ -94,7 +120,9 @@ void read_config(){
 
 
 	bool key = false;
+	std::string key_type;
 	bool value = false;
+
 	do {
 	    yaml_parser_scan(&parser, &token);
 	    switch(token.type)
@@ -126,9 +154,32 @@ void read_config(){
 
 	    case YAML_SCALAR_TOKEN:
 	    	if(key){
+	    		key_type = (char*)token.data.scalar.value;
+	    		std::cout << ">>" << key_type << std::endl;
+	    	}else if(value){
+
+	    		if(key_type.compare("height")) crop_height = atoi((char*)token.data.scalar.value);
+
+				else if(key_type.compare("width")) crop_width = atoi((char*)token.data.scalar.value);
+				else if(key_type.compare("scale")) scale = atoi((char*)token.data.scalar.value);
+				else if(key_type.compare("seed")) seed = atoi((char*)token.data.scalar.value);
+				else if(key_type.compare("offset")) random_offset = atoi((char*)token.data.scalar.value);
+				else if(key_type.compare("rough")) offset_dr = atof((char*)token.data.scalar.value);
+				else if(key_type.compare("normalise")) normalise = (strcmp((char*)token.data.scalar.value, "true") == 0);
+				else if(key_type.compare("normalise_min")) normalise_min = atoi((char*)token.data.scalar.value);
+				else if(key_type.compare("normalise_max")) normalise_max = atoi((char*)token.data.scalar.value);
+				else if(key_type.compare("sea_level")) sea_level = atoi((char*)token.data.scalar.value);
+				else if(key_type.compare("sand_level")) sand_level = atoi((char*)token.data.scalar.value);
+				else if(key_type.compare("snow_level")) snowtop_level= atoi((char*)token.data.scalar.value);
+				else if(key_type.compare("cliff_height_difference")) cliff_difference = atoi((char*)token.data.scalar.value);
+				else if(key_type.compare("number_of_river_sources")) n_rivers = atoi((char*)token.data.scalar.value);
+				else if(key_type.compare("max_branches_per_source")) max_branches = atoi((char*)token.data.scalar.value);
+				else if(key_type.compare("number_of_settlements")) n_settlements = atoi((char*)token.data.scalar.value);
+				else if(key_type.compare("min_distance_between_settlements")) min_distance = atoi((char*)token.data.scalar.value);
+				else if(key_type.compare("number_of_vegetation")) n_vegetation = atoi((char*)token.data.scalar.value);
+
 
 	    	}
-	    	printf("scalar %s \n", token.data.scalar.value);
 
 
 	    break;
@@ -386,3 +437,4 @@ int main(int argc, char** argv) {
 
 	return 0;
 }
+

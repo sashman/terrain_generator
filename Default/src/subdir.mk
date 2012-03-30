@@ -9,7 +9,8 @@ CPP_SRCS += \
 ../src/midpoint_displacement.cpp \
 ../src/rivers.cpp \
 ../src/settlements.cpp \
-../src/terrain_generator.cpp 
+../src/terrain_generator.cpp \
+../src/vegetation.cpp 
 
 OBJS += \
 ./src/3d_view.o \
@@ -17,7 +18,8 @@ OBJS += \
 ./src/midpoint_displacement.o \
 ./src/rivers.o \
 ./src/settlements.o \
-./src/terrain_generator.o 
+./src/terrain_generator.o \
+./src/vegetation.o 
 
 CPP_DEPS += \
 ./src/3d_view.d \
@@ -25,7 +27,8 @@ CPP_DEPS += \
 ./src/midpoint_displacement.d \
 ./src/rivers.d \
 ./src/settlements.d \
-./src/terrain_generator.d 
+./src/terrain_generator.d \
+./src/vegetation.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes
