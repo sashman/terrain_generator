@@ -63,10 +63,10 @@ void erosion();
 void clear_neg();
 
 //standard print
-void print_map();
+void print_map(FILE* stream);
 
 //xml print
-void print_map_xml();
+void print_map_xml(FILE* stream);
 
 #ifndef _COMPACT
 	void run_view();

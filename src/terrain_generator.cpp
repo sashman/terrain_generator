@@ -29,6 +29,8 @@ int output_format = STANDRARD_HEIGHTS;
 /* Whether to display verbose messages.  */
 int verbose = 0;
 
+std::string output_file = DEAFULT_TERRAIN_FILE;
+
 extern int tmap_size;
 extern int crop_height;
 extern int crop_width;
@@ -85,10 +87,10 @@ void print_usage(FILE* stream, int exit_code, char* program_name) {
 					"                         recommended for realistic terrain. (0.0 < v < 1.0)\n"
 					"      --erosion <value>  Number of erosion iterations over the terrain. Must be a positive integer.\n"
 					"  -n  --negative         Allow for negative height values.\n"
-					"  -s  --standard         Use standard output (used as default output):\n"
+					"  -s  --standard         Use standard output to be written to a file (used as default output).\n"
 					"                         width, height and a set of height values all separated by a space.\n"
 					"  -g  --graphical        Display the height map using a 3D OpenGL view.\n"
-					"  -x  --xml              Use the following xml output:\n"
+					"  -x  --xml              Use the following xml output to be written to a file:\n"
 					"                           <map width=int height=int>\n"
 					"                           [\n"
 					"                           <tile x=int y=int>\n"
@@ -100,9 +102,6 @@ void print_usage(FILE* stream, int exit_code, char* program_name) {
 	exit(exit_code);
 }
 
-
-
-//TODO: Add forests
 
 
 void read_config(){
@@ -143,23 +142,27 @@ void read_config(){
 	    break;
 
 
-	    /* Block delimeters */
+	    /* Block delimeters
 	    case YAML_BLOCK_SEQUENCE_START_TOKEN: puts("<b>Start Block (Sequence)</b>"); break;
 	    case YAML_BLOCK_ENTRY_TOKEN:          puts("<b>Start Block (Entry)</b>");    break;
 	    case YAML_BLOCK_END_TOKEN:            puts("<b>End block</b>");              break;
-
+	    */
 
 	    /* Data */
-	    case YAML_BLOCK_MAPPING_START_TOKEN:  puts("[Block mapping]");            break;
+	    //case YAML_BLOCK_MAPPING_START_TOKEN:  puts("[Block mapping]");            break;
 
 	    case YAML_SCALAR_TOKEN:
 	    	if(key){
 	    		key_type = (char*)token.data.scalar.value;
-	    		std::cout << ">>" << key_type << std::endl;
+	    		key = false;
+	    		//std::cout << ">>" << key_type << std::endl;
 	    	}else if(value){
+	    		value = false;
 
-	    		if(key_type.compare("height")) crop_height = atoi((char*)token.data.scalar.value);
-
+	    		if(key_type.compare("output_file")==0){
+	    			output_file = (char*)token.data.scalar.value;
+	    		}
+	    		else if(key_type.compare("height")==0) crop_height = atoi((char*)token.data.scalar.value);
 				else if(key_type.compare("width")==0) crop_width = atoi((char*)token.data.scalar.value);
 				else if(key_type.compare("scale")==0) scale = atoi((char*)token.data.scalar.value);
 				else if(key_type.compare("seed")==0) seed = atoi((char*)token.data.scalar.value);
@@ -178,7 +181,6 @@ void read_config(){
 				else if(key_type.compare("min_distance_between_settlements")==0) min_distance = atoi((char*)token.data.scalar.value);
 				else if(key_type.compare("number_of_vegetation")==0) n_vegetation = atoi((char*)token.data.scalar.value);
 
-
 	    	}
 
 
@@ -186,7 +188,8 @@ void read_config(){
 
 	    /* Others */
 	    default:
-	      printf("Got token of type %d\n", token.type);
+	      //printf("Got token of type %d\n", token.type);
+	    	break;
 	    }
 	    if(token.type != YAML_STREAM_END_TOKEN) yaml_token_delete(&token);
 	  } while(token.type != YAML_STREAM_END_TOKEN);
@@ -231,8 +234,8 @@ void generate(){
 		tmap = new int*[tmap_size];
 		for (int i = 0; i < tmap_size; ++i) {
 			tmap[i] = new int[tmap_size];
+			for(int j = 0; j < tmap_size; j++) tmap[i][j] = 0;
 		}
-
 
 		 /* initialize random seed:
 		  * use for generating a random map every time
@@ -267,12 +270,11 @@ void generate(){
 
 
 		if (output_format == STANDRARD_HEIGHTS) {
-			print_map();
+			print_map(fopen(output_file.c_str(), "w"));
 		} else if (output_format == STANDARD_XML) {
-			print_map_xml();
-		} else if (output_format == OPENGL_VIEW) {
-			run_view();
+			print_map_xml(fopen(output_file.c_str(), "w"));
 		}
+
 
 		/*
 		rivers();
@@ -312,10 +314,6 @@ int main(int argc, char** argv) {
 			{"negative", 0, NULL, 'n'},
 			{ NULL, 0, NULL, 0 } /* Required at end of array.  */
 	};
-
-	/* The name of the file to receive program output, or NULL for
-	 standard output.  */
-	const char* output_filename = NULL;
 
 	/* Remember the name of the program, to incorporate in messages.
 	 The name is stored in argv[0].  */
@@ -433,6 +431,7 @@ int main(int argc, char** argv) {
 
 
 	read_config();
+
 	generate();
 
 	return 0;

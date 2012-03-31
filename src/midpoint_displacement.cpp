@@ -10,8 +10,6 @@
 
 #include "terrain_generator.hpp"
 
-
-
 int tmap_size = DEFAULT_SIZE;
 int crop_height = 0;
 int crop_width = 0;
@@ -21,20 +19,17 @@ int seed = 10;
 int random_offset = 40;
 float offset_dr = .8; //offset decrease ratio
 
-
 //set of voronoi points
 int voronoi_size = DEFAULT_VORONOI_SIZE;
 int** voronoi_points;
 
 float voronoi_alpha = 0.33;
 
-
 //erosion
-int thermal_talus = random_offset/40;//4/tmap_size;
+int thermal_talus = random_offset / 40; //4/tmap_size;
 float thermal_shift = 0.5;
 
 int erosion_steps = 5;
-
 
 bool neg = false;
 
@@ -42,7 +37,6 @@ int sea_level = DEFAULT_SEA_LEVEL;
 int sand_level = DEAFULT_SAND_LEVEL;
 int snowtop_level = DEFAULT_SNOW_TOP_LEVEL;
 int cliff_difference = 100;
-
 
 //constraint helper methods
 bool point_above_sealevel(int x, int y) {
@@ -56,8 +50,6 @@ bool point_above_sandlevel(int x, int y) {
 bool point_below_snow_top_level(int x, int y) {
 	return tmap[y][x] < snowtop_level;
 }
-
-
 
 int get_val(int x, int y) {
 	return ((int) rand() % random_offset * 2) - (int) rand() % random_offset;
@@ -89,8 +81,6 @@ int get_dia_avg(int x, int y, int l) {
 	}
 	return (int) (sum / n + get_val(x, y));
 }
-
-
 
 int square_diamond() {
 	int l = 0; //low
@@ -151,35 +141,37 @@ int square_diamond() {
 
 }
 
-void setup_voronoi_points(){
+void setup_voronoi_points() {
 
 	voronoi_points = new int*[voronoi_size];
-	for(int i = 0; i < voronoi_size; i++){
-		voronoi_points [i] = new int[2];
-		voronoi_points [i][0] = (int) rand() % tmap_size; //random x coord
-		voronoi_points [i][1] = (int) rand() % tmap_size; //random y coord
+	for (int i = 0; i < voronoi_size; i++) {
+		voronoi_points[i] = new int[2];
+		voronoi_points[i][0] = (int) rand() % tmap_size; //random x coord
+		voronoi_points[i][1] = (int) rand() % tmap_size; //random y coord
 	}
 
 }
 
-void interpolate_voronoi(){
+void interpolate_voronoi() {
 
 	// using h = -d1 + d2 for voronoi value
 	// where d1 is the nearest point to the current coordinate
 	// d2 is the second nearest
 
-
-	int min_d1 = tmap_size+1;
-	int min_d2 = tmap_size+1;
-	for(int i = 0; i < tmap_size; ++i){
+	int min_d1 = tmap_size + 1;
+	int min_d2 = tmap_size + 1;
+	for (int i = 0; i < tmap_size; ++i) {
 		for (int j = 0; j < tmap_size; ++j) {
 
-			for(int k = 0; k < voronoi_size; ++k){
+			for (int k = 0; k < voronoi_size; ++k) {
 
-				int d = sqrt(pow((voronoi_points[k][0]-j),2) + pow((voronoi_points[k][1]-i),2));
+				int d = sqrt(
+						pow((voronoi_points[k][0] - j), 2)
+								+ pow((voronoi_points[k][1] - i), 2));
 
-				if(d<min_d2) min_d2 = d;
-				if(d<min_d1){
+				if (d < min_d2)
+					min_d2 = d;
+				if (d < min_d1) {
 					min_d2 = min_d1;
 					min_d1 = d;
 				}
@@ -188,18 +180,18 @@ void interpolate_voronoi(){
 			//line defines the shape of the voronoi diagram
 			int val = min_d2 - min_d1;
 
-			tmap[i][j] = (int)((1.0 - voronoi_alpha) * (float)tmap[i][j]) + (int)(voronoi_alpha * (float)(val));
+			tmap[i][j] = (int) ((1.0 - voronoi_alpha) * (float) tmap[i][j])
+					+ (int) (voronoi_alpha * (float) (val));
 
-			min_d1 = tmap_size+1;
-			min_d2 = tmap_size+1;
+			min_d1 = tmap_size + 1;
+			min_d2 = tmap_size + 1;
 
 		}
 	}
 
 }
 
-void voronoi(){
-
+void voronoi() {
 
 	//create points in a voronoi set
 	setup_voronoi_points();
@@ -209,121 +201,130 @@ void voronoi(){
 
 }
 
-
-void thermal(){
-
-
-
+void thermal() {
 
 	int n_count = 4;
 	int** neighbours = new int*[n_count];
-	for(int i = 0; i <n_count; i++){
+	for (int i = 0; i < n_count; i++) {
 		neighbours[i] = new int[2];
 	}
 
 	//looping ensures to always have 4 neighbours
-	for(int i = 1; i < tmap_size-1; ++i){
-			for (int j = 1; j < tmap_size-1; ++j) {
+	for (int i = 1; i < tmap_size - 1; ++i) {
+		for (int j = 1; j < tmap_size - 1; ++j) {
 
-				//north
-				neighbours[0][0] = i-1;
-				neighbours[0][1] = j;
+			//north
+			neighbours[0][0] = i - 1;
+			neighbours[0][1] = j;
 
-				//east
-				neighbours[1][0] = i;
-				neighbours[1][1] = j+1;
+			//east
+			neighbours[1][0] = i;
+			neighbours[1][1] = j + 1;
 
-				//south
-				neighbours[2][0] = i+1;
-				neighbours[2][1] = j;
+			//south
+			neighbours[2][0] = i + 1;
+			neighbours[2][1] = j;
 
-				//west
-				neighbours[3][0] = i;
-				neighbours[3][1] = j-1;
+			//west
+			neighbours[3][0] = i;
+			neighbours[3][1] = j - 1;
 
-				int d_totoal = 0;
-				int d_max =tmap[i][j] - tmap[neighbours[0][0]][neighbours[0][1]];
+			int d_totoal = 0;
+			int d_max = tmap[i][j] - tmap[neighbours[0][0]][neighbours[0][1]];
 
-				int min_n = 0;
+			int min_n = 0;
 
+			bool move = true;
+			//find the shortest neighbour
+			for (int k = 0; k < n_count; ++k) {
 
-				bool move = true;
-				//find the shortest neighbour
-				for (int k = 0; k < n_count; ++k) {
+				int d = tmap[i][j] - tmap[neighbours[k][0]][neighbours[k][1]];
+				if (tmap[neighbours[min_n][0]][neighbours[min_n][1]]
+						> tmap[neighbours[k][0]][neighbours[k][1]])
+					min_n = k;
 
-					int d = tmap[i][j] - tmap[neighbours[k][0]][neighbours[k][1]];
-					if(tmap[neighbours[min_n][0]][neighbours[min_n][1]] > tmap[neighbours[k][0]][neighbours[k][1]]) min_n = k;
-
-					if(d > thermal_talus){
-						move = true;
-						d_totoal += d;
-						if(d>d_max) d_max = d;
-					}
+				if (d > thermal_talus) {
+					move = true;
+					d_totoal += d;
+					if (d > d_max)
+						d_max = d;
 				}
-
-
-				if(move){
-					//add a fraction of the height to the shortest neighbour
-					int min_h = tmap[neighbours[min_n][0]][neighbours[min_n][1]];
-					int change = (int)(thermal_shift*((tmap[i][j] - min_h) - thermal_talus));//* ((tmap[i][j] - min_h)/d_totoal));
-					int new_h = min_h + change;
-					tmap[neighbours[min_n][0]][neighbours[min_n][1]] = new_h;
-
-					//remove from centre
-					tmap[i][j] -= change;
-				}
-
 			}
+
+			if (move) {
+				//add a fraction of the height to the shortest neighbour
+				int min_h = tmap[neighbours[min_n][0]][neighbours[min_n][1]];
+				int change = (int) (thermal_shift
+						* ((tmap[i][j] - min_h) - thermal_talus)); //* ((tmap[i][j] - min_h)/d_totoal));
+				int new_h = min_h + change;
+				tmap[neighbours[min_n][0]][neighbours[min_n][1]] = new_h;
+
+				//remove from centre
+				tmap[i][j] -= change;
+			}
+
+		}
 	}
 
 }
 
-
-void erosion(){
-
+void erosion() {
 
 	for (int i = 0; i < erosion_steps; ++i)
 		thermal();
 
-
 }
 
-
-
-
 //replace all negative values with 0
-void clear_neg(){
+void clear_neg() {
 
 	for (int i = 0; i < crop_height; ++i) {
 		for (int j = 0; j < crop_width; ++j) {
-			if(tmap[i][j]<0)tmap[i][j] = 0;
+			if (tmap[i][j] < 0)
+				tmap[i][j] = 0;
 		}
 	}
 
 }
 
 //standard print
-void print_map() {
-	printf("%i %i ", crop_width, crop_height);
-	for (int i = 0; i < crop_height; ++i) {
-		for (int j = 0; j < crop_width; ++j) {
-			printf("%i ", tmap[i][j]);
+void print_map(FILE* stream) {
+	if (stream == 0) {
+		stream = fopen(DEAFULT_RIVERS_FILE, "w");
+	}
+	if (stream == NULL)
+		perror("Error opening file");
+	else {
+
+		fprintf(stream, "%i %i ", crop_width, crop_height);
+		for (int i = 0; i < crop_height; ++i) {
+			for (int j = 0; j < crop_width; ++j) {
+				fprintf(stream, "%i ", tmap[i][j]);
+			}
 		}
+		fprintf(stream, "\n");
+
 	}
 }
 
 //xml print
-void print_map_xml() {
-	//TODO: add tile type value
-	printf("<map width='%d' height='%d'>\n", crop_width, crop_height);
-	for (int i = 0; i < crop_height; ++i) {
-		for (int j = 0; j < crop_width; ++j) {
-			printf("<tile x='%d' y='%d'>\n\t<height>%i</height>\n"
-					"<type>grass</type>"
-					"</tile>\n", i,
-					j, tmap[i][j]);
-		}
-		printf("\n");
+void print_map_xml(FILE* stream) {
+	if (stream == 0) {
+		stream = fopen(DEAFULT_RIVERS_FILE, "w");
 	}
-	printf("</map>");
+	if (stream == NULL)
+		perror("Error opening file");
+	else {
+		//TODO: add tile type value
+		fprintf(stream,"<map width='%d' height='%d'>\n", crop_width, crop_height);
+		for (int i = 0; i < crop_height; ++i) {
+			for (int j = 0; j < crop_width; ++j) {
+				fprintf(stream,"<tile x='%d' y='%d'>\n\t<height>%i</height>\n"
+						"<type>grass</type>"
+						"</tile>\n", i, j, tmap[i][j]);
+			}
+			fprintf(stream,"\n");
+		}
+		fprintf(stream,"</map>\n");
+	}
 }
