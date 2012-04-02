@@ -62,6 +62,8 @@ void erosion();
 
 void clear_neg();
 
+void normalise_map();
+
 //standard print
 void print_map(FILE* stream);
 

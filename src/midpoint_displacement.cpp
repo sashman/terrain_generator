@@ -9,6 +9,7 @@
  */
 
 #include "terrain_generator.hpp"
+#include <limits.h>
 
 int tmap_size = DEFAULT_SIZE;
 int crop_height = 0;
@@ -20,7 +21,7 @@ int random_offset = 40;
 float offset_dr = .8; //offset decrease ratio
 
 //set of voronoi points
-int voronoi_size = DEFAULT_VORONOI_SIZE;
+int voronoi_size = (int)(DEFAULT_VORONOI_SIZE*(tmap_size/512));
 int** voronoi_points;
 
 float voronoi_alpha = 0.33;
@@ -32,6 +33,11 @@ float thermal_shift = 0.5;
 int erosion_steps = 5;
 
 bool neg = false;
+
+
+bool normalise = false;
+int normalise_min = 0;
+int normalise_max = 150;
 
 int sea_level = DEFAULT_SEA_LEVEL;
 int sand_level = DEAFULT_SAND_LEVEL;
@@ -283,6 +289,27 @@ void clear_neg() {
 			if (tmap[i][j] < 0)
 				tmap[i][j] = 0;
 		}
+	}
+
+}
+
+//recalculate heights to scale the between specified min/max values
+void normalise_map(){
+
+	int max = -INT_MAX;
+	int min = INT_MAX;
+	for (int i = 0; i < crop_height; ++i) {
+				for (int j = 0; j < crop_width; ++j) {
+					if(max<tmap[i][j]) max = tmap[i][j];
+					if(min>tmap[i][j]) min = tmap[i][j];
+				}
+	}
+
+	for (int i = 0; i < crop_height; ++i) {
+			for (int j = 0; j < crop_width; ++j) {
+					int diff = normalise_max - normalise_min;
+					tmap[i][j] = (int)((float)tmap[i][j]/(float)(max-min) * (float)diff);
+			}
 	}
 
 }

@@ -51,9 +51,9 @@ extern int erosion_steps;
 
 extern bool neg;
 
-bool normalise = false;
-int normalise_min = 0;
-int normalise_max = 150;
+extern bool normalise;
+extern int normalise_min;
+extern int normalise_max;
 
 extern int sea_level;
 extern int sand_level;
@@ -262,6 +262,7 @@ void generate(){
 
 
 		if(!neg) clear_neg();
+		if(normalise) normalise_map();
 
 		if (verbose) std::cout << "Finished square diamond" << std::endl;
 
@@ -276,13 +277,15 @@ void generate(){
 		}
 
 
-		/*
-		rivers();
-		print_rivers(0);
 
-		settlements();
-		print_settlements(0);
-		*/
+		if(scale>0){
+			rivers();
+			print_rivers(0);
+
+			settlements();
+			print_settlements(0);
+		}
+
 
 		//std::cout<<"Drawing contours"<<std::endl;
 		//contour_map();
