@@ -252,16 +252,18 @@ void generate(){
 
 		if(verbose){
 			std::cout << "Voronoi points" << std::endl;
+			/*
 			for (int i = 0; i < voronoi_size; ++i) {
 				std::cout << "\t" << voronoi_points[i][0] << "," << voronoi_points[i][1] << std::endl;
 			}
+			*/
 		}
 
 		erosion();
 
 
 		if(!neg) clear_neg();
-		if(normalise) normalise_map();
+
 
 		if (verbose) std::cout << "Finished square diamond" << std::endl;
 
@@ -275,19 +277,30 @@ void generate(){
 			print_map_xml(fopen(output_file.c_str(), "w"));
 		}
 
+		if (normalise) {
+			if (verbose)
+				std::cout << "Normalising with value range " << normalise_min << "-" << normalise_max << std::endl;
+			normalise_map();
+		}
 
 
 		if(scale>0 && crop_height>256 && crop_width>256){
+
+			if(verbose) std::cout << "Generating rivers" << std::endl;
 			rivers();
 			print_rivers(0);
 
+			if(verbose) std::cout << "Generating vegetation" << std::endl;
 			vegetation();
 			print_vegetation(0);
 
+			if(verbose) std::cout << "Generating settlements" << std::endl;
 			settlements();
 			print_settlements(0);
 
 		}
+
+
 
 
 		//std::cout<<"Drawing contours"<<std::endl;

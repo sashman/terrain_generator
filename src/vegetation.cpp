@@ -16,6 +16,9 @@ extern int crop_height;
 extern int crop_width;
 extern int** tmap;
 
+extern int snowtop_level;
+extern int sea_level;
+
 extern int n_rivers;
 extern RiverPoint** source_river_points;
 
@@ -38,6 +41,7 @@ bool veg_candidate_constraint(int x, int y) {
 
 	bool result = true;
 	result = result && point_below_snow_top_level(x, y) && point_above_sealevel(x,y) && !point_at_river_tile(x,y);
+	//std::cout << "Snow level " << snowtop_level << "Sea level" << sea_level << " : " << tmap[y][x] << " " << result << std::endl;
 	return result;
 }
 
@@ -76,30 +80,30 @@ int get_branch_id(RiverPoint* rp) {
 	return -1;
 }
 
-void calculate_water_tiles(){
+void calculate_water_tiles() {
 
 	for (int i = 0; i < n_rivers; ++i) {
 		RiverPoint *rp = source_river_points[i];
 		do {
-			if (rp != 0){
+			if (rp != 0) {
 				int* loc = new int[2];
 				loc[0] = rp->x;
 				loc[1] = rp->y;
 				water_tile_location.push_back(loc);
-			}
-			//check branches
-			if (rp->branch != 0) {
-				//std::cout << "Checking branch on river " << rp->river_id << " " << rp->x << "," << rp->y << std::endl;
-				int r = get_branch_id(rp->branch);
-				if (r > -1) {
-					int* loc = new int[2];
-					loc[0] = rp->x;
-					loc[1] = rp->y;
-					water_tile_location.push_back(loc);
+
+				//check branches
+				if (rp->branch != 0) {
+					int r = get_branch_id(rp->branch);
+					if (r > -1) {
+						int* loc = new int[2];
+						loc[0] = rp->x;
+						loc[1] = rp->y;
+						water_tile_location.push_back(loc);
+					}
 				}
+				rp = rp->next;
 			}
 
-			rp = rp->next;
 		} while (rp != 0);
 	}
 

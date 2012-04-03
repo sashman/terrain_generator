@@ -306,10 +306,11 @@ void normalise_map(){
 	}
 
 	for (int i = 0; i < crop_height; ++i) {
-			for (int j = 0; j < crop_width; ++j) {
-					int diff = normalise_max - normalise_min;
-					tmap[i][j] = (int)((float)tmap[i][j]/(float)(max-min) * (float)diff);
-			}
+		for (int j = 0; j < crop_width; ++j) {
+			int diff = normalise_max - normalise_min;
+			int old = tmap[i][j];
+			tmap[i][j] = (int) ((float) (tmap[i][j]-min) / (float) (max - min) * (float)diff) ;
+		}
 	}
 
 }

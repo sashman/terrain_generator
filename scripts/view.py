@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import sys
+import sys, random
 
 
 libs_needed = []
@@ -52,12 +52,18 @@ root = etree.fromstring(river_string)
 river_elems = root.findall("river/river_point")
 rivers = []
 
+#veg data
+veg_string = open("vegetation.txt", 'r').read()
+root =  etree.fromstring(veg_string)
+veg_elems = root.findall("veg")
+
+
 #draw image
 img = Image.new("RGB", (w,h), (256,256,256))
 xsize,ysize = w,h
 draw = ImageDraw.Draw(img)
 
-cliff_diff = 5
+cliff_diff = 4
 for i in range(0,h):
 	for j in range(2,w):
 		v = int(map_vals[i*h + j])
@@ -99,6 +105,26 @@ for re in river_elems:
     blue = 240
     draw.rectangle((int(x_pos), int(y_pos), int(x_pos), int(y_pos)), fill=(0,0,int(blue)))
     i+=1
+
+
+def get_random_tree_green():
+	#return random.randint(60,200)
+	return 0
+
+#draw vegetation
+for ve in veg_elems:
+	x_pos = int(ve.get("y"))
+	y_pos = int(ve.get("x"))
+	
+	#draw 4 points in a triangle
+	#centre
+	draw.point((x_pos,y_pos), fill = (150,get_random_tree_green(),0))
+	#top
+	draw.point((x_pos,y_pos-1), fill = (150,get_random_tree_green(),0))
+	#sides
+	draw.point((x_pos-1,y_pos), fill = (150,get_random_tree_green(),0))
+	draw.point((x_pos+1,y_pos), fill = (150,get_random_tree_green(),0))
+
 
 # use a truetype font
 font = ImageFont.truetype("VeniceClassic.ttf", 18)

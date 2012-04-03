@@ -26,30 +26,30 @@ rough : 0.8
 
 normalise : true
 normalise_min : 0
-normalise_max : 150
+normalise_max : 255
 
 
 # Map attributes
 ################
 
-sea_level : 88
-sand_level : 105
-snow_level : 120
+sea_level : 150
+sand_level : 160
+snow_level : 210
 
-cliff_height_difference : 10
+cliff_height_difference : 5
 
 
 # Rivers
 ########
 number_of_river_sources : 20
-max_branches_per_source : 10
+max_branches_per_source : 5
 
 
 #Settlements
 ############
 
 number_of_settlements : 12
-min_distance_between_settlements : 200
+min_distance_between_settlements : 300
 
 
 #Vegetation
