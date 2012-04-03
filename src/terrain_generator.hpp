@@ -47,6 +47,8 @@
 
 #define DEFAULT_NO_OF_VEGETATION 300
 
+#define DEAFULT_ROOT_RADIUS 2
+
 #define DEFAULT_CONTOUR_FILE "contour.txt"
 
 #define DEFAULT_CONTOUR_KF_FILE "contour_kf.txt"

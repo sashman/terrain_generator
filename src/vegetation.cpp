@@ -23,6 +23,7 @@ extern int n_rivers;
 extern RiverPoint** source_river_points;
 
 int n_vegetation = DEFAULT_NO_OF_VEGETATION;
+int root_radius = DEAFULT_ROOT_RADIUS;
 
 std::vector<int*> candidate_veg_location;
 std::vector<int*> veg_location;
@@ -129,6 +130,14 @@ void populate_veg() {
 }
 
 void refine_veg(){
+
+	for (int i = 0; i < veg_location.size(); ++i) {
+
+		int x = veg_location[i][0];
+		int y = veg_location[i][1];
+		std::vector<int*> neighbours;
+
+	}
 
 }
 
