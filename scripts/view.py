@@ -77,14 +77,14 @@ for i in range(0,h):
 			if(i-1>=0 and (i+1)<h-2):
 				if(abs(int(map_vals[(i-1)*h + j])-int(map_vals[(i+1)*h+j])) >= cliff_diff):
 	        #type="cliff";
-					draw.point((i,j), fill=(51,70,0))
+					draw.point((i,j), fill=(41,85,0))
 					is_cliff = True;
 
   	  #East-West difference
 			if not is_cliff:
 				if(j-1>=0 and j+1<w-2):
 					if(abs(int(map_vals[(i)*h + j-1])-int(map_vals[(i)*h+j+1])) >= cliff_diff):
-						draw.point((i,j), fill=(51,70,0))
+						draw.point((i,j), fill=(41,85,0))
 
 i = 0
 for re in river_elems:
