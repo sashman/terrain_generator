@@ -43,6 +43,10 @@
 
 #define DEFAULT_MIN_DISTANCE_BETWEEN_SETTLEMENTS 400
 
+#define DEAFULT_VEGETATION_FILE "vegetation.txt"
+
+#define DEFAULT_NO_OF_VEGETATION 300
+
 #define DEFAULT_CONTOUR_FILE "contour.txt"
 
 #define DEFAULT_CONTOUR_KF_FILE "contour_kf.txt"
@@ -84,10 +88,33 @@ void settlements();
 void print_settlements(FILE* stream);
 
 void rivers();
+
 void print_rivers(FILE* stream);
 
 void contour_map();
 void print_contour(FILE* stream);
 void print_kf(FILE* stream);
 
+class RiverPoint {
+public:
+	int x;
+	int y;
+	int river_id;
+	RiverPoint* next;
+	RiverPoint* branch;
+
+	RiverPoint(int x_, int y_, int river_id_) {
+		x = x_;
+		y = y_;
+		river_id = river_id_;
+		next = 0;
+		branch = 0;
+	}
+	~RiverPoint() {
+		//delete next;
+	}
+};
+
+void vegetation();
+void print_vegetation(FILE* stream);
 #endif /* TERRAIN_GENERATOR_HPP_ */

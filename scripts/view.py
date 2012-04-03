@@ -62,7 +62,8 @@ for i in range(0,h):
 	for j in range(2,w):
 		v = int(map_vals[i*h + j])
 		v = int(float(v)/float(max_val) * 255)
-		
+	
+	#colour depending on height value
 		if(v<150):
 			draw.point((i,j), fill=(0,0,100+v))
 		elif(v<160):
@@ -71,6 +72,7 @@ for i in range(0,h):
 			draw.point((i,j), fill=(0,200-(v/2),0))
 		else:
 			draw.point((i,j), fill=(v-60,v-10,v-60))
+
 		if(v>=150): 
    		#North-South difference
 			is_cliff = False
@@ -86,13 +88,14 @@ for i in range(0,h):
 					if(abs(int(map_vals[(i)*h + j-1])-int(map_vals[(i)*h+j+1])) >= cliff_diff):
 						draw.point((i,j), fill=(41,85,0))
 
+#draw rivers
 i = 0
 for re in river_elems:
     x_pos = re.get("y")
     y_pos = re.get("x")
 
 
-    blue = float(i)/float(len(river_elems)) * 240
+    #blue = float(i)/float(len(river_elems)) * 240
     blue = 240
     draw.rectangle((int(x_pos), int(y_pos), int(x_pos), int(y_pos)), fill=(0,0,int(blue)))
     i+=1
@@ -100,6 +103,7 @@ for re in river_elems:
 # use a truetype font
 font = ImageFont.truetype("VeniceClassic.ttf", 18)
 
+#draw settlements
 for s in settlements:
 	v = int(map_vals[int(s.x)*h + int(s.y)])
 	v = int(float(v)/float(max_val) * 255)

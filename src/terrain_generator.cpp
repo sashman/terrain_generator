@@ -281,8 +281,12 @@ void generate(){
 			rivers();
 			print_rivers(0);
 
+			vegetation();
+			print_vegetation(0);
+
 			settlements();
 			print_settlements(0);
+
 		}
 
 

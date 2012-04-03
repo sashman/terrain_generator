@@ -24,26 +24,6 @@ int** source_location;
 int* n_river_branches;
 int max_branches = DEFAULT_MAX_RIVER_BRANCHES;
 
-class RiverPoint {
-public:
-	int x;
-	int y;
-	int river_id;
-	RiverPoint* next;
-	RiverPoint* branch;
-
-	RiverPoint(int x_, int y_, int river_id_) {
-		x = x_;
-		y = y_;
-		river_id = river_id_;
-		next = 0;
-		branch = 0;
-	}
-	~RiverPoint() {
-		//delete next;
-	}
-};
-
 RiverPoint** source_river_points;
 
 bool get_river_source(int river_index) {
@@ -287,7 +267,7 @@ bool river_source_candidate_constraint(int x, int y) {
 	return result;
 }
 
-void calculate_candiates() {
+void calculate_source_candiates() {
 
 	for (int i = 0; i < crop_height; ++i) {
 
@@ -311,7 +291,7 @@ int source_cutoff = 100;
 int source_cutoff_count = 0;
 void rivers() {
 
-	calculate_candiates();
+	calculate_source_candiates();
 
 	source_location = new int*[n_rivers];
 	n_river_branches = new int[n_rivers];
