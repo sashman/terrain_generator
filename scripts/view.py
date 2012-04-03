@@ -12,11 +12,11 @@ except Exception:
 try:
 	import lxml
 except Exception:
-	libs_needed.append("python-lxml")
+	libs_needed.append("python-lxml 2.3.3")
 
 if(len(libs_needed)>0):
-	print "Required libs: "
-	print ",".join(libs_needed)
+	print("Required libs: ")
+	print(",".join(libs_needed))
 	exit()
 
 from PIL import Image, ImageDraw, ImageFont
@@ -57,6 +57,7 @@ img = Image.new("RGB", (w,h), (256,256,256))
 xsize,ysize = w,h
 draw = ImageDraw.Draw(img)
 
+cliff_diff = 5
 for i in range(0,h):
 	for j in range(2,w):
 		v = int(map_vals[i*h + j])
@@ -70,6 +71,21 @@ for i in range(0,h):
 			draw.point((i,j), fill=(0,200-(v/2),0))
 		else:
 			draw.point((i,j), fill=(v-60,v-10,v-60))
+		if(v>=150): 
+   		#North-South difference
+			is_cliff = False
+			if(i-1>=0 and (i+1)<h-2):
+				if(abs(int(map_vals[(i-1)*h + j])-int(map_vals[(i+1)*h+j])) >= cliff_diff):
+	        #type="cliff";
+					draw.point((i,j), fill=(51,70,0))
+					is_cliff = True;
+
+  	  #East-West difference
+			if not is_cliff:
+				if(j-1>=0 and j+1<w-2):
+					if(abs(int(map_vals[(i)*h + j-1])-int(map_vals[(i)*h+j+1])) >= cliff_diff):
+						draw.point((i,j), fill=(51,70,0))
+
 i = 0
 for re in river_elems:
     x_pos = re.get("y")

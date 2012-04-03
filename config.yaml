@@ -6,8 +6,8 @@ output_file : terrain.txt
 # Dimentions
 ###########
 #Note if any of the below values are less than 256, rivers, settlements, and vegetation will not be generated
-height : 20
-width : 20
+height : 512
+width : 512
 
 # scale, amount of detail per tile
 # 0 = tile is smaller than a character, one tile represents part of an object, a tree make take up multiple tiles
@@ -36,20 +36,20 @@ sea_level : 88
 sand_level : 105
 snow_level : 120
 
-cliff_height_difference : 3
+cliff_height_difference : 10
 
 
 # Rivers
 ########
-number_of_river_sources : 50
-max_branches_per_source : 20
+number_of_river_sources : 20
+max_branches_per_source : 10
 
 
 #Settlements
 ############
 
-number_of_settlements : 30
-min_distance_between_settlements : 400
+number_of_settlements : 20
+min_distance_between_settlements : 200
 
 
 #Vegetation

@@ -95,7 +95,7 @@ void print_usage(FILE* stream, int exit_code, char* program_name) {
 					"                           [\n"
 					"                           <tile x=int y=int>\n"
 					"                           <height>int</height>\n"
-					"							<type>grass</type>\n"
+					"							<type>string</type>\n"
 					"                           </tile>\n"
 					"                           ]+\n"
 					"                           </map>\n");
@@ -219,7 +219,6 @@ void generate(){
 			tmap_size = (1<<t)+1;
 		}
 
-		//if(tmap_size < 513) tmap_size = 513;
 		//display info
 		if (verbose) {
 			std::cout << "Staring square diamond" << std::endl;
@@ -278,7 +277,7 @@ void generate(){
 
 
 
-		if(scale>0){
+		if(scale>0 && crop_height>256 && crop_width>256){
 			rivers();
 			print_rivers(0);
 

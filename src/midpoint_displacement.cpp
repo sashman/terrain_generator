@@ -334,6 +334,8 @@ void print_map(FILE* stream) {
 	}
 }
 
+
+
 //xml print
 void print_map_xml(FILE* stream) {
 	if (stream == 0) {
@@ -346,9 +348,44 @@ void print_map_xml(FILE* stream) {
 		fprintf(stream,"<map width='%d' height='%d'>\n", crop_width, crop_height);
 		for (int i = 0; i < crop_height; ++i) {
 			for (int j = 0; j < crop_width; ++j) {
+
+				std::string type;
+
+				//resolve tile type
+				//plain type
+				if(tmap[i][j]<=sea_level){
+					type = "water";
+				}else if(tmap[i][j]<=sand_level){
+					type = "sand";
+				}else if(tmap[i][j]<=sand_level){
+					type = "sand";
+				}else if(tmap[i][j]<=snowtop_level){
+					type = "grass";
+				}else
+					type = "snow";
+
+				//height difference type for cliffs
+				//North-South difference
+				bool is_cliff = false;
+				if(i-1>=0 && i+1<crop_height)
+					if(abs(tmap[i-1][j]-tmap[i+1][j]) >= cliff_difference){
+						type="cliff";
+						is_cliff = true;
+					}
+				//East-West difference
+				if(!is_cliff){
+					if(j-1>=0 && j+1<crop_width)
+						if(abs(tmap[i][j-1]-tmap[i][j+1]) >= cliff_difference){
+							type="cliff";
+						}
+				}
+
+
+
+
 				fprintf(stream,"<tile x='%d' y='%d'>\n\t<height>%i</height>\n"
-						"<type>grass</type>"
-						"</tile>\n", i, j, tmap[i][j]);
+						"<type>%s</type>"
+						"</tile>\n", i, j, tmap[i][j], type.c_str());
 			}
 			fprintf(stream,"\n");
 		}
