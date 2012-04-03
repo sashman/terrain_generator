@@ -108,8 +108,8 @@ for re in river_elems:
 
 
 def get_random_tree_green():
-	#return random.randint(60,200)
-	return 0
+	return random.randint(60,85)
+
 
 #draw vegetation
 for ve in veg_elems:
@@ -118,12 +118,12 @@ for ve in veg_elems:
 	
 	#draw 4 points in a triangle
 	#centre
-	draw.point((x_pos,y_pos), fill = (150,get_random_tree_green(),0))
+	draw.point((x_pos,y_pos), fill = (0,get_random_tree_green(),0))
 	#top
-	draw.point((x_pos,y_pos-1), fill = (150,get_random_tree_green(),0))
+	draw.point((x_pos,y_pos-1), fill = (0,get_random_tree_green(),0))
 	#sides
-	draw.point((x_pos-1,y_pos), fill = (150,get_random_tree_green(),0))
-	draw.point((x_pos+1,y_pos), fill = (150,get_random_tree_green(),0))
+	draw.point((x_pos-1,y_pos), fill = (0,get_random_tree_green(),0))
+	draw.point((x_pos+1,y_pos), fill = (0,get_random_tree_green(),0))
 
 
 # use a truetype font
