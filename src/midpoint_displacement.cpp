@@ -345,7 +345,6 @@ void print_map_xml(FILE* stream) {
 	if (stream == NULL)
 		perror("Error opening file");
 	else {
-		//TODO: add tile type value
 		fprintf(stream,"<map width='%d' height='%d'>\n", crop_width, crop_height);
 		for (int i = 0; i < crop_height; ++i) {
 			for (int j = 0; j < crop_width; ++j) {

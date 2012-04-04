@@ -268,7 +268,6 @@ void generate(){
 
 		if (verbose) std::cout << "Finished square diamond" << std::endl;
 
-		//TODO: generate tile types
 
 
 

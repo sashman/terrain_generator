@@ -36,7 +36,6 @@ bool get_above_sea_level(int location_index) {
 	int x = rand() % crop_width;
 	int y = rand() % crop_height;
 
-	//TODO: change to a set sea level!
 
 	while (tmap[y][x] <= sea_level) {
 		x = rand() % crop_width;
@@ -191,7 +190,6 @@ void settlements() {
 
 		//use a simple rule to find a suitable place for a settlement
 		if(get_settelement(i)){
-			//TODO: change to loop if not found
 			get_name(&names[i]);
 			settlement_found[i] = true;
 		}

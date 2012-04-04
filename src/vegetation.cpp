@@ -129,15 +129,82 @@ void populate_veg() {
 	}
 }
 
+bool veg_tile(int x, int y){
+	for (int i = 0; i < veg_location.size(); ++i) {
+		if(x== veg_location[i][0] && y== veg_location[i][1]) return true;
+	}
+	return false;
+}
+
+bool water_tile  = false;
+
 void refine_veg(){
 
+	std::vector<int*> remove_indeces;
+	std::vector<int*> add_points;
 	for (int i = 0; i < veg_location.size(); ++i) {
 
 		int x = veg_location[i][0];
 		int y = veg_location[i][1];
 		std::vector<int*> neighbours;
+		//fill neighbourhood
+		for (int j = y-root_radius; j < y+root_radius; ++j) {
+			if(j>=0 && j<crop_height){
+				for (int k = x-root_radius; k < x+root_radius; ++k) {
+					if(k>=0 && k<crop_width){
+						int* n = new int[2];
+						n[0] = k;
+						n[1] = y;
+						neighbours.push_back(n);
+					}
+				}
+			}
+		}
 
+
+		int veg_neighbous = 0;
+		int* point = new int[2];
+		bool water_present = false;
+		for (int j = 0; j < neighbours.size(); ++j) {
+			int nx = neighbours[j][0];
+			int ny = neighbours[j][1];
+			point[0] = nx;
+			point[1] = ny;
+
+			//get local veg count
+			if(veg_tile(nx,ny)) veg_neighbous++;
+			if(point_at_river_tile(nx,ny) || !point_above_sealevel(nx,ny)) water_present = true;
+		}
+
+
+
+		if(!water_present && veg_neighbous>=3){
+
+			remove_indeces.push_back(point);
+		}else{
+			for (int j = 0; j < neighbours.size(); ++j) {
+				int nx = neighbours[j][0];
+				int ny = neighbours[j][1];
+				if(!veg_tile(nx,ny) && !point_at_river_tile(nx,ny) && point_above_sealevel(nx,ny)){
+					point[0] = nx;
+					point[1] = ny;
+					add_points.push_back(point);
+				}
+
+			}
+		}
 	}
+
+	for (int i = 0; i < remove_indeces.size(); ++i){
+		for(std::vector<int*>::iterator it = veg_location.begin(); it != veg_location.end(); ++it) {
+			if(((int*)*it)[0] == remove_indeces[i][0] && ((int*)*it)[1] == remove_indeces[i][1]){
+				veg_location.erase(it);
+			}
+		}
+	}
+	remove_indeces.clear();
+	for (int i = 0; i < add_points.size(); ++i) veg_location.push_back(add_points[i]);
+	add_points.clear();
 
 }
 
@@ -148,6 +215,11 @@ void vegetation() {
 
 	calculate_veg_candiates();
 	populate_veg();
+
+	for (int i = 0; i < 5; ++i) {
+		refine_veg();
+	}
+
 
 
 
