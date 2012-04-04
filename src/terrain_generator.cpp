@@ -30,6 +30,7 @@ int output_format = STANDRARD_HEIGHTS;
 int verbose = 0;
 
 std::string output_file = DEAFULT_TERRAIN_FILE;
+std::string config_file = DEFAULT_CONFIG_FILE;
 
 extern int tmap_size;
 extern int crop_height;
@@ -71,34 +72,33 @@ extern int root_radius;
 
 
 void print_usage(FILE* stream, int exit_code, char* program_name) {
-	fprintf(stream, "A program to generate simple terrain with variable formats.\n\n");
+	fprintf(stream, "A program to generate terrain and features with variable formats.\n\n");
 	fprintf(stream, "Usage:  %s [options]\n", program_name);
 	fprintf(
 			stream,
-					"  -h  --help             Display this usage information.\n"
-					"  -v  --verbose          Print verbose messages.\n"
-					"      --height <value>   Crop the map down to specified positive integer height.\n"
-					"      --width <value>    Crop the map down to specified positive integer width.\n"
-					"      --rough <value>    Define smoothness of the terrain as a float (0.0 < v < 1.0).\n"
-					"                         Lower values produce smoother terrain, smaller difference in adjacent tiles.\n"
-					"      --seed <value>     Set the initial positive integer height for the algorithm to be generate values from.\n"
-					"      --offset <value>   Set the initial offset positive integer height (seed+offset=max possible height).\n"
-					"      --plate <value>    Set the fraction of the tectonic plates appearance.\n"
-					"                         Higher values will give a more 'ripped apart' look, values too close to 1 are not\n"
-					"                         recommended for realistic terrain. (0.0 < v < 1.0)\n"
-					"      --erosion <value>  Number of erosion iterations over the terrain. Must be a positive integer.\n"
-					"  -n  --negative         Allow for negative height values.\n"
-					"  -s  --standard         Use standard output to be written to a file (used as default output).\n"
-					"                         width, height and a set of height values all separated by a space.\n"
-					"  -g  --graphical        Display the height map using a 3D OpenGL view.\n"
-					"  -x  --xml              Use the following xml output to be written to a file:\n"
+					"  -h  --help                 Display this usage information.\n"
+					"  -c  --config <filename>    Use custom config file.\n"
+					"  -v  --verbose              Print verbose messages.\n"
+					"      --height <value>       Crop the map down to specified positive integer height.\n"
+					"      --width <value>        Crop the map down to specified positive integer width.\n"
+					"      --rough <value>        Define smoothness of the terrain as a float (0.0 < v < 1.0).\n"
+					"                             Lower values produce smoother terrain, smaller difference in adjacent tiles.\n"
+					"      --seed <value>         Set the initial positive integer height for the algorithm to be generate values from.\n"
+					"      --offset <value>       Set the initial offset positive integer height (seed+offset=max possible height).\n"
+					"      --plate <value>        Set the fraction of the tectonic plates appearance.\n"
+					"                             Higher values will give a more 'ripped apart' look, values too close to 1 are not\n"
+					"                             recommended for realistic terrain. (0.0 < v < 1.0)\n"
+					"      --erosion <value>      Number of erosion iterations over the terrain. Must be a positive integer.\n"
+					"  -n  --negative             Allow for negative height values.\n"
+					"  -s  --standard             Use standard output to be written to a file (used as default output).\n"
+					"                             width, height and a set of height values all separated by a space.\n"
+					"  -g  --graphical            Display the height map using a 3D OpenGL view.\n"
+					"  -x  --xml                  Use the following xml output to be written to a file:\n"
 					"                           <map width=int height=int>\n"
-					"                           [\n"
-					"                           <tile x=int y=int>\n"
+					"                           [<tile x=int y=int>\n"
 					"                           <height>int</height>\n"
 					"							<type>string</type>\n"
-					"                           </tile>\n"
-					"                           ]+\n"
+					"                           </tile>\n]+"
 					"                           </map>\n");
 	exit(exit_code);
 }
@@ -114,7 +114,7 @@ void read_config(){
 
 	yaml_parser_initialize(&parser);
 
-	FILE *input = fopen(DEFAULT_CONFIG_FILE, "rb");
+	FILE *input = fopen(config_file.c_str(), "rb");
 
 	yaml_parser_set_input_file(&parser, input);
 
@@ -162,6 +162,9 @@ void read_config(){
 
 	    		if(key_type.compare("output_file")==0){
 	    			output_file = (char*)token.data.scalar.value;
+	    		}
+	    		else if(key_type.compare("output_format")==0){
+	    			if(strcmp((char*)token.data.scalar.value, "xml")==0) output_format = STANDARD_XML;
 	    		}
 	    		else if(key_type.compare("height")==0) crop_width = atoi((char*)token.data.scalar.value);
 				else if(key_type.compare("width")==0) crop_height = atoi((char*)token.data.scalar.value);
@@ -222,6 +225,7 @@ void generate(){
 
 		//display info
 		if (verbose) {
+			std::cout << "Using " << config_file << std::endl;
 			std::cout << "Staring square diamond" << std::endl;
 			std::cout << "Size: " << crop_width << " x " << crop_height << " original size " << tmap_size << std::endl;
 			std::cout << "Starting seed value " << seed << std::endl;
@@ -319,10 +323,11 @@ int main(int argc, char** argv) {
 
 
 	/* A string listing valid short options letters.  */
-	const char* const short_options = "hsxgvn";
+	const char* const short_options = "hc:sxgvn";
 	/* An array describing valid long options.  */
-	const struct option long_options[] = { { "help", 0, NULL, 'h' }, {
-			"standard", 0, NULL, 's' }, { "xml", 0, NULL, 'x' }, { "graphic", 0, NULL, 'g' }, { "verbose", 0,
+	const struct option long_options[] = { { "help", 0, NULL, 'h' },
+			{"config", 1, NULL, 'c'},
+			{"standard", 0, NULL, 's' }, { "xml", 0, NULL, 'x' }, { "graphic", 0, NULL, 'g' }, { "verbose", 0,
 			NULL, 'v' },
 			{"height", 1, NULL, 'e'},
 			{"width", 1, NULL, 'w'},
@@ -347,6 +352,12 @@ int main(int argc, char** argv) {
 			/* User has requested usage information.  Print it to standard
 			 output, and exit with exit code zero (normal termination).  */
 			print_usage(stdout, 0, program_name);
+			break;
+
+		case 'c': //config file
+
+			config_file = optarg;
+
 			break;
 		case 's': /* -s --standard */
 

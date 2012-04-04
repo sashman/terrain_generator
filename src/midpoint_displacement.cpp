@@ -387,7 +387,7 @@ void print_map_xml(FILE* stream) {
 				}
 
 				fprintf(stream,"<tile x='%d' y='%d'>\n\t<height>%i</height>\n"
-						"<type>%s</type>"
+						"<type>%s</type>\n"
 						"</tile>\n", i, j, tmap[i][j], type.c_str());
 			}
 			fprintf(stream,"\n");
