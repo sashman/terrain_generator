@@ -183,6 +183,10 @@ void refine_veg(){
 
 			remove_indeces.push_back(point);
 
+		} else if(veg_neighbous>=6){
+
+			remove_indeces.push_back(point);
+
 		}else{
 
 			for (int j = 0; j < neighbours.size(); ++j) {
@@ -207,12 +211,12 @@ void refine_veg(){
 		for(std::vector<int*>::iterator it = veg_location.begin(); it != veg_location.end(); ++it) {
 			if(((int*)*it)[0] == remove_indeces[i][0] && ((int*)*it)[1] == remove_indeces[i][1]){
 				veg_location.erase(it);
-				return;
+				break;
 			}
 		}
 	}
-
 	remove_indeces.clear();
+
 	for (int i = 0; i < add_points.size(); ++i){
 		veg_location.push_back(add_points[i]);
 	}
@@ -220,7 +224,7 @@ void refine_veg(){
 
 }
 
-void vegetation() {
+void vegetation(bool verbose) {
 
 	//create a list of river tiles
 	calculate_water_tiles();
@@ -229,7 +233,7 @@ void vegetation() {
 	populate_veg();
 
 	for (int i = 0; i < generations; ++i) {
-		//std::cout << "Gen " << i << " pop "<< veg_location.size() << std::endl;
+		if(verbose)std::cout << "\tGen " << i << " pop "<< veg_location.size() << std::endl;
 		refine_veg();
 	}
 

@@ -63,7 +63,7 @@ img = Image.new("RGB", (w,h), (256,256,256))
 xsize,ysize = w,h
 draw = ImageDraw.Draw(img)
 
-cliff_diff = 7 
+cliff_diff = 8 
 for i in range(0,h):
 	for j in range(2,w):
 		v = int(map_vals[i*h + j])

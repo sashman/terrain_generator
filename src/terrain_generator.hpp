@@ -119,6 +119,6 @@ public:
 	}
 };
 
-void vegetation();
+void vegetation(bool verbose);
 void print_vegetation(FILE* stream);
 #endif /* TERRAIN_GENERATOR_HPP_ */

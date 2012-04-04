@@ -59,6 +59,6 @@ min_distance_between_settlements : 300
 #Vegetation
 ###########
 
-number_of_vegetation : 5000
+number_of_vegetation : 50
 vegetation_root_radius : 3
-vegetation_generations : 3
+vegetation_generations : 60

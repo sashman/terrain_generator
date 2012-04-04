@@ -298,7 +298,7 @@ void generate(){
 			print_rivers(0);
 
 			if(verbose) std::cout << "Generating vegetation" << std::endl;
-			vegetation();
+			vegetation(verbose);
 			print_vegetation(0);
 
 			if(verbose) std::cout << "Generating settlements" << std::endl;
