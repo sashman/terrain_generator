@@ -163,8 +163,8 @@ void read_config(){
 	    		if(key_type.compare("output_file")==0){
 	    			output_file = (char*)token.data.scalar.value;
 	    		}
-	    		else if(key_type.compare("height")==0) crop_height = atoi((char*)token.data.scalar.value);
-				else if(key_type.compare("width")==0) crop_width = atoi((char*)token.data.scalar.value);
+	    		else if(key_type.compare("height")==0) crop_width = atoi((char*)token.data.scalar.value);
+				else if(key_type.compare("width")==0) crop_height = atoi((char*)token.data.scalar.value);
 				else if(key_type.compare("scale")==0) scale = atoi((char*)token.data.scalar.value);
 				else if(key_type.compare("seed")==0) seed = atoi((char*)token.data.scalar.value);
 				else if(key_type.compare("offset")==0) random_offset = atoi((char*)token.data.scalar.value);
