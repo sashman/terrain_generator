@@ -154,7 +154,7 @@ void refine_veg(){
 					if(k>=0 && k<crop_width){
 						int* n = new int[2];
 						n[0] = k;
-						n[1] = y;
+						n[1] = j;
 						neighbours.push_back(n);
 					}
 				}
@@ -181,14 +181,21 @@ void refine_veg(){
 		if(!water_present && veg_neighbous>=3){
 
 			remove_indeces.push_back(point);
+
 		}else{
+
 			for (int j = 0; j < neighbours.size(); ++j) {
 				int nx = neighbours[j][0];
 				int ny = neighbours[j][1];
-				if(!veg_tile(nx,ny) && !point_at_river_tile(nx,ny) && point_above_sealevel(nx,ny)){
+				int chance = neighbours.size()-j;
+
+				if (rand()%(chance)==0 &&
+						!veg_tile(nx, ny) && !point_at_river_tile(nx, ny)
+						&& point_above_sealevel(nx, ny) && nx != x && ny != y) {
 					point[0] = nx;
 					point[1] = ny;
 					add_points.push_back(point);
+					break;
 				}
 
 			}
@@ -199,11 +206,15 @@ void refine_veg(){
 		for(std::vector<int*>::iterator it = veg_location.begin(); it != veg_location.end(); ++it) {
 			if(((int*)*it)[0] == remove_indeces[i][0] && ((int*)*it)[1] == remove_indeces[i][1]){
 				veg_location.erase(it);
+				return;
 			}
 		}
 	}
+
 	remove_indeces.clear();
-	for (int i = 0; i < add_points.size(); ++i) veg_location.push_back(add_points[i]);
+	for (int i = 0; i < add_points.size(); ++i){
+		veg_location.push_back(add_points[i]);
+	}
 	add_points.clear();
 
 }
@@ -216,7 +227,8 @@ void vegetation() {
 	calculate_veg_candiates();
 	populate_veg();
 
-	for (int i = 0; i < 5; ++i) {
+	for (int i = 0; i < 100; ++i) {
+		std::cout << "Gen " << i << " pop "<< veg_location.size() << std::endl;
 		refine_veg();
 	}
 
