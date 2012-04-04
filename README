@@ -1,6 +1,6 @@
 A program to generate simple terrain with variable formats.
 
-Usage:  ./../Default/terrain_generator [options]
+Usage:  ./Default/terrain_generator [options]
   -h  --help             Display this usage information.
   -v  --verbose          Print verbose messages.
       --height <value>   Crop the map down to specified positive integer height.
@@ -14,21 +14,19 @@ Usage:  ./../Default/terrain_generator [options]
                          recommended for realistic terrain. (0.0 < v < 1.0)
       --erosion <value>  Number of erosion iterations over the terrain. Must be a positive integer.
   -n  --negative         Allow for negative height values.
-  -s  --standard         Use standard output (used as default output):
+  -s  --standard         Use standard output to be written to a file (used as default output).
                          width, height and a set of height values all separated by a space.
   -g  --graphical        Display the height map using a 3D OpenGL view.
-  -x  --xml              Use the following xml output:
+  -x  --xml              Use the following xml output to be written to a file:
                            <map width=int height=int>
                            [
                            <tile x=int y=int>
                            <height>int</height>
-							<type>grass</type>
+							<type>string</type>
                            </tile>
                            ]+
                            </map>
 
 
 TODO:
-- Add forests
 - add noise to voronoi
-- generate tile types

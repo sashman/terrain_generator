@@ -299,17 +299,23 @@ void normalise_map(){
 	int max = -INT_MAX;
 	int min = INT_MAX;
 	for (int i = 0; i < crop_height; ++i) {
-				for (int j = 0; j < crop_width; ++j) {
-					if(max<tmap[i][j]) max = tmap[i][j];
-					if(min>tmap[i][j]) min = tmap[i][j];
-				}
+		for (int j = 0; j < crop_width; ++j) {
+			if (max < tmap[i][j])
+				max = tmap[i][j];
+			if (min > tmap[i][j])
+				min = tmap[i][j];
+		}
 	}
+
+	int diff = normalise_max - normalise_min;
 
 	for (int i = 0; i < crop_height; ++i) {
 		for (int j = 0; j < crop_width; ++j) {
-			int diff = normalise_max - normalise_min;
+
 			int old = tmap[i][j];
 			tmap[i][j] = (int) ((float) (tmap[i][j]-min) / (float) (max - min) * (float)diff) ;
+			if(tmap[i][j]>normalise_max)
+				std::cout << old << "->" << tmap[i][j] << std::endl;
 		}
 	}
 

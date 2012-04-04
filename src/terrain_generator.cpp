@@ -270,6 +270,11 @@ void generate(){
 
 
 
+		if (normalise) {
+			if (verbose)
+				std::cout << "Normalising with value range " << normalise_min << "-" << normalise_max << std::endl;
+			normalise_map();
+		}
 
 		if (output_format == STANDRARD_HEIGHTS) {
 			print_map(fopen(output_file.c_str(), "w"));
@@ -277,11 +282,7 @@ void generate(){
 			print_map_xml(fopen(output_file.c_str(), "w"));
 		}
 
-		if (normalise) {
-			if (verbose)
-				std::cout << "Normalising with value range " << normalise_min << "-" << normalise_max << std::endl;
-			normalise_map();
-		}
+
 
 
 		if(scale>0 && crop_height>256 && crop_width>256){

@@ -227,8 +227,8 @@ void vegetation() {
 	calculate_veg_candiates();
 	populate_veg();
 
-	for (int i = 0; i < 100; ++i) {
-		std::cout << "Gen " << i << " pop "<< veg_location.size() << std::endl;
+	for (int i = 0; i < 2; ++i) {
+		//std::cout << "Gen " << i << " pop "<< veg_location.size() << std::endl;
 		refine_veg();
 	}
 
