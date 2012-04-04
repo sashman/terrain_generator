@@ -69,6 +69,7 @@ extern int min_distance;
 
 extern int n_vegetation;
 extern int root_radius;
+extern int generations;
 
 
 void print_usage(FILE* stream, int exit_code, char* program_name) {
@@ -185,6 +186,7 @@ void read_config(){
 				else if(key_type.compare("min_distance_between_settlements")==0) min_distance = atoi((char*)token.data.scalar.value);
 				else if(key_type.compare("number_of_vegetation")==0) n_vegetation = atoi((char*)token.data.scalar.value);
 				else if(key_type.compare("vegetation_root_radius")==0) root_radius = atoi((char*)token.data.scalar.value);
+				else if(key_type.compare("vegetation_generations")==0) generations = atoi((char*)token.data.scalar.value);
 	    	}
 
 

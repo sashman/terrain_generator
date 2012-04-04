@@ -24,6 +24,7 @@ extern RiverPoint** source_river_points;
 
 int n_vegetation = DEFAULT_NO_OF_VEGETATION;
 int root_radius = DEAFULT_ROOT_RADIUS;
+int generations = DEAFULT_VEGETATION_GENERATIONS;
 
 std::vector<int*> candidate_veg_location;
 std::vector<int*> veg_location;
@@ -227,7 +228,7 @@ void vegetation() {
 	calculate_veg_candiates();
 	populate_veg();
 
-	for (int i = 0; i < 2; ++i) {
+	for (int i = 0; i < generations; ++i) {
 		//std::cout << "Gen " << i << " pop "<< veg_location.size() << std::endl;
 		refine_veg();
 	}
