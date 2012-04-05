@@ -78,10 +78,6 @@ void print_map(FILE* stream);
 //xml print
 void print_map_xml(FILE* stream);
 
-#ifndef _COMPACT
-	void run_view();
-#endif
-
 bool point_above_sealevel(int x, int y);
 
 bool point_above_sandlevel(int x, int y);
