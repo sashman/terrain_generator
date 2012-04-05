@@ -1,6 +1,6 @@
 //============================================================================
 // Name        : terrain_generator.cpp
-// Author      : os63
+// Author      : sash
 // Version     : 0.0.0.1
 //============================================================================
 
@@ -12,15 +12,32 @@
 enum OutFormat {
 	STANDRARD_HEIGHTS, STANDARD_XML, OPENGL_VIEW
 };
+
+enum ConfigTags{
+	HEIGHT, WIDTH, SCALE,
+	SEED, OFFSET, ROUGH,
+	NORMALISE,NORMALISE_MIN,NORMALISE_MAX,
+	SEA_LEVEL, SAND_LEVEL, SNOW_LEVEL, CLIFF_HEIGHT_DIFFERENCE,
+	NUMBER_OF_RIVER_SOURCES, MAX_BRANCHES_PER_SOURCE,
+	NUMBER_OF_SETTELMENTS, MIN_DISTANCE_BETWEEN_SETTLEMENTS,
+	NUMBER_OF_VEGETATION
+};
+
+
 int output_format = STANDRARD_HEIGHTS;
 
 /* Whether to display verbose messages.  */
 int verbose = 0;
 
+std::string output_file = DEAFULT_TERRAIN_FILE;
+std::string config_file = DEFAULT_CONFIG_FILE;
+
 extern int tmap_size;
 extern int crop_height;
 extern int crop_width;
 extern int** tmap;
+
+int scale = 1;
 
 extern int seed;
 extern int random_offset;
@@ -35,100 +52,154 @@ extern int erosion_steps;
 
 extern bool neg;
 
+extern bool normalise;
+extern int normalise_min;
+extern int normalise_max;
+
+extern int sea_level;
+extern int sand_level;
+extern int snowtop_level;
+extern int cliff_difference;
+
+extern int n_rivers;
+extern int max_branches;
+
+extern int n_settlements;
+extern int min_distance;
+
+extern int n_vegetation;
+extern int root_radius;
+extern int generations;
 
 
 void print_usage(FILE* stream, int exit_code, char* program_name) {
-	fprintf(stream, "A program to generate simple terrain with variable formats.\n\n");
+	fprintf(stream, "A program to generate terrain and features with variable formats.\n\n");
 	fprintf(stream, "Usage:  %s [options]\n", program_name);
 	fprintf(
 			stream,
-					"  -h  --help             Display this usage information.\n"
-					"  -v  --verbose          Print verbose messages.\n"
-					"      --height <value>   Crop the map down to specified positive integer height.\n"
-					"      --width <value>    Crop the map down to specified positive integer width.\n"
-					"      --rough <value>    Define smoothness of the terrain as a float (0.0 < v < 1.0).\n"
-					"                         Lower values produce smoother terrain, smaller difference in adjacent tiles.\n"
-					"      --seed <value>     Set the initial positive integer height for the algorithm to be generate values from.\n"
-					"      --offset <value>   Set the initial offset positive integer height (seed+offset=max possible height).\n"
-					"      --plate <value>    Set the fraction of the tectonic plates appearance.\n"
-					"                         Higher values will give a more 'ripped apart' look, values too close to 1 are not\n"
-					"                         recommended for realistic terrain. (0.0 < v < 1.0)\n"
-					"      --erosion <value>  Number of erosion iterations over the terrain. Must be a positive integer.\n"
-					"  -n  --negative         Allow for negative height values.\n"
-					"  -s  --standard         Use standard output (used as default output):\n"
-					"                         width, height and a set of height values all separated by a space.\n"
-					"  -g  --graphical        Display the height map using a 3D OpenGL view.\n"
-					"  -x  --xml              Use the following xml output:\n"
+					"  -h  --help                 Display this usage information.\n"
+					"  -c  --config <filename>    Use custom config file.\n"
+					"  -v  --verbose              Print verbose messages.\n"
+					"      --height <value>       Crop the map down to specified positive integer height.\n"
+					"      --width <value>        Crop the map down to specified positive integer width.\n"
+					"      --rough <value>        Define smoothness of the terrain as a float (0.0 < v < 1.0).\n"
+					"                             Lower values produce smoother terrain, smaller difference in adjacent tiles.\n"
+					"      --seed <value>         Set the initial positive integer height for the algorithm to be generate values from.\n"
+					"      --offset <value>       Set the initial offset positive integer height (seed+offset=max possible height).\n"
+					"      --plate <value>        Set the fraction of the tectonic plates appearance.\n"
+					"                             Higher values will give a more 'ripped apart' look, values too close to 1 are not\n"
+					"                             recommended for realistic terrain. (0.0 < v < 1.0)\n"
+					"      --erosion <value>      Number of erosion iterations over the terrain. Must be a positive integer.\n"
+					"  -n  --negative             Allow for negative height values.\n"
+					"  -s  --standard             Use standard output to be written to a file (used as default output).\n"
+					"                             width, height and a set of height values all separated by a space.\n"
+					"  -g  --graphical            Display the height map using a 3D OpenGL view.\n"
+					"  -x  --xml                  Use the following xml output to be written to a file:\n"
 					"                           <map width=int height=int>\n"
-					"                           [\n"
-					"                           <tile x=int y=int>\n"
+					"                           [<tile x=int y=int>\n"
 					"                           <height>int</height>\n"
-					"							<type>grass</type>\n"
-					"                           </tile>\n"
-					"                           ]+\n"
+					"							<type>string</type>\n"
+					"                           </tile>\n]+"
 					"                           </map>\n");
 	exit(exit_code);
 }
 
 
 
-//TODO: Add fresh water source creation
-//TODO: Add forests
-//TODO: Add settlement generation
-
-
-/* Set a generic reader. */
-void *ext = 0;
-int read_handler(void *ext, char *buffer, int size, int *length) {
-    /* ... */
-
-	std::cout << buffer << " " << size << " " << *length << std::endl;
-
-    //*buffer = ...;
-    //*length = ...;
-    /* ... */
-    return 1;
-}
-
 void read_config(){
 
 	yaml_parser_t parser;
-	yaml_event_t event;
+	yaml_token_t  token;
 
 	int done = 0;
 
-
-	/* Create the Parser object. */
 	yaml_parser_initialize(&parser);
 
-	/* Set a file input. */
-	FILE *input = fopen(DEFAULT_CONFIG_FILE, "rb");
+	FILE *input = fopen(config_file.c_str(), "rb");
 
 	yaml_parser_set_input_file(&parser, input);
 
-	yaml_parser_set_input_file(&parser, input);
 
-	/* Read the event sequence. */
-	while (!done) {
+	bool key = false;
+	std::string key_type;
+	bool value = false;
 
-	    /* Get the next event. */
-	    if (!yaml_parser_parse(&parser, &event))
-
-	    	yaml_parser_delete(&parser);
-
-	    /*
-	      ...
-	      Process the event.
-	      ...
+	do {
+	    yaml_parser_scan(&parser, &token);
+	    switch(token.type)
+	    {
+	    /* Stream start/end
+	    case YAML_STREAM_START_TOKEN: puts("STREAM START"); break;
+	    case YAML_STREAM_END_TOKEN:   puts("STREAM END");   break;
 	    */
 
-	    /* Are we finished? */
-	    done = (event.type == YAML_STREAM_END_EVENT);
+	    /* Token types (read before actual token) */
+	    case YAML_KEY_TOKEN:
+	    	//printf("(Key token)   ");
+	    	key = true;
+	    break;
+	    case YAML_VALUE_TOKEN:
+//	    	printf("(Value token) ");
+	    	value = true;
+	    break;
 
-	    /* The application is responsible for destroying the event object. */
-	    yaml_event_delete(&event);
 
-	}
+	    /* Block delimeters
+	    case YAML_BLOCK_SEQUENCE_START_TOKEN: puts("<b>Start Block (Sequence)</b>"); break;
+	    case YAML_BLOCK_ENTRY_TOKEN:          puts("<b>Start Block (Entry)</b>");    break;
+	    case YAML_BLOCK_END_TOKEN:            puts("<b>End block</b>");              break;
+	    */
+
+	    /* Data */
+	    //case YAML_BLOCK_MAPPING_START_TOKEN:  puts("[Block mapping]");            break;
+
+	    case YAML_SCALAR_TOKEN:
+	    	if(key){
+	    		key_type = (char*)token.data.scalar.value;
+	    		key = false;
+	    		//std::cout << ">>" << key_type << std::endl;
+	    	}else if(value){
+	    		value = false;
+
+	    		if(key_type.compare("output_file")==0){
+	    			output_file = (char*)token.data.scalar.value;
+	    		}
+	    		else if(key_type.compare("output_format")==0){
+	    			if(strcmp((char*)token.data.scalar.value, "xml")==0) output_format = STANDARD_XML;
+	    		}
+	    		else if(key_type.compare("height")==0) crop_width = atoi((char*)token.data.scalar.value);
+				else if(key_type.compare("width")==0) crop_height = atoi((char*)token.data.scalar.value);
+				else if(key_type.compare("scale")==0) scale = atoi((char*)token.data.scalar.value);
+				else if(key_type.compare("seed")==0) seed = atoi((char*)token.data.scalar.value);
+				else if(key_type.compare("offset")==0) random_offset = atoi((char*)token.data.scalar.value);
+				else if(key_type.compare("rough")==0) offset_dr = atof((char*)token.data.scalar.value);
+				else if(key_type.compare("normalise")==0) normalise = (strcmp((char*)token.data.scalar.value, "true") == 0);
+				else if(key_type.compare("normalise_min")==0) normalise_min = atoi((char*)token.data.scalar.value);
+				else if(key_type.compare("normalise_max")==0) normalise_max = atoi((char*)token.data.scalar.value);
+				else if(key_type.compare("sea_level")==0) sea_level = atoi((char*)token.data.scalar.value);
+				else if(key_type.compare("sand_level")==0) sand_level = atoi((char*)token.data.scalar.value);
+				else if(key_type.compare("snow_level")==0) snowtop_level= atoi((char*)token.data.scalar.value);
+				else if(key_type.compare("cliff_height_difference")==0) cliff_difference = atoi((char*)token.data.scalar.value);
+				else if(key_type.compare("number_of_river_sources")==0) n_rivers = atoi((char*)token.data.scalar.value);
+				else if(key_type.compare("max_branches_per_source")==0) max_branches = atoi((char*)token.data.scalar.value);
+				else if(key_type.compare("number_of_settlements")==0) n_settlements = atoi((char*)token.data.scalar.value);
+				else if(key_type.compare("min_distance_between_settlements")==0) min_distance = atoi((char*)token.data.scalar.value);
+				else if(key_type.compare("number_of_vegetation")==0) n_vegetation = atoi((char*)token.data.scalar.value);
+				else if(key_type.compare("vegetation_root_radius")==0) root_radius = atoi((char*)token.data.scalar.value);
+				else if(key_type.compare("vegetation_generations")==0) generations = atoi((char*)token.data.scalar.value);
+	    	}
+
+
+	    break;
+
+	    /* Others */
+	    default:
+	      //printf("Got token of type %d\n", token.type);
+	    	break;
+	    }
+	    if(token.type != YAML_STREAM_END_TOKEN) yaml_token_delete(&token);
+	  } while(token.type != YAML_STREAM_END_TOKEN);
+	  yaml_token_delete(&token);
 
 	yaml_parser_delete(&parser);
 }
@@ -154,9 +225,9 @@ void generate(){
 			tmap_size = (1<<t)+1;
 		}
 
-		//if(tmap_size < 513) tmap_size = 513;
 		//display info
 		if (verbose) {
+			std::cout << "Using " << config_file << std::endl;
 			std::cout << "Staring square diamond" << std::endl;
 			std::cout << "Size: " << crop_width << " x " << crop_height << " original size " << tmap_size << std::endl;
 			std::cout << "Starting seed value " << seed << std::endl;
@@ -169,8 +240,8 @@ void generate(){
 		tmap = new int*[tmap_size];
 		for (int i = 0; i < tmap_size; ++i) {
 			tmap[i] = new int[tmap_size];
+			for(int j = 0; j < tmap_size; j++) tmap[i][j] = 0;
 		}
-
 
 		 /* initialize random seed:
 		  * use for generating a random map every time
@@ -188,9 +259,11 @@ void generate(){
 
 		if(verbose){
 			std::cout << "Voronoi points" << std::endl;
+			/*
 			for (int i = 0; i < voronoi_size; ++i) {
 				std::cout << "\t" << voronoi_points[i][0] << "," << voronoi_points[i][1] << std::endl;
 			}
+			*/
 		}
 
 		erosion();
@@ -198,25 +271,44 @@ void generate(){
 
 		if(!neg) clear_neg();
 
+
 		if (verbose) std::cout << "Finished square diamond" << std::endl;
 
-		//TODO: generate tile types
 
 
-
-		if (output_format == STANDRARD_HEIGHTS) {
-			print_map();
-		} else if (output_format == STANDARD_XML) {
-			print_map_xml();
-		} else if (output_format == OPENGL_VIEW) {
-			run_view();
+		if (normalise) {
+			if (verbose)
+				std::cout << "Normalising with value range " << normalise_min << "-" << normalise_max << std::endl;
+			normalise_map();
 		}
 
-		rivers();
-		print_rivers(0);
+		if (output_format == STANDRARD_HEIGHTS) {
+			print_map(fopen(output_file.c_str(), "w"));
+		} else if (output_format == STANDARD_XML) {
+			print_map_xml(fopen(output_file.c_str(), "w"));
+		}
 
-		settlements();
-		print_settlements(0);
+
+
+
+		if(scale>0 && crop_height>256 && crop_width>256){
+
+			if(verbose) std::cout << "Generating rivers" << std::endl;
+			rivers();
+			print_rivers(0);
+
+			if(verbose) std::cout << "Generating vegetation" << std::endl;
+			vegetation(verbose);
+			print_vegetation(0);
+
+			if(verbose) std::cout << "Generating settlements" << std::endl;
+			settlements();
+			print_settlements(0);
+
+		}
+
+
+
 
 		//std::cout<<"Drawing contours"<<std::endl;
 		//contour_map();
@@ -233,10 +325,11 @@ int main(int argc, char** argv) {
 
 
 	/* A string listing valid short options letters.  */
-	const char* const short_options = "hsxgvn";
+	const char* const short_options = "hc:sxgvn";
 	/* An array describing valid long options.  */
-	const struct option long_options[] = { { "help", 0, NULL, 'h' }, {
-			"standard", 0, NULL, 's' }, { "xml", 0, NULL, 'x' }, { "graphic", 0, NULL, 'g' }, { "verbose", 0,
+	const struct option long_options[] = { { "help", 0, NULL, 'h' },
+			{"config", 1, NULL, 'c'},
+			{"standard", 0, NULL, 's' }, { "xml", 0, NULL, 'x' }, { "graphic", 0, NULL, 'g' }, { "verbose", 0,
 			NULL, 'v' },
 			{"height", 1, NULL, 'e'},
 			{"width", 1, NULL, 'w'},
@@ -248,10 +341,6 @@ int main(int argc, char** argv) {
 			{"negative", 0, NULL, 'n'},
 			{ NULL, 0, NULL, 0 } /* Required at end of array.  */
 	};
-
-	/* The name of the file to receive program output, or NULL for
-	 standard output.  */
-	const char* output_filename = NULL;
 
 	/* Remember the name of the program, to incorporate in messages.
 	 The name is stored in argv[0].  */
@@ -265,6 +354,12 @@ int main(int argc, char** argv) {
 			/* User has requested usage information.  Print it to standard
 			 output, and exit with exit code zero (normal termination).  */
 			print_usage(stdout, 0, program_name);
+			break;
+
+		case 'c': //config file
+
+			config_file = optarg;
+
 			break;
 		case 's': /* -s --standard */
 
@@ -368,8 +463,10 @@ int main(int argc, char** argv) {
 	} while (next_option != -1);
 
 
-	//read_config();
+	read_config();
+
 	generate();
 
 	return 0;
 }
+

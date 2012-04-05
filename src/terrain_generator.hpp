@@ -31,17 +31,25 @@
 
 #define DEFAULT_SNOW_TOP_LEVEL 0.8 * 126
 
+#define DEAFULT_RIVERS_FILE "rivers.txt"
+
 #define DEFAULT_NO_OF_RIVERS 70
 
 #define DEFAULT_MAX_RIVER_BRANCHES 30
 
-#define DEAFULT_RIVERS_FILE "rivers.txt"
+#define DEAFULT_SETTLEMENTS_FILE "settlements.txt"
 
 #define DEFAULT_NO_OF_SETTLEMENTS 30
 
-#define DEAFULT_SETTLEMENTS_FILE "settlements.txt"
-
 #define DEFAULT_MIN_DISTANCE_BETWEEN_SETTLEMENTS 400
+
+#define DEAFULT_VEGETATION_FILE "vegetation.txt"
+
+#define DEFAULT_NO_OF_VEGETATION 300
+
+#define DEAFULT_ROOT_RADIUS 2
+
+#define DEAFULT_VEGETATION_GENERATIONS 3
 
 #define DEFAULT_CONTOUR_FILE "contour.txt"
 
@@ -62,15 +70,13 @@ void erosion();
 
 void clear_neg();
 
+void normalise_map();
+
 //standard print
-void print_map();
+void print_map(FILE* stream);
 
 //xml print
-void print_map_xml();
-
-#ifndef _COMPACT
-	void run_view();
-#endif
+void print_map_xml(FILE* stream);
 
 bool point_above_sealevel(int x, int y);
 
@@ -82,10 +88,33 @@ void settlements();
 void print_settlements(FILE* stream);
 
 void rivers();
+
 void print_rivers(FILE* stream);
 
 void contour_map();
 void print_contour(FILE* stream);
 void print_kf(FILE* stream);
 
+class RiverPoint {
+public:
+	int x;
+	int y;
+	int river_id;
+	RiverPoint* next;
+	RiverPoint* branch;
+
+	RiverPoint(int x_, int y_, int river_id_) {
+		x = x_;
+		y = y_;
+		river_id = river_id_;
+		next = 0;
+		branch = 0;
+	}
+	~RiverPoint() {
+		//delete next;
+	}
+};
+
+void vegetation(bool verbose);
+void print_vegetation(FILE* stream);
 #endif /* TERRAIN_GENERATOR_HPP_ */

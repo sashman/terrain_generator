@@ -24,26 +24,6 @@ int** source_location;
 int* n_river_branches;
 int max_branches = DEFAULT_MAX_RIVER_BRANCHES;
 
-class RiverPoint {
-public:
-	int x;
-	int y;
-	int river_id;
-	RiverPoint* next;
-	RiverPoint* branch;
-
-	RiverPoint(int x_, int y_, int river_id_) {
-		x = x_;
-		y = y_;
-		river_id = river_id_;
-		next = 0;
-		branch = 0;
-	}
-	~RiverPoint() {
-		//delete next;
-	}
-};
-
 RiverPoint** source_river_points;
 
 bool get_river_source(int river_index) {
@@ -121,7 +101,8 @@ int get_tile_river_id(int x, int y) {
 int branch_chance = 2; //1 in branch_chance chance to branch on available equal heights
 void grow(RiverPoint *rp, bool branch) {
 
-	//std::cout << "Growing id " << rp->river_id << " " << rp->x << "," << rp->y<< std::endl;
+	if(rp==NULL) return;
+
 	//if at sea level stop
 	if (!point_above_sealevel(rp->x, rp->y))
 		return;
@@ -176,7 +157,7 @@ void grow(RiverPoint *rp, bool branch) {
 	neighbours[7][0] = rp->x - 1;
 	neighbours[7][1] = rp->y - 1;
 
-	//check if ALL neighbours are part of teh same river
+	//check if ALL neighbours are part of the same river
 	int surrounded_count = 0;
 
 	for (int i = 0; i < n_count; ++i) {
@@ -219,7 +200,9 @@ void grow(RiverPoint *rp, bool branch) {
 	//check for equal height to branch to
 	if (true_min_id > -1) {
 		for (int i = 0; i < n_count; ++i) {
-			if (tmap[neighbours[i][0]][neighbours[i][1]] == true_min
+			int y = neighbours[i][0];
+			int x = neighbours[i][1];
+			if (tmap[y][x] == true_min
 					&& true_min != i) {
 				branch_id = i;
 			}
@@ -282,12 +265,10 @@ void grow(RiverPoint *rp, bool branch) {
 
 bool river_source_candidate_constraint(int x, int y) {
 
-	bool result = true;
-	result = result && !point_below_snow_top_level(x, y);
-	return result;
+	return !point_below_snow_top_level(x, y);
 }
 
-void calculate_candiates() {
+void calculate_source_candiates() {
 
 	for (int i = 0; i < crop_height; ++i) {
 
@@ -311,25 +292,26 @@ int source_cutoff = 100;
 int source_cutoff_count = 0;
 void rivers() {
 
-	calculate_candiates();
+	calculate_source_candiates();
 
 	source_location = new int*[n_rivers];
 	n_river_branches = new int[n_rivers];
 	source_river_points = new RiverPoint*[n_rivers];
 
+
 	for (int i = 0; i < n_rivers; ++i) {
 
 		source_location[i] = new int[2];
+		source_location[i][0] = -1;
+		source_location[i][1] = -1;
+		source_river_points[i] = NULL;
 
 		//create source
 
-		if (!get_river_source_from_candidates(i))
-			return;
-
-		source_river_points[i] = new RiverPoint(source_location[i][0],
-				source_location[i][1], i);
-
-		n_river_branches[i] = max_branches;
+		if (get_river_source_from_candidates(i)){
+			source_river_points[i] = new RiverPoint(source_location[i][0],source_location[i][1], i);
+			n_river_branches[i] = max_branches;
+		}
 
 	}
 
@@ -353,12 +335,16 @@ void print_rivers(FILE* stream) {
 
 		fprintf(stream, "<rivers>\n");
 		for (int i = 0; i < n_rivers; ++i) {
+			int x = source_location[i][0];
+			int y = source_location[i][1];
+
+			if(x==-1 || y==-1) continue;
 
 			fprintf(
 					stream,
 					"<river id = '%d' source_x='%d' source_y='%d' alt = '%d'>\n",
-					i, source_location[i][0], source_location[i][1],
-					tmap[source_location[i][0]][source_location[i][1]]);
+					i, x, y,
+					tmap[y][x]);
 
 			RiverPoint* rp = source_river_points[i];
 			do {
@@ -382,9 +368,10 @@ void print_rivers(FILE* stream) {
 						} while (rpb != 0);
 
 					}
+					rp = rp->next;
 				}
 
-				rp = rp->next;
+
 			} while (rp != 0);
 
 			fprintf(stream, "</river>\n");

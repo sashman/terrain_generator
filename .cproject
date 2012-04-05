@@ -36,10 +36,7 @@
 							<tool id="cdt.managedbuild.tool.gnu.c.linker.base.416653102" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.base"/>
 							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.base.2000279212" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.base">
 								<option id="gnu.cpp.link.option.libs.1073757952" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
-									<listOptionValue builtIn="false" value="GL"/>
 									<listOptionValue builtIn="false" value="yaml"/>
-									<listOptionValue builtIn="false" value="GLU"/>
-									<listOptionValue builtIn="false" value="glut"/>
 								</option>
 								<option id="gnu.cpp.link.option.paths.267574325" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.26840" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
