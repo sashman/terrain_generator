@@ -6,7 +6,8 @@
 
 function _list_terrain_generator(){
 	echo "--help
-		  --verbose
+		--verbose
+		--config
 		--height
 		--width
 		--rough
