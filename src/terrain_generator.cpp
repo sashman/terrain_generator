@@ -74,7 +74,8 @@ extern int generations;
 
 void print_usage(FILE* stream, int exit_code, char* program_name) {
 	fprintf(stream, "A program to generate terrain and features with variable formats.\n\n");
-	fprintf(stream, "Usage:  %s [options]\n", program_name);
+	//fprintf(stream, "Usage:  %s [options]\n", program_name);
+	fprintf(stream, "Usage:  ./terrain_generator [options]\n");
 	fprintf(
 			stream,
 					"  -h  --help                 Display this usage information.\n"
