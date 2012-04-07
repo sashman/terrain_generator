@@ -363,8 +363,6 @@ void print_map_xml(FILE* stream) {
 					type = "water";
 				}else if(tmap[i][j]<=sand_level){
 					type = "sand";
-				}else if(tmap[i][j]<=sand_level){
-					type = "sand";
 				}else if(tmap[i][j]<=snowtop_level){
 					type = "grass";
 				}else
