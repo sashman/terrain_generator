@@ -1,7 +1,7 @@
 //============================================================================
 // Name        : terrain_generator.cpp
 // Author      : sash
-// Version     : 0.0.0.1
+// Version     : 0.0.1
 //============================================================================
 
 #include "terrain_generator.hpp"
@@ -94,15 +94,15 @@ void print_usage(FILE* stream, int exit_code, char* program_name) {
 					"                             recommended for realistic terrain. (0.0 < v < 1.0)\n"
 					"      --erosion <value>      Number of erosion iterations over the terrain. Must be a positive integer.\n"
 					"  -n  --negative             Allow for negative height values.\n"
+					"  -a  --randomseed <value>   A integer seed given to the pseudo-random generator.\n"
 					"  -s  --standard             Use standard output to be written to a file (used as default output).\n"
 					"                             width, height and a set of height values all separated by a space.\n"
 					"  -g  --graphical            Display the height map using a 3D OpenGL view.\n"
 					"  -x  --xml                  Use the following xml output to be written to a file:\n"
 					"                           <map width=int height=int>\n"
 					"                           [<tile x=int y=int>\n"
-					"                           <height>int</height>\n"
-					"							<type>string</type>\n"
-					"                           </tile>\n]+"
+					"                           <height>int</height><type>string</type>\n"
+					"                           </tile>]+\n"
 					"                           </map>\n");
 	exit(exit_code);
 }
