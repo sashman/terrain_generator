@@ -347,6 +347,9 @@ int main(int argc, char** argv) {
 	 The name is stored in argv[0].  */
 	char* program_name = argv[0];
 
+
+	read_config();
+
 	do {
 
 		next_option = getopt_long(argc, argv, short_options, long_options,NULL);
@@ -360,6 +363,7 @@ int main(int argc, char** argv) {
 		case 'c': //config file
 
 			config_file = optarg;
+			read_config();
 
 			break;
 		case 's': /* -s --standard */
@@ -464,7 +468,7 @@ int main(int argc, char** argv) {
 	} while (next_option != -1);
 
 
-	read_config();
+
 
 	generate();
 
