@@ -119,6 +119,10 @@ void read_config(){
 	yaml_parser_initialize(&parser);
 
 	FILE *input = fopen(config_file.c_str(), "rb");
+	if(!input){
+		std::cout << "File not found: " << config_file.c_str() << std::endl;
+		return;
+	}
 
 	yaml_parser_set_input_file(&parser, input);
 
@@ -349,7 +353,8 @@ int main(int argc, char** argv) {
 	char* program_name = argv[0];
 
 
-	read_config();
+	if(fopen(config_file.c_str(), "r"))
+		read_config();
 
 	do {
 
