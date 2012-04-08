@@ -37,6 +37,8 @@ extern int crop_height;
 extern int crop_width;
 extern int** tmap;
 
+int random_seed = 0;
+
 int scale = 1;
 
 extern int seed;
@@ -246,10 +248,8 @@ void generate(){
 
 		 /* initialize random seed:
 		  * use for generating a random map every time
-		  TODO: create random map argument
-		  TODO: create random-seed argument value */
 		  //srand ( time(NULL) );
-
+		*/
 
 		//fill the array with values
 		square_diamond();
@@ -326,7 +326,7 @@ int main(int argc, char** argv) {
 
 
 	/* A string listing valid short options letters.  */
-	const char* const short_options = "hc:sxgvn";
+	const char* const short_options = "hc:sxgvna:";
 	/* An array describing valid long options.  */
 	const struct option long_options[] = { { "help", 0, NULL, 'h' },
 			{"config", 1, NULL, 'c'},
@@ -340,6 +340,7 @@ int main(int argc, char** argv) {
 			{"plate", 1, NULL, 'p'},
 			{"erosion", 1, NULL, 'o'},
 			{"negative", 0, NULL, 'n'},
+			{"randomseed", 1, NULL, 'a'},
 			{ NULL, 0, NULL, 0 } /* Required at end of array.  */
 	};
 
@@ -362,8 +363,10 @@ int main(int argc, char** argv) {
 
 		case 'c': //config file
 
-			config_file = optarg;
-			read_config();
+			if(strcmp(config_file.c_str(),optarg) != 0){
+				config_file = optarg;
+				read_config();
+			}
 
 			break;
 		case 's': /* -s --standard */
@@ -453,6 +456,12 @@ int main(int argc, char** argv) {
 			neg = true;
 			break;
 
+		case 'a': /* random seed value */
+
+			srand ( time(NULL) );
+
+			break;
+
 		case '?': /* The user specified an invalid option.  */
 			/* Print usage information to standard error, and exit with exit
 			 code one (indicating abnormal termination).  */
@@ -466,6 +475,7 @@ int main(int argc, char** argv) {
 			break;
 		}
 	} while (next_option != -1);
+
 
 
 
