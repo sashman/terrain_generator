@@ -1,31 +1,30 @@
-A program to generate simple terrain with variable formats.
+A program to generate terrain and features with variable formats.
 
-Usage:  ./Default/terrain_generator [options]
-  -h  --help             Display this usage information.
-  -v  --verbose          Print verbose messages.
-      --height <value>   Crop the map down to specified positive integer height.
-      --width <value>    Crop the map down to specified positive integer width.
-      --rough <value>    Define smoothness of the terrain as a float (0.0 < v < 1.0).
-                         Lower values produce smoother terrain, smaller difference in adjacent tiles.
-      --seed <value>     Set the initial positive integer height for the algorithm to be generate values from.
-      --offset <value>   Set the initial offset positive integer height (seed+offset=max possible height).
-      --plate <value>    Set the fraction of the tectonic plates appearance.
-                         Higher values will give a more 'ripped apart' look, values too close to 1 are not
-                         recommended for realistic terrain. (0.0 < v < 1.0)
-      --erosion <value>  Number of erosion iterations over the terrain. Must be a positive integer.
-  -n  --negative         Allow for negative height values.
-  -s  --standard         Use standard output to be written to a file (used as default output).
-                         width, height and a set of height values all separated by a space.
-  -g  --graphical        Display the height map using a 3D OpenGL view.
-  -x  --xml              Use the following xml output to be written to a file:
+Usage:  ./terrain_generator [options]
+  -h  --help                 Display this usage information.
+  -c  --config <filename>    Use custom config file.
+  -v  --verbose              Print verbose messages.
+      --height <value>       Crop the map down to specified positive integer height.
+      --width <value>        Crop the map down to specified positive integer width.
+      --rough <value>        Define smoothness of the terrain as a float (0.0 < v < 1.0).
+                             Lower values produce smoother terrain, smaller difference in adjacent tiles.
+      --seed <value>         Set the initial positive integer height for the algorithm to be generate values from.
+      --offset <value>       Set the initial offset positive integer height (seed+offset=max possible height).
+      --plate <value>        Set the fraction of the tectonic plates appearance.
+                             Higher values will give a more 'ripped apart' look, values too close to 1 are not
+                             recommended for realistic terrain. (0.0 < v < 1.0)
+      --erosion <value>      Number of erosion iterations over the terrain. Must be a positive integer.
+  -n  --negative             Allow for negative height values.
+  -s  --standard             Use standard output to be written to a file (used as default output).
+                             width, height and a set of height values all separated by a space.
+  -g  --graphical            Display the height map using a 3D OpenGL view.
+  -x  --xml                  Use the following xml output to be written to a file:
                            <map width=int height=int>
-                           [
-                           <tile x=int y=int>
+                           [<tile x=int y=int>
                            <height>int</height>
 							<type>string</type>
                            </tile>
-                           ]+
-                           </map>
+]+                           </map>
 
 
 TODO:

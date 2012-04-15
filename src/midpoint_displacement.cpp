@@ -363,8 +363,6 @@ void print_map_xml(FILE* stream) {
 					type = "water";
 				}else if(tmap[i][j]<=sand_level){
 					type = "sand";
-				}else if(tmap[i][j]<=sand_level){
-					type = "sand";
 				}else if(tmap[i][j]<=snowtop_level){
 					type = "grass";
 				}else
@@ -386,11 +384,11 @@ void print_map_xml(FILE* stream) {
 						}
 				}
 
-				fprintf(stream,"<tile x='%d' y='%d'>\n\t<height>%i</height>\n"
-						"<type>%s</type>\n"
+				fprintf(stream,"<tile x='%d' y='%d'>\n"
+						"\t<height>%i</height>\n"
+						"\t<type>%s</type>\n"
 						"</tile>\n", i, j, tmap[i][j], type.c_str());
 			}
-			fprintf(stream,"\n");
 		}
 		fprintf(stream,"</map>\n");
 	}
