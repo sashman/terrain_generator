@@ -21,7 +21,7 @@ int random_offset = 40;
 float offset_dr = .8; //offset decrease ratio
 
 //set of voronoi points
-int voronoi_size = (int)(DEFAULT_VORONOI_SIZE*(tmap_size/512));
+int voronoi_size = 100;//(int)(DEFAULT_VORONOI_SIZE*((float)tmap_size/(float)512));
 int** voronoi_points;
 
 float voronoi_alpha = 0.33;
@@ -114,6 +114,7 @@ int square_diamond() {
 			i += (m * 2);
 		}
 
+
 		//diamond values
 		bool odd = false;
 		i = 0;
@@ -169,10 +170,10 @@ void interpolate_voronoi() {
 	for (int i = 0; i < tmap_size; ++i) {
 		for (int j = 0; j < tmap_size; ++j) {
 
+
 			for (int k = 0; k < voronoi_size; ++k) {
 
-				int d = sqrt(
-						pow((voronoi_points[k][0] - j), 2)
+				int d = sqrt(pow((voronoi_points[k][0] - j), 2)
 								+ pow((voronoi_points[k][1] - i), 2));
 
 				if (d < min_d2)
@@ -335,6 +336,7 @@ void print_map(FILE* stream) {
 			for (int j = 0; j < crop_width; ++j) {
 				fprintf(stream, "%i ", tmap[i][j]);
 			}
+			fprintf(stream, "\n");
 		}
 		fprintf(stream, "\n");
 

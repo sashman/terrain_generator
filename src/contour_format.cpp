@@ -12,12 +12,14 @@ extern int crop_width;
 extern int** tmap;
 
 int max = 0;
-int threshhold_increment = 15;
+int threshhold_increment = 20;
 int threshold = 0;
 
 extern int sea_level;
 
 int** cmap;
+
+
 
 //TODO: change using tile types
 enum TILE_CASE {
@@ -94,7 +96,7 @@ void set_cmap(int i, int j, TILE_CASE a, TILE_CASE b, TILE_CASE c,
 	if (check_priority(cmap[i][j + 1], d))
 		cmap[i][j + 1] = d;
 
-	/*
+/*
 	 if (tmap[i][j] < sea_level)
 	 cmap[i][j] = WATER;
 	 if (tmap[i + 1][j] < sea_level)
@@ -103,7 +105,7 @@ void set_cmap(int i, int j, TILE_CASE a, TILE_CASE b, TILE_CASE c,
 	 cmap[i][j + 1] = WATER;
 	 if (tmap[i + 1][j + 1] < sea_level)
 	 cmap[i + 1][j + 1] = WATER;
-	 */
+*/
 
 }
 
@@ -225,6 +227,18 @@ void reset_grass() {
 }
 
 
+void correct_contours(){
+
+	for (int i = 0; i < crop_height; ++i) {
+			for (int j = 0; j < crop_width; ++j) {
+
+
+
+			}
+	}
+
+}
+
 void contour_map() {
 
 	round_tmap();
@@ -254,6 +268,8 @@ void contour_map() {
 		set_contour_values();
 		reset_grass();
 	}
+
+	correct_contours();
 }
 
 void print_contour(FILE* stream) {
@@ -300,14 +316,14 @@ void print_contour(FILE* stream) {
 		fprintf(stream, "\n");
 		fprintf(stream, "   ");
 		for (int i = 0; i < crop_height; ++i)
-			fprintf(stream, "%02i ", i);
+			fprintf(stream, "%03i ", i);
 		fprintf(stream, "\n");
 		for (int i = 0; i < crop_height; ++i) {
 			fprintf(stream, "%02i ", i);
 			for (int j = 0; j < crop_width; ++j) {
 
 				int t = tmap[i][j];
-				fprintf(stream, "%02i ", t);
+				fprintf(stream, "%03i ", t);
 			}
 			fprintf(stream, "\n");
 		}
