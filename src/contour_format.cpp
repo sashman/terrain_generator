@@ -6,6 +6,7 @@
  */
 
 #include "terrain_generator.hpp"
+#include <vector>;
 
 extern int crop_height;
 extern int crop_width;
@@ -19,7 +20,7 @@ extern int sea_level;
 
 int** cmap;
 
-
+std::vector<int>** domain;
 
 //TODO: change using tile types
 enum TILE_CASE {
@@ -57,6 +58,9 @@ enum TILE_CASE {
 	//other
 	GRASS,
 	WATER
+
+	//count
+	,TILE_COUNT
 };
 
 int get_case(int a, int b, int c, int d) {
@@ -226,15 +230,53 @@ void reset_grass() {
 
 }
 
+//extensional neighbour constraints
+int constraints [][4][8]= {
+		{
+				//(High) Grass
+				{0, 1, 2, 7, 8, 11, 12, 13},
+				{0, 1, 3, 9, 10, 5, 7, 13},
+				{0, 3, 4, 5, 6, 11, 12, 13},
+				{0, 2, 4, 6, 8, 9, 10, 13}
+		},
+		{
+				//NE_SN
+				{3,6,10, -1,-1,-1,-1,-1,},
+				{2,6,12, -1,-1,-1,-1,-1,},
+				{0,3,4,5,6,11,12,13},
+				{0,2,4,6,8,9,10,13}
+		},
+		{
+				//NW_SN
+				{4,5,9, -1,-1,-1,-1,-1,},
+				{0,1,3,5,7,9,10,13},
+				{0,3,4,5,6,11,12,13},
+				{1,5,12,-1,-1,-1,-1,-1}
+		}
+
+};
+
 
 void correct_contours(){
 
+	std::vector<int> value_range;
+	for (int i = 0; i < TILE_COUNT; ++i) {
+		value_range.push_back(i);
+	}
+	//set up values
+	domain = new std::vector<int>*[crop_height];
 	for (int i = 0; i < crop_height; ++i) {
+		domain[i] = new std::vector<int>[crop_width];
 			for (int j = 0; j < crop_width; ++j) {
-
-
+				domain[i][j] = value_range;
 
 			}
+	}
+
+	for (int i = 0; i < crop_height; ++i) {
+		for (int j = 0; j < crop_width; ++j) {
+
+		}
 	}
 
 }
