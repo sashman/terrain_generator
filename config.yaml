@@ -40,25 +40,25 @@ sea_level : 150
 sand_level : 160
 snow_level : 210
 
-cliff_height_difference : 5
+cliff_height_difference : 4
 
 
 # Rivers
 ########
-number_of_river_sources : 20
+number_of_river_sources : 10
 max_branches_per_source : 5
 
 
 #Settlements
 ############
 
-number_of_settlements : 12
+number_of_settlements : 10
 min_distance_between_settlements : 300
 
 
 #Vegetation
 ###########
 
-number_of_vegetation : 50
+number_of_vegetation : 100
 vegetation_root_radius : 3
-vegetation_generations : 10
+vegetation_generations : 7

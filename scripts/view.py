@@ -63,7 +63,7 @@ img = Image.new("RGB", (w,h), (256,256,256))
 xsize,ysize = w,h
 draw = ImageDraw.Draw(img)
 
-cliff_diff = 8 
+cliff_diff = 6 
 for i in range(0,h):
 	for j in range(2,w):
 		v = int(map_vals[i*h + j])
@@ -117,13 +117,14 @@ for ve in veg_elems:
 	y_pos = int(ve.get("x"))
 	
 	#draw 4 points in a triangle
+	highlight = 0
 	#centre
-	draw.point((x_pos,y_pos), fill = (0,get_random_tree_green(),0))
+	draw.point((x_pos,y_pos), fill = (highlight,get_random_tree_green(),0))
 	#top
-	draw.point((x_pos,y_pos-1), fill = (0,get_random_tree_green(),0))
+	draw.point((x_pos,y_pos-1), fill = (highlight,get_random_tree_green(),0))
 	#sides
-	draw.point((x_pos-1,y_pos), fill = (0,get_random_tree_green(),0))
-	draw.point((x_pos+1,y_pos), fill = (0,get_random_tree_green(),0))
+	draw.point((x_pos-1,y_pos), fill = (highlight,get_random_tree_green(),0))
+	draw.point((x_pos+1,y_pos), fill = (highlight,get_random_tree_green(),0))
 
 
 # use a truetype font

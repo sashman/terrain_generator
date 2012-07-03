@@ -9,6 +9,7 @@
 
 #include <yaml.h>
 
+
 enum OutFormat {
 	STANDRARD_HEIGHTS, STANDARD_XML, OPENGL_VIEW
 };
@@ -214,6 +215,14 @@ void read_config(){
 
 
 void generate(){
+
+	//analysis
+	/*
+	char* analysis_name;
+	sprintf(analysis_name, "analysis_%d_%d", crop_width, crop_width);
+	FILE* analysis_file = fopen(analysis_name, "r");
+
+*/
 	//set crop height and width
 		if(crop_height<1) crop_height = tmap_size;
 		if(crop_width<1) crop_width = tmap_size;
@@ -232,6 +241,8 @@ void generate(){
 			tmap_size = (1<<t)+1;
 		}
 
+		double start = clock();
+		double finish = 0;
 		//display info
 		if (verbose) {
 			std::cout << "Using " << config_file << std::endl;
@@ -258,26 +269,29 @@ void generate(){
 		//fill the array with values
 		square_diamond();
 
+
 		//interpolate voronoi diagram
 		//TODO: add noise to voronoi
-		voronoi();
-
 		if(verbose){
-			std::cout << "Voronoi points" << std::endl;
+			std::cout << "Voronoi points " << voronoi_size<< std::endl;
 			/*
 			for (int i = 0; i < voronoi_size; ++i) {
 				std::cout << "\t" << voronoi_points[i][0] << "," << voronoi_points[i][1] << std::endl;
 			}
 			*/
 		}
+		voronoi();
+
+
 
 		erosion();
 
 
 		if(!neg) clear_neg();
 
-
-		if (verbose) std::cout << "Finished square diamond" << std::endl;
+		finish = clock() - start;
+		if (verbose) std::cout << "Finished square diamond " << (finish/1000000) << std::endl;
+		double sqadia = (finish/1000000);
 
 
 
@@ -298,27 +312,39 @@ void generate(){
 
 		if(scale>0 && crop_height>256 && crop_width>256){
 
+			start = clock();
 			if(verbose) std::cout << "Generating rivers" << std::endl;
 			rivers();
+			finish = clock() - start;
+			if(verbose) std::cout << "Done " << (finish/1000000) << std::endl;
+			double rivers_time = (finish/1000000);
 			print_rivers(0);
 
+			start = clock();
 			if(verbose) std::cout << "Generating vegetation" << std::endl;
 			vegetation(verbose);
+			finish = clock() - start;
+			if(verbose) std::cout << "Done " << (finish/1000000) << std::endl;
+			double veg_time = (finish/1000000);
 			print_vegetation(0);
 
 			if(verbose) std::cout << "Generating settlements" << std::endl;
 			settlements();
+			finish = clock() - start;
+			if(verbose) std::cout << "Done " << (finish/1000000) << std::endl;
+			double settlement_time = (finish/1000000);
 			print_settlements(0);
 
+			std::cout << crop_height << "\t"<< (sqadia+rivers_time+veg_time+settlement_time) << "\t" << sqadia << "\t " << rivers_time << "\t" << veg_time << "\t" << settlement_time << std::endl;
 		}
 
 
 
 
-		//std::cout<<"Drawing contours"<<std::endl;
-		//contour_map();
-		//print_contour(0);
-		//print_kf(0);
+		std::cout<<"Drawing contours"<<std::endl;
+		contour_map();
+		print_contour(0);
+		print_kf(0);
 
 
 }
