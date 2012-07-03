@@ -218,6 +218,33 @@ void round_tmap() {
 
 }
 
+void fill_one_tile_gaps(int treshold){
+
+	for (int i = 0; i < crop_height; ++i) {
+		for (int j = 0; j < crop_width-3; ++j) {
+
+			if(tmap[i][j+1] <= threshold &&
+					tmap[i][j] > threshold &&
+					tmap[i][j+2] > threshold){
+
+				tmap[i][j+1] = threshold + 1;
+			}
+		}
+	}
+
+	for (int i = 0; i < crop_height-3; ++i) {
+			for (int j = 0; j < crop_width; ++j) {
+
+				if(tmap[i+1][j] <= threshold &&
+						tmap[i][j] > threshold &&
+						tmap[i+2][j] > threshold){
+
+					tmap[i+1][j] = threshold + 1;
+				}
+			}
+		}
+}
+
 void reset_grass() {
 
 	for (int i = 0; i < crop_height; ++i) {
@@ -252,7 +279,8 @@ int constraints [][4][8]= {
 				{0,1,3,5,7,9,10,13},
 				{0,3,4,5,6,11,12,13},
 				{1,5,12,-1,-1,-1,-1,-1}
-		}
+		},
+
 
 };
 
