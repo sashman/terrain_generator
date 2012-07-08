@@ -14,7 +14,7 @@ extern int crop_width;
 extern int** tmap;
 
 int max = 0;
-int threshhold_increment = 20;
+int threshhold_increment = 150;
 int threshold = 0;
 
 extern int sea_level;
@@ -99,10 +99,11 @@ void fill_one_tile_gaps(int t){
 	for (int i = 0; i < crop_height; ++i) {
 		for (int j = 0; j < crop_width-3; ++j) {
 
+//			std::cout << i << ","<< j << std::endl;
 			if(tmap[i][j+1] <= t &&
 					tmap[i][j] > t &&
 					tmap[i][j+2] > t){
-
+//				std::cout << "fill " << i << ","<< j << std::endl;
 				tmap[i][j+1] = t + 1;
 			}
 		}
@@ -110,18 +111,33 @@ void fill_one_tile_gaps(int t){
 
 	for (int i = 0; i < crop_height-3; ++i) {
 			for (int j = 0; j < crop_width; ++j) {
+				if(tmap[i+1][j] <= t &&
+						tmap[i][j] > t &&
+						tmap[i+2][j] > t){
+//					std::cout << "fill " << i << ","<< j << std::endl;
 
-				if(tmap[i+1][j] <= threshold &&
-						tmap[i][j] > threshold &&
-						tmap[i+2][j] > threshold){
-
-					tmap[i+1][j] = threshold + 1;
+					tmap[i+1][j] = t + 1;
 				}
 			}
 		}
 }
 
+bool above_threshold(int x, int y){
+	return tmap[y][x] > threshold;
+
+}
+
 void set_contour_values(){
+
+	for (int i = 0; i < crop_height; i += 1) {
+			for (int j = 0; j < crop_width; j += 1) {
+				if(above_threshold(j,i)){
+					cmap[i][j] = GRASS;
+				} else cmap[i][j] = WATER;
+
+			}
+
+	}
 
 }
 
@@ -147,10 +163,14 @@ void contour_map() {
 		}
 	}
 
+	threshold = sea_level;
 	std::cout << "\n" << std::endl;
 	for (threshold = sea_level; threshold < max; threshold +=
 			threshhold_increment) {
 		std::cout << "T= " << threshold << std::endl;
+
+		//needs to be ran twice to get rid of some cases
+		fill_one_tile_gaps(threshold);
 		fill_one_tile_gaps(threshold);
 		//threshold = 65;
 		set_contour_values();
