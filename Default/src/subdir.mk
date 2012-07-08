@@ -5,7 +5,7 @@
 # Add inputs and outputs from these tool invocations to the build variables 
 CPP_SRCS += \
 ../src/contour_format.cpp \
-../src/contour_format2.cpp \
+../src/contour_format_old.cpp \
 ../src/midpoint_displacement.cpp \
 ../src/rivers.cpp \
 ../src/settlements.cpp \
@@ -14,7 +14,7 @@ CPP_SRCS += \
 
 OBJS += \
 ./src/contour_format.o \
-./src/contour_format2.o \
+./src/contour_format_old.o \
 ./src/midpoint_displacement.o \
 ./src/rivers.o \
 ./src/settlements.o \
@@ -23,7 +23,7 @@ OBJS += \
 
 CPP_DEPS += \
 ./src/contour_format.d \
-./src/contour_format2.d \
+./src/contour_format_old.d \
 ./src/midpoint_displacement.d \
 ./src/rivers.d \
 ./src/settlements.d \
