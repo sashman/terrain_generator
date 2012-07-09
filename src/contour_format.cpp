@@ -5,7 +5,6 @@
  *      Author: sashman
  */
 
-
 #include "terrain_generator.hpp"
 #include <vector>;
 
@@ -61,11 +60,9 @@ enum TILE_CASE {
 	WATER
 
 	//count
-	,TILE_COUNT
+	,
+	TILE_COUNT
 };
-
-
-
 
 void round_tmap() {
 
@@ -82,65 +79,104 @@ void round_tmap() {
 
 }
 
+bool above_threshold(int height) {
+	return height > threshold;
+
+}
+
+int get_neighbour_case(std::vector<int> *n_case) {
+	//-1 invalid
+	if (n_case->size() != 8)
+		return -1;
+
+	int case_id = 0;
+
+	for (int i = 0; i < n_case->size(); ++i) {
+
+		case_id |= above_threshold(n_case->at(i)) ? 1 << i : 0;
+
+	}
+
+	if (case_id == 255 || case_id == 0)
+		return 0;
+
+	std::cout << case_id << std::endl;
+	return case_id;
+
+}
+
 void reset_grass() {
 
 	for (int i = 0; i < crop_height; ++i) {
 		for (int j = 0; j < crop_width; ++j) {
 
-			if(cmap[i][j] == HIGH_GRASS) cmap[i][j] = GRASS;
+			if (cmap[i][j] == HIGH_GRASS)
+				cmap[i][j] = GRASS;
 
 		}
 	}
 
 }
 
-void fill_one_tile_gaps(int t){
+void fill_one_tile_gaps(int t) {
 
 	for (int i = 0; i < crop_height; ++i) {
-		for (int j = 0; j < crop_width-3; ++j) {
+		for (int j = 0; j < crop_width - 3; ++j) {
 
 //			std::cout << i << ","<< j << std::endl;
-			if(tmap[i][j+1] <= t &&
-					tmap[i][j] > t &&
-					tmap[i][j+2] > t){
+			if (tmap[i][j + 1] <= t && tmap[i][j] > t && tmap[i][j + 2] > t) {
 //				std::cout << "fill " << i << ","<< j << std::endl;
-				tmap[i][j+1] = t + 1;
+				tmap[i][j + 1] = t + 1;
 			}
 		}
 	}
 
-	for (int i = 0; i < crop_height-3; ++i) {
-			for (int j = 0; j < crop_width; ++j) {
-				if(tmap[i+1][j] <= t &&
-						tmap[i][j] > t &&
-						tmap[i+2][j] > t){
+	for (int i = 0; i < crop_height - 3; ++i) {
+		for (int j = 0; j < crop_width; ++j) {
+			if (tmap[i + 1][j] <= t && tmap[i][j] > t && tmap[i + 2][j] > t) {
 //					std::cout << "fill " << i << ","<< j << std::endl;
 
-					tmap[i+1][j] = t + 1;
-				}
+				tmap[i + 1][j] = t + 1;
 			}
 		}
+	}
 }
 
-bool above_threshold(int x, int y){
-	return tmap[y][x] > threshold;
-
-}
-
-void set_contour_values(){
+void set_contour_values() {
 
 	for (int i = 0; i < crop_height; i += 1) {
-			for (int j = 0; j < crop_width; j += 1) {
-				if(above_threshold(j,i)){
-					cmap[i][j] = GRASS;
-				} else cmap[i][j] = WATER;
+		for (int j = 0; j < crop_width; j += 1) {
 
+			if (above_threshold(tmap[i][j])) {
+
+				cmap[i][j] = GRASS;
+			} else {
+
+				std::vector<int> *n_case = new std::vector<int>;
+				for (int k = i - 1; k <= i + 1; ++k) {
+					for (int l = j - 1; l <= j + 1; ++l) {
+						if ((k > 0 && k < crop_height)
+								&& (l > 0 && l < crop_width)
+								&& (k != i || l != j)) {
+							//std::cout << i << ","<< j << " pushing back " << tmap[k][l] <<  " " << k << ","<< l <<  std::endl;
+							n_case->push_back(tmap[k][l]);
+						}
+					}
+				}
+
+				int id = get_neighbour_case(n_case);
+				if (id != 0 && id != 255 && id != -1) {
+					std::cout << j << "," << i << std::endl;
+				}
+
+				cmap[i][j] = WATER;
 			}
+
+		}
 
 	}
 
 }
-
 
 void contour_map() {
 
@@ -300,7 +336,7 @@ void print_kf(FILE* stream) {
 						"<pass>false</pass>"
 						"</tile>"
 
-				//grass
+						//grass
 
 						"<tile tag = \"n\">"
 						"<pass>true</pass>"
