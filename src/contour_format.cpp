@@ -86,21 +86,26 @@ bool above_threshold(int height) {
 
 int get_neighbour_case(std::vector<int> *n_case) {
 	//-1 invalid
-	if (n_case->size() != 8)
+	if (n_case->size() != 8){
+
 		return -1;
+	}
+
 
 	int case_id = 0;
 
-	for (int i = 0; i < n_case->size(); ++i) {
+//	for (int i = 0; i < n_case->size(); ++i) {
+	for (int i = n_case->size()-1; i >=0; --i) {
 
 		case_id |= above_threshold(n_case->at(i)) ? 1 << i : 0;
 
 	}
 
+
 	if (case_id == 255 || case_id == 0)
 		return 0;
-
 	std::cout << case_id << std::endl;
+
 	return case_id;
 
 }
@@ -152,17 +157,21 @@ void set_contour_values() {
 				cmap[i][j] = GRASS;
 			} else {
 
+
 				std::vector<int> *n_case = new std::vector<int>;
 				for (int k = i - 1; k <= i + 1; ++k) {
 					for (int l = j - 1; l <= j + 1; ++l) {
-						if ((k > 0 && k < crop_height)
-								&& (l > 0 && l < crop_width)
+						if ((k >= 0 && k < crop_height)
+								&& (l >= 0 && l < crop_width)
 								&& (k != i || l != j)) {
 							//std::cout << i << ","<< j << " pushing back " << tmap[k][l] <<  " " << k << ","<< l <<  std::endl;
+							//std::cout <<  l << "," << k << ":::";
 							n_case->push_back(tmap[k][l]);
+
 						}
 					}
 				}
+
 
 				int id = get_neighbour_case(n_case);
 				if (id != 0 && id != 255 && id != -1) {
