@@ -84,7 +84,7 @@ bool above_threshold(int height) {
 
 }
 
-int get_neighbour_case(std::vector<int> *n_case) {
+char get_neighbour_case(std::vector<int> *n_case) {
 	//-1 invalid
 	if (n_case->size() != 8){
 
@@ -92,7 +92,7 @@ int get_neighbour_case(std::vector<int> *n_case) {
 	}
 
 
-	int case_id = 0;
+	unsigned char case_id = 0;
 
 //	for (int i = 0; i < n_case->size(); ++i) {
 	for (int i = n_case->size()-1; i >=0; --i) {
@@ -104,7 +104,17 @@ int get_neighbour_case(std::vector<int> *n_case) {
 
 	if (case_id == 255 || case_id == 0)
 		return 0;
-	std::cout << case_id << std::endl;
+	std::cout << (int)case_id << std::endl;
+
+
+	for (int i = 0; i < n_case->size(); ++i) {
+
+		if(i==4) std::cout<<"  ";
+		above_threshold(n_case->at(i)) ? std::cout <<  ". " :std::cout<<  "~ ";
+		if(i == 2 || i == 4) std::cout<<std::endl;
+	}
+
+	std::cout<<std::endl;
 
 	return case_id;
 
@@ -147,6 +157,38 @@ void fill_one_tile_gaps(int t) {
 	}
 }
 
+
+unsigned char rotate_case(std::vector<int> *n_case){
+
+//	int shift = 2;
+//	//return (case_id >> shift) | (case_id << (sizeof(case_id)*8 - shift));
+//	int t;
+//
+//	for (int i = 0; i < shift; ++i) {
+//		t = n_case->at(0);
+//		int j = 0;
+//		for (; j < n_case->size()-1; ++j) {
+//			(*n_case)[j] = (*n_case)[j+1];
+//		}
+//		(*n_case)[j] = t;
+//	}
+	int t5 = (*n_case)[5];
+	int t3 = (*n_case)[3];
+	(*n_case)[5] = (*n_case)[0];
+	(*n_case)[3] = (*n_case)[1];
+	(*n_case)[0] = (*n_case)[2];
+	(*n_case)[1] = (*n_case)[4];
+	(*n_case)[2] = (*n_case)[7];
+	(*n_case)[4] = (*n_case)[6];
+	(*n_case)[7] = t5;//(*n_case)[5];
+	(*n_case)[6] = t3;
+
+
+
+
+	return get_neighbour_case(n_case);
+}
+
 void set_contour_values() {
 
 	for (int i = 0; i < crop_height; i += 1) {
@@ -173,9 +215,30 @@ void set_contour_values() {
 				}
 
 
-				int id = get_neighbour_case(n_case);
+				unsigned char id = get_neighbour_case(n_case);
 				if (id != 0 && id != 255 && id != -1) {
-					std::cout << j << "," << i << std::endl;
+//					std::cout << j << "," << i << std::endl;
+
+					int r = 0;
+					while(id != 1 &&
+							id != 2 &&
+							id != 3 &&
+							id != 6 &&
+							id != 7 &&
+							id != 11 &&
+							id != 15 &&
+							id != 43 &&
+							id != 47 ){
+						if(r>=3){
+							std::cout<<"***BAD CASE!"<<std::endl;
+							break;
+						}
+						std::cout<< (int)id << " shifting "<<std::endl;
+						id = rotate_case(n_case);
+						r++;
+					}
+					std::cout<<"-> " << (int)id <<std::endl;
+
 				}
 
 				cmap[i][j] = WATER;
