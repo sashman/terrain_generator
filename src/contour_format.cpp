@@ -13,7 +13,7 @@ extern int crop_width;
 extern int** tmap;
 
 int max = 0;
-int threshhold_increment = 150;
+int threshhold_increment = 50;
 int threshold = 0;
 
 extern int sea_level;
@@ -28,15 +28,18 @@ enum TILE_CASE {
 	HIGH_GRASS,
 
 	//convex cliff corners
+
+	CLIFF_NW_SN, //north -> west turn, south->north increasing incline
 	CLIFF_NE_SN, //north -> east turn, south->north increasing incline
 	/*
 	 * 	lower	| higher
 	 * 	lower	\______
 	 * 		lower   lower
 	 */
-	CLIFF_NW_SN, //north -> west turn, south->north increasing incline
 	CLIFF_SE_NS, //south -> east turn, north->south incline
 	CLIFF_SW_NS,
+
+
 	//concave cliff corners
 	CLIFF_SE_SN, //south -> east corner, south->north incline
 	/*
@@ -46,14 +49,18 @@ enum TILE_CASE {
 	 * higher 	| lower
 	 */
 	CLIFF_SW_SN,
-	CLIFF_NE_NS,
 	CLIFF_NW_NS,
+	CLIFF_NE_NS,
+
 
 	//cliff straights
-	CLIFF_NS_EW, //along north->south, east->west increasing incline
+	CLIFF_WE_SN,
 	CLIFF_NS_WE,
 	CLIFF_WE_NS,
-	CLIFF_WE_SN,
+	CLIFF_NS_EW, //along north->south, east->west increasing incline
+
+
+
 
 	//other
 	GRASS,
@@ -189,6 +196,15 @@ unsigned char rotate_case(std::vector<int> *n_case){
 	return get_neighbour_case(n_case);
 }
 
+int undo_rotation(int id, int r){
+	if(r>3) return -1;
+
+	if(id == 1) return CLIFF_NW_SN+r;
+	else if(id == 2 ||id == 3 ||id == 6 ||id == 7 )return CLIFF_WE_SN+r;
+	else if(id == 11 ||id == 15 ||id == 43 ||id == 47 )return CLIFF_SE_SN+r;
+	else return -1;
+}
+
 void set_contour_values() {
 
 	for (int i = 0; i < crop_height; i += 1) {
@@ -239,9 +255,13 @@ void set_contour_values() {
 					}
 					std::cout<<"-> " << (int)id <<std::endl;
 
-				}
+					cmap[i][j] = undo_rotation(id,r);
+//					cmap[i][j] = WATER;
 
-				cmap[i][j] = WATER;
+				}else{
+
+					if(cmap[i][j] == -1) cmap[i][j] = GRASS;
+				}
 			}
 
 		}
