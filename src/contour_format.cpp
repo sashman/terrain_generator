@@ -101,7 +101,6 @@ char get_neighbour_case(std::vector<int> *n_case) {
 
 	unsigned char case_id = 0;
 
-//	for (int i = 0; i < n_case->size(); ++i) {
 	for (int i = n_case->size()-1; i >=0; --i) {
 
 		case_id |= above_threshold(n_case->at(i)) ? 1 << i : 0;
@@ -142,26 +141,49 @@ void reset_grass() {
 
 void fill_one_tile_gaps(int t) {
 
+	//horizontal gaps
 	for (int i = 0; i < crop_height; ++i) {
 		for (int j = 0; j < crop_width - 3; ++j) {
 
-//			std::cout << i << ","<< j << std::endl;
 			if (tmap[i][j + 1] <= t && tmap[i][j] > t && tmap[i][j + 2] > t) {
-//				std::cout << "fill " << i << ","<< j << std::endl;
 				tmap[i][j + 1] = t + 1;
 			}
 		}
 	}
 
+	//vertical gaps
 	for (int i = 0; i < crop_height - 3; ++i) {
 		for (int j = 0; j < crop_width; ++j) {
 			if (tmap[i + 1][j] <= t && tmap[i][j] > t && tmap[i + 2][j] > t) {
-//					std::cout << "fill " << i << ","<< j << std::endl;
-
 				tmap[i + 1][j] = t + 1;
 			}
 		}
 	}
+
+	//diagonal gaps
+	for (int i = 0; i < crop_height - 3; ++i) {
+		for (int j = 0; j < crop_width-3; ++j){
+			//2 rotational cases
+			/*
+			 *
+			 * ^ v v
+			 * v v v
+			 * v v ^
+			 *
+			 * and
+			 *
+			 * v v ^
+			 * v v v
+			 * ^ v v
+			 *
+			 */
+			if((tmap[i][j] > t && tmap[i+1][j+1] <= t && tmap[i+2][j+2] > t) ||
+					(tmap[i+2][j] > t && tmap[i+1][j+1] <= t && tmap[i][j+2] > t)){
+				tmap[i+1][j+1] = t + 1;
+			}
+		}
+	}
+
 }
 
 
