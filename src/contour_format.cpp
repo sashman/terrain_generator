@@ -13,7 +13,7 @@ extern int crop_width;
 extern int** tmap;
 
 int max = 0;
-int threshhold_increment = 50;
+int threshhold_increment = 40;
 int threshold = 0;
 
 extern int sea_level;
@@ -91,8 +91,8 @@ bool above_threshold(int height) {
 
 }
 
-char get_neighbour_case(std::vector<int> *n_case) {
 	//-1 invalid
+char get_neighbour_case(std::vector<int> *n_case) {
 	if (n_case->size() != 8
 //			&& n_case->size() != 5 &&
 //			n_case->size() != 3
@@ -188,6 +188,58 @@ void fill_one_tile_gaps(int t) {
 
 }
 
+void verify_one_tile_gaps(int t) {
+	//horizontal gaps
+	for (int i = 0; i < crop_height; ++i) {
+		for (int j = 0; j < crop_width - 3; ++j) {
+
+			if (tmap[i][j + 1] <= t && tmap[i][j] > t && tmap[i][j + 2] > t) {
+				std::cout << "===" << j << ", " << i << " horizontal gap (threshold = " << t <<")"
+						<< std::endl;
+				std::cout << "===" << "\t-----" << std::endl;
+				for (int k = (i) - 2; k < (i) + 3; k++) {
+					std::cout << "===";
+					for (int l = (j+1) - 2; l < (j+1) + 3; l++) {
+						if ((k >= 0 && k < crop_height)
+								&& (l >= 0 && l < crop_width)) {
+							above_threshold(tmap[k][l]) ?
+									std::cout << " ." : std::cout << " ~";
+						}
+					}
+					std::cout << std::endl;
+				}
+				std::cout << "===" << "\t-----" << std::endl;
+			}
+
+		}
+	}
+	//vertical gaps
+	for (int i = 0; i < crop_height - 3; ++i) {
+		for (int j = 0; j < crop_width; ++j) {
+			if (tmap[i + 1][j] <= t && tmap[i][j] > t && tmap[i + 2][j] > t) {
+				if (tmap[i][j + 1] <= t && tmap[i][j] > t
+						&& tmap[i][j + 2] > t) {
+					std::cout << "===" << j << ", " << i << " vertical gap (threshold = " << t <<")"
+							<< std::endl;
+					std::cout << "===" << "\t-----" << std::endl;
+					for (int k = (i+1) - 2; k < (i+1) + 3; k++) {
+						std::cout << "===";
+						for (int l = (j) - 2; l < (j) + 3; l++) {
+							if ((k >= 0 && k < crop_height)
+									&& (l >= 0 && l < crop_width)) {
+								above_threshold(tmap[k][l]) ?
+										std::cout << " ." : std::cout << " ~";
+							}
+						}
+						std::cout << std::endl;
+					}
+					std::cout << "===" << "\t-----" << std::endl;
+				}
+			}
+		}
+	}
+}
+
 
 unsigned char rotate_case(std::vector<int> *n_case){
 
@@ -221,12 +273,19 @@ unsigned char rotate_case(std::vector<int> *n_case){
 }
 
 int undo_rotation(int id, int r){
-	if(r>3) return -1;
+	if(r>3){
+		std::cout<<"***BAD ROTATE r = "<< r <<std::endl;
+		return -1;
+	}
 
 	if(id == 1) return CLIFF_NW_SN+r;
 	else if(id == 2 ||id == 3 ||id == 6 ||id == 7 )return CLIFF_WE_SN+r;
-	else if(id == 11 ||id == 15 ||id == 43 ||id == 47 )return CLIFF_SE_SN+r;
-	else return -1;
+	else if(id == 10 || id == 11 ||id == 15 ||id == 43 ||id == 47 )return CLIFF_SE_SN+r;
+	else {
+
+		std::cout<<"***BAD ROTATE id = "<< id <<std::endl;
+		return -1;
+	}
 }
 
 void set_contour_values() {
@@ -257,7 +316,7 @@ void set_contour_values() {
 
 				unsigned char id = get_neighbour_case(n_case);
 				if (id != 0 && id != 255 && id != -1) {
-//					std::cout << j << "," << i << std::endl;
+					std::cout << j << "," << i << std::endl;
 
 					std::cout<<"---------"<<std::endl;
 					int r = 0;
@@ -266,6 +325,7 @@ void set_contour_values() {
 							id != 3 &&
 							id != 6 &&
 							id != 7 &&
+							id != 10 &&
 							id != 11 &&
 							id != 15 &&
 							id != 43 &&
@@ -275,8 +335,8 @@ void set_contour_values() {
 						id = rotate_case(n_case);
 						r++;
 						if(r>3){
-							std::cout<<"***BAD CASE!"<<std::endl;
-							break;
+							std::cout<<"***BAD CASE! id = "<< id << " on threshold = " << threshold << " EXITING!"<<std::endl;
+							exit(0);
 						}
 					}
 					std::cout<<"-> " << (int)id <<std::endl;
@@ -317,7 +377,6 @@ void contour_map() {
 		}
 	}
 
-	threshold = sea_level;
 	std::cout << "\n" << std::endl;
 	for (threshold = sea_level; threshold < max; threshold +=
 			threshhold_increment) {
@@ -327,6 +386,9 @@ void contour_map() {
 		fill_one_tile_gaps(threshold);
 		fill_one_tile_gaps(threshold);
 		fill_one_tile_gaps(threshold);
+
+		verify_one_tile_gaps(threshold);
+		//fill_one_tile_gaps(threshold);
 		//threshold = 65;
 		set_contour_values();
 		reset_grass();
