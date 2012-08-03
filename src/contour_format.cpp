@@ -93,8 +93,10 @@ bool above_threshold(int height) {
 
 char get_neighbour_case(std::vector<int> *n_case) {
 	//-1 invalid
-	if (n_case->size() != 8){
-
+	if (n_case->size() != 8
+//			&& n_case->size() != 5 &&
+//			n_case->size() != 3
+			){
 		return -1;
 	}
 
@@ -257,6 +259,7 @@ void set_contour_values() {
 				if (id != 0 && id != 255 && id != -1) {
 //					std::cout << j << "," << i << std::endl;
 
+					std::cout<<"---------"<<std::endl;
 					int r = 0;
 					while(id != 1 &&
 							id != 2 &&
@@ -267,13 +270,14 @@ void set_contour_values() {
 							id != 15 &&
 							id != 43 &&
 							id != 47 ){
-						if(r>=3){
-							std::cout<<"***BAD CASE!"<<std::endl;
-							break;
-						}
+
 						std::cout<< (int)id << " shifting "<<std::endl;
 						id = rotate_case(n_case);
 						r++;
+						if(r>3){
+							std::cout<<"***BAD CASE!"<<std::endl;
+							break;
+						}
 					}
 					std::cout<<"-> " << (int)id <<std::endl;
 
@@ -320,6 +324,7 @@ void contour_map() {
 		std::cout << "T= " << threshold << std::endl;
 
 		//needs to be ran twice to get rid of some cases
+		fill_one_tile_gaps(threshold);
 		fill_one_tile_gaps(threshold);
 		fill_one_tile_gaps(threshold);
 		//threshold = 65;
