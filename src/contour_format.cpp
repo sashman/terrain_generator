@@ -15,6 +15,7 @@ extern int** tmap;
 int max = 0;
 int threshhold_increment = 40;
 int threshold = 0;
+int nearest_round = 5;
 
 extern int sea_level;
 
@@ -39,7 +40,6 @@ enum TILE_CASE {
 	CLIFF_SE_NS, //south -> east turn, north->south incline
 	CLIFF_SW_NS,
 
-
 	//concave cliff corners
 	CLIFF_SE_SN, //south -> east corner, south->north incline
 	/*
@@ -52,15 +52,11 @@ enum TILE_CASE {
 	CLIFF_NW_NS,
 	CLIFF_NE_NS,
 
-
 	//cliff straights
 	CLIFF_WE_SN,
 	CLIFF_NS_WE,
 	CLIFF_WE_NS,
 	CLIFF_NS_EW, //along north->south, east->west increasing incline
-
-
-
 
 	//other
 	GRASS,
@@ -79,7 +75,7 @@ void round_tmap() {
 			//nearest 10
 			//tmap[i][j] = (int) (tmap[i][j] / 10 * 10);
 
-			tmap[i][j] = (int) (tmap[i][j] / 5 * 5);
+			tmap[i][j] = (int) (tmap[i][j] / nearest_round * nearest_round);
 
 		}
 	}
@@ -91,38 +87,43 @@ bool above_threshold(int height) {
 
 }
 
-	//-1 invalid
-char get_neighbour_case(std::vector<int> *n_case) {
+//-1 invalid
+char get_neighbour_case(std::vector<int> *n_case, bool verbose) {
 	if (n_case->size() != 8
 //			&& n_case->size() != 5 &&
 //			n_case->size() != 3
-			){
+			) {
 		return -1;
 	}
 
-
 	unsigned char case_id = 0;
 
-	for (int i = n_case->size()-1; i >=0; --i) {
+	for (int i = n_case->size() - 1; i >= 0; --i) {
 
 		case_id |= above_threshold(n_case->at(i)) ? 1 << i : 0;
 
 	}
 
-
 	if (case_id == 255 || case_id == 0)
 		return 0;
-	std::cout << (int)case_id << std::endl;
+	if (verbose)
+		std::cout << (int) case_id << std::endl;
 
+	if (verbose){
+		for (int i = 0; i < n_case->size(); ++i) {
 
-	for (int i = 0; i < n_case->size(); ++i) {
+			if (i == 4)
+				std::cout << "  ";
 
-		if(i==4) std::cout<<"  ";
-		above_threshold(n_case->at(i)) ? std::cout <<  ". " :std::cout<<  "~ ";
-		if(i == 2 || i == 4) std::cout<<std::endl;
+				above_threshold(n_case->at(i)) ?
+						std::cout << ". " : std::cout << "~ ";
+			if (i == 2 || i == 4)
+				std::cout << std::endl;
+		}
 	}
 
-	std::cout<<std::endl;
+	if (verbose)
+		std::cout << std::endl;
 
 	return case_id;
 
@@ -147,8 +148,10 @@ void fill_one_tile_gaps(int t) {
 	for (int i = 0; i < crop_height; ++i) {
 		for (int j = 0; j < crop_width - 3; ++j) {
 
-			if (tmap[i][j + 1] <= t && tmap[i][j] > t && tmap[i][j + 2] > t) {
-				tmap[i][j + 1] = t + 1;
+			if (!above_threshold(tmap[i][j + 1]) && above_threshold(tmap[i][j])
+					&& above_threshold(tmap[i][j + 2])) {
+				//if (tmap[i][j + 1] <= t && tmap[i][j] > t && tmap[i][j + 2] > t) {
+				tmap[i][j + 1] = t + nearest_round;
 			}
 		}
 	}
@@ -156,15 +159,16 @@ void fill_one_tile_gaps(int t) {
 	//vertical gaps
 	for (int i = 0; i < crop_height - 3; ++i) {
 		for (int j = 0; j < crop_width; ++j) {
-			if (tmap[i + 1][j] <= t && tmap[i][j] > t && tmap[i + 2][j] > t) {
-				tmap[i + 1][j] = t + 1;
+			if (!above_threshold(tmap[i + 1][j]) && above_threshold(tmap[i][j])
+					&& above_threshold(tmap[i + 2][j])) {
+				tmap[i + 1][j] = t + nearest_round;
 			}
 		}
 	}
 
 	//diagonal gaps
 	for (int i = 0; i < crop_height - 3; ++i) {
-		for (int j = 0; j < crop_width-3; ++j){
+		for (int j = 0; j < crop_width - 3; ++j) {
 			//2 rotational cases
 			/*
 			 *
@@ -179,36 +183,45 @@ void fill_one_tile_gaps(int t) {
 			 * ^ v v
 			 *
 			 */
-			if((tmap[i][j] > t && tmap[i+1][j+1] <= t && tmap[i+2][j+2] > t) ||
-					(tmap[i+2][j] > t && tmap[i+1][j+1] <= t && tmap[i][j+2] > t)){
-				tmap[i+1][j+1] = t + 1;
+			if ((above_threshold(tmap[i][j])
+					&& !above_threshold(tmap[i + 1][j + 1])
+					&& above_threshold(tmap[i + 2][j + 2]))
+					|| (above_threshold(tmap[i + 2][j])
+							&& !above_threshold(tmap[i + 1][j + 1])
+							&& above_threshold(tmap[i][j + 2]))) {
+				tmap[i + 1][j + 1] = t + nearest_round;
 			}
 		}
 	}
 
 }
 
-void verify_one_tile_gaps(int t) {
+void verify_one_tile_gaps(int t, bool verbose) {
 	//horizontal gaps
 	for (int i = 0; i < crop_height; ++i) {
 		for (int j = 0; j < crop_width - 3; ++j) {
 
-			if (tmap[i][j + 1] <= t && tmap[i][j] > t && tmap[i][j + 2] > t) {
-				std::cout << "===" << j << ", " << i << " horizontal gap (threshold = " << t <<")"
-						<< std::endl;
-				std::cout << "===" << "\t-----" << std::endl;
-				for (int k = (i) - 2; k < (i) + 3; k++) {
-					std::cout << "===";
-					for (int l = (j+1) - 2; l < (j+1) + 3; l++) {
-						if ((k >= 0 && k < crop_height)
-								&& (l >= 0 && l < crop_width)) {
-							above_threshold(tmap[k][l]) ?
-									std::cout << " ." : std::cout << " ~";
+			if (!above_threshold(tmap[i][j + 1]) && above_threshold(tmap[i][j])
+					&& above_threshold(tmap[i][j + 2])) {
+
+				if (verbose) {
+					std::cout << "===" << j << ", " << i
+							<< " horizontal gap (threshold = " << t << ")"
+							<< std::endl;
+					std::cout << "===" << "\t-----" << std::endl;
+					for (int k = (i) - 2; k < (i) + 3; k++) {
+						std::cout << "===";
+						for (int l = (j + 1) - 2; l < (j + 1) + 3; l++) {
+							if ((k >= 0 && k < crop_height)
+									&& (l >= 0 && l < crop_width)) {
+								above_threshold(tmap[k][l]) ?
+										std::cout << " ." : std::cout << " ~";
+							}
 						}
+						std::cout << std::endl;
 					}
-					std::cout << std::endl;
+					std::cout << "===" << "\t-----" << std::endl;
 				}
-				std::cout << "===" << "\t-----" << std::endl;
 			}
 
 		}
@@ -216,13 +229,14 @@ void verify_one_tile_gaps(int t) {
 	//vertical gaps
 	for (int i = 0; i < crop_height - 3; ++i) {
 		for (int j = 0; j < crop_width; ++j) {
-			if (tmap[i + 1][j] <= t && tmap[i][j] > t && tmap[i + 2][j] > t) {
-				if (tmap[i][j + 1] <= t && tmap[i][j] > t
-						&& tmap[i][j + 2] > t) {
-					std::cout << "===" << j << ", " << i << " vertical gap (threshold = " << t <<")"
+			if (!above_threshold(tmap[i + 1][j]) && above_threshold(tmap[i][j])
+					&& above_threshold(tmap[i + 2][j])) {
+				if (verbose) {
+					std::cout << "===" << j << ", " << i
+							<< " vertical gap (threshold = " << t << ")"
 							<< std::endl;
 					std::cout << "===" << "\t-----" << std::endl;
-					for (int k = (i+1) - 2; k < (i+1) + 3; k++) {
+					for (int k = (i + 1) - 2; k < (i + 1) + 3; k++) {
 						std::cout << "===";
 						for (int l = (j) - 2; l < (j) + 3; l++) {
 							if ((k >= 0 && k < crop_height)
@@ -240,21 +254,9 @@ void verify_one_tile_gaps(int t) {
 	}
 }
 
+unsigned char rotate_case(std::vector<int> *n_case, bool verbose) {
 
-unsigned char rotate_case(std::vector<int> *n_case){
 
-//	int shift = 2;
-//	//return (case_id >> shift) | (case_id << (sizeof(case_id)*8 - shift));
-//	int t;
-//
-//	for (int i = 0; i < shift; ++i) {
-//		t = n_case->at(0);
-//		int j = 0;
-//		for (; j < n_case->size()-1; ++j) {
-//			(*n_case)[j] = (*n_case)[j+1];
-//		}
-//		(*n_case)[j] = t;
-//	}
 	int t5 = (*n_case)[5];
 	int t3 = (*n_case)[3];
 	(*n_case)[5] = (*n_case)[0];
@@ -263,32 +265,33 @@ unsigned char rotate_case(std::vector<int> *n_case){
 	(*n_case)[1] = (*n_case)[4];
 	(*n_case)[2] = (*n_case)[7];
 	(*n_case)[4] = (*n_case)[6];
-	(*n_case)[7] = t5;//(*n_case)[5];
+	(*n_case)[7] = t5;			//(*n_case)[5];
 	(*n_case)[6] = t3;
 
-
-
-
-	return get_neighbour_case(n_case);
+	return get_neighbour_case(n_case, verbose);
 }
 
-int undo_rotation(int id, int r){
-	if(r>3){
-		std::cout<<"***BAD ROTATE r = "<< r <<std::endl;
+int undo_rotation(int id, int r, bool verbose) {
+	if (r > 3) {
+		if (verbose)
+			std::cout << "***BAD ROTATE r = " << r << std::endl;
 		return -1;
 	}
 
-	if(id == 1) return CLIFF_NW_SN+r;
-	else if(id == 2 ||id == 3 ||id == 6 ||id == 7 )return CLIFF_WE_SN+r;
-	else if(id == 10 || id == 11 ||id == 15 ||id == 43 ||id == 47 )return CLIFF_SE_SN+r;
+	if (id == 1)
+		return CLIFF_NW_SN + r;
+	else if (id == 2 || id == 3 || id == 6 || id == 7)
+		return CLIFF_WE_SN + r;
+	else if (id == 10 || id == 11 || id == 15 || id == 43 || id == 47)
+		return CLIFF_SE_SN + r;
 	else {
-
-		std::cout<<"***BAD ROTATE id = "<< id <<std::endl;
+		if (verbose)
+			std::cout << "***BAD ROTATE id = " << id << std::endl;
 		return -1;
 	}
 }
 
-void set_contour_values() {
+void set_contour_values(bool verbose) {
 
 	for (int i = 0; i < crop_height; i += 1) {
 		for (int j = 0; j < crop_width; j += 1) {
@@ -297,7 +300,6 @@ void set_contour_values() {
 
 				cmap[i][j] = GRASS;
 			} else {
-
 
 				std::vector<int> *n_case = new std::vector<int>;
 				for (int k = i - 1; k <= i + 1; ++k) {
@@ -313,40 +315,41 @@ void set_contour_values() {
 					}
 				}
 
-
-				unsigned char id = get_neighbour_case(n_case);
+				unsigned char id = get_neighbour_case(n_case, verbose);
 				if (id != 0 && id != 255 && id != -1) {
-					std::cout << j << "," << i << std::endl;
+					if (verbose)
+						std::cout << j << "," << i << std::endl;
 
-					std::cout<<"---------"<<std::endl;
+					if (verbose)
+						std::cout << "---------" << std::endl;
 					int r = 0;
-					while(id != 1 &&
-							id != 2 &&
-							id != 3 &&
-							id != 6 &&
-							id != 7 &&
-							id != 10 &&
-							id != 11 &&
-							id != 15 &&
-							id != 43 &&
-							id != 47 ){
+					while (id != 1 && id != 2 && id != 3 && id != 6 && id != 7
+							&& id != 10 && id != 11 && id != 15 && id != 43
+							&& id != 47) {
 
-						std::cout<< (int)id << " shifting "<<std::endl;
-						id = rotate_case(n_case);
+						if (verbose)
+							std::cout << (int) id << " shifting " << std::endl;
+						id = rotate_case(n_case, verbose);
 						r++;
-						if(r>3){
-							std::cout<<"***BAD CASE! id = "<< id << " on threshold = " << threshold << " EXITING!"<<std::endl;
-							exit(0);
+						if (r > 3) {
+							if (verbose)
+								std::cout << "***BAD CASE! id = " << (int) id
+										<< " on threshold = " << threshold
+										<< " EXITING!" << std::endl;
+							//exit(0);
+							break;
 						}
 					}
-					std::cout<<"-> " << (int)id <<std::endl;
+					if (verbose)
+						std::cout << "-> " << (int) id << std::endl;
 
-					cmap[i][j] = undo_rotation(id,r);
+					cmap[i][j] = undo_rotation(id, r, verbose);
 //					cmap[i][j] = WATER;
 
-				}else{
+				} else {
 
-					if(cmap[i][j] == -1) cmap[i][j] = GRASS;
+					if (cmap[i][j] == -1)
+						cmap[i][j] = GRASS;
 				}
 			}
 
@@ -356,7 +359,7 @@ void set_contour_values() {
 
 }
 
-void contour_map() {
+void contour_map(bool verbose) {
 
 	round_tmap();
 
@@ -387,10 +390,10 @@ void contour_map() {
 		fill_one_tile_gaps(threshold);
 		fill_one_tile_gaps(threshold);
 
-		verify_one_tile_gaps(threshold);
+		verify_one_tile_gaps(threshold, verbose);
 		//fill_one_tile_gaps(threshold);
 		//threshold = 65;
-		set_contour_values();
+		set_contour_values(verbose);
 		reset_grass();
 	}
 

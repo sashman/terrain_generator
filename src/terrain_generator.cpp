@@ -342,7 +342,7 @@ void generate(){
 
 
 		std::cout<<"Drawing contours"<<std::endl;
-		contour_map();
+		contour_map(verbose);
 		print_contour(0);
 		print_kf(0);
 
