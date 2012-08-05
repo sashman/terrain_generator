@@ -91,7 +91,7 @@ void rivers();
 
 void print_rivers(FILE* stream);
 
-void contour_map(bool verbose);
+void contour_map(int sub_map_h, int sub_map_w, bool verbose);
 void print_contour(FILE* stream);
 void print_kf(FILE* stream);
 

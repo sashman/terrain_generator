@@ -12,10 +12,14 @@ extern int crop_height;
 extern int crop_width;
 extern int** tmap;
 
+int sub_map_h = 0;
+int sub_map_w = 0;
+
 int max = 0;
 int threshhold_increment = 40;
 int threshold = 0;
 int nearest_round = 5;
+
 
 extern int sea_level;
 
@@ -359,7 +363,9 @@ void set_contour_values(bool verbose) {
 
 }
 
-void contour_map(bool verbose) {
+void contour_map(int _sub_map_h, int _sub_map_w, bool verbose) {
+	sub_map_h = _sub_map_h;
+	sub_map_w = _sub_map_w;
 
 	round_tmap();
 
