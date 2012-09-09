@@ -464,131 +464,144 @@ void print_contour(FILE* stream) {
 	}
 }
 
+std::string kf_tile_header =
+					"<map x=\"0\" y=\"0\" type = \"grass\" colour = \"#008800\" >"
+							"<tile tag = \"a\">"
+							"<pass>false</pass>"
+							"</tile>"
+
+							"<tile tag = \"b\">"
+							"<pass>false</pass>"
+							"</tile>"
+
+							"<tile tag = \"c\">"
+							"<pass>false</pass>"
+							"</tile>"
+
+							"<tile tag = \"d\">"
+							"<pass>false</pass>"
+							"</tile>"
+
+							"<tile tag = \"e\">"
+							"<pass>false</pass>"
+							"</tile>"
+
+							"<tile tag = \"f\">"
+							"<pass>false</pass>"
+							"</tile>"
+
+							"<tile tag = \"g\">"
+							"<pass>false</pass>"
+							"</tile>"
+
+							"<tile tag = \"h\">"
+							"<pass>false</pass>"
+							"</tile>"
+
+							"<tile tag = \"i\">"
+							"<pass>false</pass>"
+							"</tile>"
+
+							"<tile tag = \"j\">"
+							"<pass>false</pass>"
+							"</tile>"
+
+							"<tile tag = \"k\">"
+							"<pass>false</pass>"
+							"</tile>"
+
+							"<tile tag = \"l\">"
+							"<pass>false</pass>"
+							"</tile>"
+
+							"<tile tag = \"m\">"
+							"<pass>false</pass>"
+							"</tile>"
+
+							//grass
+
+							"<tile tag = \"n\">"
+							"<pass>true</pass>"
+							"</tile>"
+							"<tile tag = \"o\">"
+							"<pass>true</pass>"
+							"</tile>"
+							"<tile tag = \"p\">"
+							"<pass>true</pass>"
+							"</tile>"
+							"\n\n";
+
+void print_kf_char_to_stream(int t, FILE* stream) {
+
+	if (t == GRASS) {
+		char t = 110 + rand() % 3;
+
+		fprintf(stream, "%c", t);
+	}
+
+	//straights
+	else if (t == CLIFF_NS_EW)
+		fprintf(stream, "e");
+	else if (t == CLIFF_NS_WE)
+		fprintf(stream, "f");
+	else if (t == CLIFF_WE_NS)
+		fprintf(stream, "j");
+	else if (t == CLIFF_WE_SN)
+		fprintf(stream, "k");
+	else if (t == WATER)
+		fprintf(stream, "p");
+
+	//corners
+	else if (t == CLIFF_NE_NS)
+		fprintf(stream, "a");
+	else if (t == CLIFF_NE_SN)
+		fprintf(stream, "b");
+	else if (t == CLIFF_SW_NS)
+		fprintf(stream, "i");
+	else if (t == CLIFF_SW_SN)
+		fprintf(stream, "m");
+	else if (t == CLIFF_SE_NS)
+		fprintf(stream, "d");
+	else if (t == CLIFF_SE_SN)
+		fprintf(stream, "h");
+	else if (t == CLIFF_NW_NS)
+		fprintf(stream, "c");
+	else if (t == CLIFF_NW_SN)
+		fprintf(stream, "g");
+	//else
+	//fprintf(stream, " ");
+}
+
 void print_kf(FILE* stream) {
 
-	if (stream == 0) {
-		stream = fopen(DEFAULT_CONTOUR_KF_FILE, "w");
-	}
-	if (stream == NULL)
-		perror("Error opening file");
-	else {
-		std::string header =
-				"<map x=\"0\" y=\"0\" type = \"grass\" colour = \"#008800\" >"
-						"<tile tag = \"a\">"
-						"<pass>false</pass>"
-						"</tile>"
-
-						"<tile tag = \"b\">"
-						"<pass>false</pass>"
-						"</tile>"
-
-						"<tile tag = \"c\">"
-						"<pass>false</pass>"
-						"</tile>"
-
-						"<tile tag = \"d\">"
-						"<pass>false</pass>"
-						"</tile>"
-
-						"<tile tag = \"e\">"
-						"<pass>false</pass>"
-						"</tile>"
-
-						"<tile tag = \"f\">"
-						"<pass>false</pass>"
-						"</tile>"
-
-						"<tile tag = \"g\">"
-						"<pass>false</pass>"
-						"</tile>"
-
-						"<tile tag = \"h\">"
-						"<pass>false</pass>"
-						"</tile>"
-
-						"<tile tag = \"i\">"
-						"<pass>false</pass>"
-						"</tile>"
-
-						"<tile tag = \"j\">"
-						"<pass>false</pass>"
-						"</tile>"
-
-						"<tile tag = \"k\">"
-						"<pass>false</pass>"
-						"</tile>"
-
-						"<tile tag = \"l\">"
-						"<pass>false</pass>"
-						"</tile>"
-
-						"<tile tag = \"m\">"
-						"<pass>false</pass>"
-						"</tile>"
-
-						//grass
-
-						"<tile tag = \"n\">"
-						"<pass>true</pass>"
-						"</tile>"
-						"<tile tag = \"o\">"
-						"<pass>true</pass>"
-						"</tile>"
-						"<tile tag = \"p\">"
-						"<pass>true</pass>"
-						"</tile>"
-						"\n\n";
-
-		fprintf(stream, "%s", header.c_str());
-		fprintf(stream, "<content>\n");
-		for (int i = 0; i < crop_height; ++i) {
-			fprintf(stream, "<r>");
-			for (int j = 0; j < crop_width; ++j) {
-
-				int t = cmap[i][j];
-
-				if (t == GRASS) {
-					char t = 110 + rand() % 3;
-
-					fprintf(stream, "%c", t);
-				}
-
-				//straights
-				else if (t == CLIFF_NS_EW)
-					fprintf(stream, "e");
-				else if (t == CLIFF_NS_WE)
-					fprintf(stream, "f");
-				else if (t == CLIFF_WE_NS)
-					fprintf(stream, "j");
-				else if (t == CLIFF_WE_SN)
-					fprintf(stream, "k");
-				else if (t == WATER)
-					fprintf(stream, "p");
-
-				//corners
-				else if (t == CLIFF_NE_NS)
-					fprintf(stream, "a");
-				else if (t == CLIFF_NE_SN)
-					fprintf(stream, "b");
-				else if (t == CLIFF_SW_NS)
-					fprintf(stream, "i");
-				else if (t == CLIFF_SW_SN)
-					fprintf(stream, "m");
-				else if (t == CLIFF_SE_NS)
-					fprintf(stream, "d");
-				else if (t == CLIFF_SE_SN)
-					fprintf(stream, "h");
-				else if (t == CLIFF_NW_NS)
-					fprintf(stream, "c");
-				else if (t == CLIFF_NW_SN)
-					fprintf(stream, "g");
-				//else
-				//fprintf(stream, " ");
-
-			}
-			fprintf(stream, "</r>\n");
+	if(sub_map_h == 0 || sub_map_w == 0){
+		if (stream == 0) {
+			stream = fopen(DEFAULT_CONTOUR_KF_FILE, "w");
 		}
-		fprintf(stream, "</content></map>");
+		if (stream == NULL)
+			perror("Error opening file");
+		else {
+
+
+			fprintf(stream, "%s", kf_tile_header.c_str());
+			fprintf(stream, "<content>\n");
+			for (int i = 0; i < crop_height; ++i) {
+				fprintf(stream, "<r>");
+				for (int j = 0; j < crop_width; ++j) {
+
+					int t = cmap[i][j];
+					print_kf_char_to_stream(t, stream);
+
+
+				}
+				fprintf(stream, "</r>\n");
+			}
+			fprintf(stream, "</content></map>");
+		}
+	} else {
+
+		std::string map_name =
+
 	}
 }
 
