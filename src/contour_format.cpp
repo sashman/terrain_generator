@@ -7,6 +7,8 @@
 
 #include "terrain_generator.hpp"
 #include <vector>;
+#include <iostream>;
+#include <sstream>;
 
 extern int crop_height;
 extern int crop_width;
@@ -464,9 +466,25 @@ void print_contour(FILE* stream) {
 	}
 }
 
+
+//TODO: change from char* and mallocing to using C++ string
+const char* get_kf_map_name(int x, int y, std::string grass, std::string colour){
+
+	if(x < 0) return "<map x = \"0\" y = \"0\" type = \"grass\" colour = \"\" >";
+	if(y < 0) return "<map x = \"0\" y = \"0\" type = \"grass\" colour = \"\" >";
+
+	char *buffer = (char*)malloc(sizeof(char)*50);
+
+	//use these for reference
+	//'<map x = "%d" y = "%d" type = "grass" colour = "#008800" >'
+	sprintf (buffer, "<map x = \"%d\" y = \"%d\" type = \"grass\" colour = \"\" >", x,y);
+	std::cout<<buffer<<std::endl;
+	return buffer;
+}
+
 std::string kf_tile_header =
-					"<map x=\"0\" y=\"0\" type = \"grass\" colour = \"#008800\" >"
-							"<tile tag = \"a\">"
+
+							"\n\n<tile tag = \"a\">"
 							"<pass>false</pass>"
 							"</tile>"
 
@@ -582,7 +600,7 @@ void print_kf(FILE* stream) {
 			perror("Error opening file");
 		else {
 
-
+			fprintf(stream, "%s", get_kf_map_name(0,0,"grass", ""));
 			fprintf(stream, "%s", kf_tile_header.c_str());
 			fprintf(stream, "<content>\n");
 			for (int i = 0; i < crop_height; ++i) {
@@ -600,7 +618,48 @@ void print_kf(FILE* stream) {
 		}
 	} else {
 
-		std::string map_name =
+		int sub_map_count_h = crop_height/sub_map_h;
+		int sub_map_count_w = crop_width/sub_map_w;
+
+		for(int i = 0; i < sub_map_count_h; i++){
+			for (int j = 0; j < sub_map_count_w; ++j) {
+
+				std::cout<<j<<"x"<<i<<std::endl;
+
+
+				std::ostringstream map_file;
+				map_file << KF_MAP_DIRECTORY << j << "_" << i << ".xml";
+				std::cout<<map_file.str()<<std::endl;
+				if (stream == 0) {
+					stream = fopen( map_file.str().c_str() , "w");
+				}
+				if (stream == NULL)
+					perror("Error opening file");
+				else {
+
+
+					fprintf(stream, "%s", get_kf_map_name(j,i,"grass", ""));
+					fprintf(stream, "%s", kf_tile_header.c_str());
+					fprintf(stream, "<content>\n");
+					for (int i = 0; i < crop_height; ++i) {
+						fprintf(stream, "<r>");
+						for (int j = 0; j < crop_width; ++j) {
+
+							int t = cmap[i][j];
+							print_kf_char_to_stream(t, stream);
+
+
+						}
+						fprintf(stream, "</r>\n");
+					}
+					fprintf(stream, "</content></map>\n");
+					//fclose(stream);
+				}
+
+			}
+		}
+
+//		std::string map_name = get_kf_map_name();
 
 	}
 }

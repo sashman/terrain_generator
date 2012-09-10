@@ -55,6 +55,8 @@
 
 #define DEFAULT_CONTOUR_KF_FILE "contour_kf.txt"
 
+#define KF_MAP_DIRECTORY "map/"
+
 
 int get_val(int x, int y);
 
