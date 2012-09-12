@@ -350,7 +350,16 @@ void set_contour_values(bool verbose) {
 						std::cout << "-> " << (int) id << std::endl;
 
 					cmap[i][j] = undo_rotation(id, r, verbose);
+
+					//add random gaps in straights
+					if(cmap[i][j] >= CLIFF_WE_SN && cmap[i][j] <= CLIFF_NS_EW)
+						if(rand() % 10 == 0)
+							cmap[i][j] = GRASS;
+
+
 //					cmap[i][j] = WATER;
+					if (cmap[i][j] == -1)
+						cmap[i][j] = GRASS;
 
 				} else {
 
@@ -478,7 +487,6 @@ const char* get_kf_map_name(int x, int y, std::string grass, std::string colour)
 	//use these for reference
 	//'<map x = "%d" y = "%d" type = "grass" colour = "#008800" >'
 	sprintf (buffer, "<map x = \"%d\" y = \"%d\" type = \"grass\" colour = \"\" >", x,y);
-	std::cout<<buffer<<std::endl;
 	return buffer;
 }
 
@@ -624,12 +632,13 @@ void print_kf(FILE* stream) {
 		for(int i = 0; i < sub_map_count_h; i++){
 			for (int j = 0; j < sub_map_count_w; ++j) {
 
-				std::cout<<j<<"x"<<i<<std::endl;
 
 
 				std::ostringstream map_file;
 				map_file << KF_MAP_DIRECTORY << j << "_" << i << ".xml";
 				std::cout<<map_file.str()<<std::endl;
+
+				FILE* stream = 0;
 				if (stream == 0) {
 					stream = fopen( map_file.str().c_str() , "w");
 				}
@@ -641,11 +650,13 @@ void print_kf(FILE* stream) {
 					fprintf(stream, "%s", get_kf_map_name(j,i,"grass", ""));
 					fprintf(stream, "%s", kf_tile_header.c_str());
 					fprintf(stream, "<content>\n");
-					for (int i = 0; i < crop_height; ++i) {
+					for (int k = 0; k < sub_map_h; ++k) {
 						fprintf(stream, "<r>");
-						for (int j = 0; j < crop_width; ++j) {
+						for (int l = 0; l < sub_map_w; ++l) {
 
-							int t = cmap[i][j];
+							int offset_h = (sub_map_h-1)*i;
+							int offset_w = (sub_map_w-1)*j;
+							int t = cmap[k + offset_h][l + offset_w];
 							print_kf_char_to_stream(t, stream);
 
 
@@ -653,7 +664,7 @@ void print_kf(FILE* stream) {
 						fprintf(stream, "</r>\n");
 					}
 					fprintf(stream, "</content></map>\n");
-					//fclose(stream);
+					fclose(stream);
 				}
 
 			}

@@ -1,22 +1,22 @@
-<map x = "0" y = "0" type = "grass" colour = "" >
+<map x = "0" y = "4" type = "grass" colour = "" >
 
 <tile tag = "a"><pass>false</pass></tile><tile tag = "b"><pass>false</pass></tile><tile tag = "c"><pass>false</pass></tile><tile tag = "d"><pass>false</pass></tile><tile tag = "e"><pass>false</pass></tile><tile tag = "f"><pass>false</pass></tile><tile tag = "g"><pass>false</pass></tile><tile tag = "h"><pass>false</pass></tile><tile tag = "i"><pass>false</pass></tile><tile tag = "j"><pass>false</pass></tile><tile tag = "k"><pass>false</pass></tile><tile tag = "l"><pass>false</pass></tile><tile tag = "m"><pass>false</pass></tile><tile tag = "n"><pass>true</pass></tile><tile tag = "o"><pass>true</pass></tile><tile tag = "p"><pass>true</pass></tile>
 
 <content>
-<r>noopnopnppnpoonn</r>
-<r>nnopnpoooppnnnno</r>
-<r>nponpoopnoopnopn</r>
-<r>ooponoonponnooop</r>
-<r>onnnoppponoooonn</r>
-<r>nnnonponnnnppopn</r>
-<r>ononnnpppnnopopn</r>
-<r>nnonnonnoopnppop</r>
-<r>npnoonnnooonnooo</r>
-<r>pooppppoonponnoo</r>
-<r>npppnppooonpnonn</r>
-<r>ppnopnnnnpopnono</r>
-<r>nnnnpnooooopopnn</r>
-<r>ponoonpnnpponppn</r>
-<r>pnonnnpppppnonop</r>
-<r>oonpnononpponppn</r>
+<r>ooppoonpoonoonon</r>
+<r>oponnnonopponnpo</r>
+<r>ppoopdjpoioooppn</r>
+<r>onppdcopnajjipnp</r>
+<r>poodcnonnnpoajjj</r>
+<r>podcnonppppnnoop</r>
+<r>odcnoonnnponpnno</r>
+<r>ocnpnpnonppponon</r>
+<r>onopnonnpnppnpnp</r>
+<r>noonooppoooppnno</r>
+<r>ppopoonopponpnnn</r>
+<r>poonnnponoopnpop</r>
+<r>nnoodjipoppoppop</r>
+<r>podjcoaiopponpno</r>
+<r>ndcnonpajidjjinn</r>
+<r>pcnoonnopacpoaji</r>
 </content></map>

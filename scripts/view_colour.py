@@ -17,14 +17,17 @@ for i in range(0,h):
 		v = int(map_vals[i*h + j])
 		v = int(float(v)/float(max_val) * 255)
 		
-		if(v<150):
-			draw.point((i,j), fill=(0,0,100+v))
-		elif(v<160):
-			draw.point((i,j), fill=(v,v,0))
-		elif(v<210):
-			draw.point((i,j), fill=(0,200-(v/2),0))
-		else:
-			draw.point((i,j), fill=(v-60,v-10,v-60))
+		#if(v<150):
+		#	draw.point((i,j), fill=(0,0,100+v))
+		#elif(v<160):
+	#		draw.point((i,j), fill=(v,v,0))
+	#	elif(v<210):
+	#		draw.point((i,j), fill=(0,200-(v/2),0))
+	#	else:
+	#		draw.point((i,j), fill=(v-60,v-10,v-60))
+		
+		#just grass
+		draw.point((i,j), fill=(0,200-(v/2),0))
 
 if(len(sys.argv)>2):
 	scale = int(sys.argv[2])
