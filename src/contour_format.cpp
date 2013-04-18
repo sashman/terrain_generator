@@ -51,8 +51,8 @@ enum TILE_CASE {
 	/*
 	 *       higher
 	 * higher 	 ____
-	 * 			/
-	 * higher 	| lower
+	 * 		/
+	 * higher       | lower
 	 */
 	CLIFF_SW_SN,
 	CLIFF_NW_NS,
