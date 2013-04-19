@@ -112,6 +112,7 @@ void print_usage(FILE* stream, int exit_code, char* program_name) {
 
 void read_config(){
 
+
 	yaml_parser_t parser;
 	yaml_token_t  token;
 

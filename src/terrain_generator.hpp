@@ -53,7 +53,7 @@
 
 #define DEFAULT_CONTOUR_FILE "contour.txt"
 
-#define DEFAULT_CONTOUR_KF_FILE "contour_kf.txt"
+#define DEFAULT_CONTOUR_KF_FILE "contour_kf.map"
 
 #define KF_MAP_DIRECTORY "map/"
 
