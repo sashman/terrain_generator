@@ -581,7 +581,7 @@ void print_kf_file(FILE* stream, int sub_x, int sub_y) {
 			fprintf(stream, "\" }");
 
 			//check if last element then dont put ","
-			if (i != crop_height - 1)
+			if (i != h_bounds - 1)
 				fprintf(stream, ",\n");
 			else
 				fprintf(stream, "\n");
@@ -589,7 +589,7 @@ void print_kf_file(FILE* stream, int sub_x, int sub_y) {
 		}
 		fprintf(stream, "\t\t]");
 		//check if last element then dont put ","
-		if (j != crop_width - 1)
+		if (j != w_bounds - 1)
 			fprintf(stream, ",\n");
 		else
 			fprintf(stream, "\n");

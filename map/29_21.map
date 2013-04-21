@@ -19,7 +19,7 @@
 			{ "type": "GRASS1" },
 			{ "type": "GRASS1" },
 			{ "type": "GRASS0" },
-			{ "type": "GRASS0" },
+			{ "type": "GRASS0" }
 		],
 		[
  			{ "type": "GRASS1" },
@@ -37,7 +37,7 @@
 			{ "type": "GRASS1" },
 			{ "type": "GRASS1" },
 			{ "type": "GRASS0" },
-			{ "type": "GRASS0" },
+			{ "type": "GRASS0" }
 		],
 		[
  			{ "type": "GRASS2" },
@@ -55,7 +55,7 @@
 			{ "type": "GRASS2" },
 			{ "type": "GRASS1" },
 			{ "type": "GRASS2" },
-			{ "type": "CLIFF_SE_NS" },
+			{ "type": "CLIFF_SE_NS" }
 		],
 		[
  			{ "type": "CLIFF_NS_WE" },
@@ -73,7 +73,7 @@
 			{ "type": "GRASS2" },
 			{ "type": "GRASS2" },
 			{ "type": "CLIFF_SE_NS" },
-			{ "type": "CLIFF_NW_NS" },
+			{ "type": "CLIFF_NW_NS" }
 		],
 		[
  			{ "type": "GRASS1" },
@@ -91,7 +91,7 @@
 			{ "type": "GRASS1" },
 			{ "type": "GRASS0" },
 			{ "type": "CLIFF_WE_NS" },
-			{ "type": "GRASS2" },
+			{ "type": "GRASS2" }
 		],
 		[
  			{ "type": "CLIFF_NS_EW" },
@@ -109,7 +109,7 @@
 			{ "type": "CLIFF_NE_SN" },
 			{ "type": "CLIFF_SE_NS" },
 			{ "type": "CLIFF_NW_NS" },
-			{ "type": "GRASS0" },
+			{ "type": "GRASS0" }
 		],
 		[
  			{ "type": "GRASS0" },
@@ -127,7 +127,7 @@
 			{ "type": "GRASS1" },
 			{ "type": "CLIFF_NW_NS" },
 			{ "type": "GRASS2" },
-			{ "type": "GRASS0" },
+			{ "type": "GRASS0" }
 		],
 		[
  			{ "type": "GRASS2" },
@@ -145,7 +145,7 @@
 			{ "type": "GRASS1" },
 			{ "type": "GRASS1" },
 			{ "type": "GRASS0" },
-			{ "type": "GRASS1" },
+			{ "type": "GRASS1" }
 		],
 		[
  			{ "type": "GRASS0" },
@@ -163,7 +163,7 @@
 			{ "type": "CLIFF_NE_NS" },
 			{ "type": "GRASS1" },
 			{ "type": "GRASS2" },
-			{ "type": "GRASS0" },
+			{ "type": "GRASS0" }
 		],
 		[
  			{ "type": "GRASS0" },
@@ -181,7 +181,7 @@
 			{ "type": "CLIFF_WE_NS" },
 			{ "type": "GRASS0" },
 			{ "type": "GRASS1" },
-			{ "type": "GRASS1" },
+			{ "type": "GRASS1" }
 		],
 		[
  			{ "type": "GRASS0" },
@@ -199,7 +199,7 @@
 			{ "type": "CLIFF_WE_NS" },
 			{ "type": "GRASS0" },
 			{ "type": "GRASS2" },
-			{ "type": "GRASS1" },
+			{ "type": "GRASS1" }
 		],
 		[
  			{ "type": "GRASS0" },
@@ -217,7 +217,7 @@
 			{ "type": "CLIFF_WE_NS" },
 			{ "type": "GRASS1" },
 			{ "type": "GRASS2" },
-			{ "type": "GRASS2" },
+			{ "type": "GRASS2" }
 		],
 		[
  			{ "type": "GRASS0" },
@@ -235,7 +235,7 @@
 			{ "type": "CLIFF_WE_NS" },
 			{ "type": "GRASS0" },
 			{ "type": "GRASS1" },
-			{ "type": "GRASS0" },
+			{ "type": "GRASS0" }
 		],
 		[
  			{ "type": "GRASS2" },
@@ -253,7 +253,7 @@
 			{ "type": "CLIFF_SW_NS" },
 			{ "type": "CLIFF_NE_NS" },
 			{ "type": "GRASS1" },
-			{ "type": "GRASS1" },
+			{ "type": "GRASS1" }
 		],
 		[
  			{ "type": "GRASS1" },
@@ -271,7 +271,7 @@
 			{ "type": "CLIFF_SE_NS" },
 			{ "type": "CLIFF_NW_NS" },
 			{ "type": "GRASS2" },
-			{ "type": "GRASS0" },
+			{ "type": "GRASS0" }
 		],
 		[
  			{ "type": "CLIFF_NS_WE" },
@@ -289,8 +289,8 @@
 			{ "type": "CLIFF_NW_NS" },
 			{ "type": "GRASS2" },
 			{ "type": "GRASS0" },
-			{ "type": "GRASS0" },
-		],
+			{ "type": "GRASS0" }
+		]
 	]
 }
 }
