@@ -476,9 +476,9 @@ const std::string get_kf_map_name(int x, int y, std::string grass,
 		std::string colour) {
 
 	std::stringstream ss;
-	ss << "'x':" << x << "," << std::endl;
-	ss << "'y':" << y << "," << std::endl;
-	//ss << "'colour':" << colour << "," << std::endl;
+	ss << "\"x\":" << x << "," << std::endl;
+	ss << "\"y\":" << y << "," << std::endl;
+	//ss << "\"colour\":" << colour << "," << std::endl;
 
 	std::string out = ss.str();
 	return out;
@@ -540,14 +540,14 @@ void print_kf_char_to_stream(int t, FILE* stream) {
 
 void print_kf_file(FILE* stream, int sub_x, int sub_y) {
 	//print wrapper
-	fprintf(stream, "{'map': {\n");
+	fprintf(stream, "{\"map\": {\n");
 
 	//headers etc
 	fprintf(stream, "%s", get_kf_map_name(sub_x, sub_x, "grass", "").c_str());
 	fprintf(stream, "%s", kf_tile_header.c_str());
 
 	//conternt wrapper
-	fprintf(stream, "'content': \n");
+	fprintf(stream, "\"content\": \n");
 
 	//x coordinate
 	fprintf(stream, "\t[\n");
@@ -557,15 +557,15 @@ void print_kf_file(FILE* stream, int sub_x, int sub_y) {
 
 	for (int j = 0; j < w_bounds; ++j) {
 
-		//fprintf(stream, "\t'%d': {\n", j);
+		//fprintf(stream, "\t\"%d\": {\n", j);
 
 		//y coordinate
-		//fprintf(stream, "\t\t'%d': {\n ", j);
+		//fprintf(stream, "\t\t\"%d\": {\n ", j);
 		fprintf(stream, "\t\t[\n ");
 		for (int i = 0; i < h_bounds; ++i) {
 
 			//tile wrapper
-			fprintf(stream, "\t\t\t{ 'type': '");
+			fprintf(stream, "\t\t\t{ \"type\": \"");
 
 			//value, calculate offset for it
 			int offset_h = (sub_map_h - 1) * sub_y;
@@ -578,7 +578,7 @@ void print_kf_file(FILE* stream, int sub_x, int sub_y) {
 			print_kf_char_to_stream(t, stream);
 
 			//close tile wrapper
-			fprintf(stream, "' }");
+			fprintf(stream, "\" }");
 
 			//check if last element then dont put ","
 			if (i != crop_height - 1)
