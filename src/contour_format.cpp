@@ -574,7 +574,7 @@ void print_kf_file(FILE* stream, int sub_x, int sub_y) {
 //			debug
 //			std::cout << "Getting " << i+offset_h << "," << j+offset_w << "  " << sub_y << "," << sub_x << std::endl;
 
-			int t = cmap[i+offset_h][j+offset_w];
+			int t = cmap[j+offset_h][i+offset_w];
 			print_kf_char_to_stream(t, stream);
 
 			//close tile wrapper
