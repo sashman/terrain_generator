@@ -476,6 +476,8 @@ const std::string get_kf_map_name(int x, int y, std::string grass,
 		std::string colour) {
 
 	std::stringstream ss;
+	ss << "\"total_x\":" << sub_map_w << "," << std::endl;
+	ss << "\"total_y\":" << sub_map_h << "," << std::endl;
 	ss << "\"x\":" << x << "," << std::endl;
 	ss << "\"y\":" << y << "," << std::endl;
 	//ss << "\"colour\":" << colour << "," << std::endl;
@@ -491,7 +493,7 @@ void print_kf_char_to_stream(int t, FILE* stream) {
 	switch (t) {
 	case GRASS:
 		int random_grass_type;
-		random_grass_type = rand() % 3;
+		random_grass_type = rand() % 4;
 		fprintf(stream, "GRASS%d", random_grass_type);
 		break;
 		//straights
@@ -555,14 +557,14 @@ void print_kf_file(FILE* stream, int sub_x, int sub_y) {
 	int h_bounds = sub_map_h ? sub_map_h : crop_width;
 	int w_bounds = sub_map_w ? sub_map_w : crop_height;
 
-	for (int j = 0; j < w_bounds; ++j) {
+	for (int i = 0; i < h_bounds; ++i) {
 
 		//fprintf(stream, "\t\"%d\": {\n", j);
 
 		//y coordinate
 		//fprintf(stream, "\t\t\"%d\": {\n ", j);
 		fprintf(stream, "\t\t[\n ");
-		for (int i = 0; i < h_bounds; ++i) {
+		for (int j = 0; j < w_bounds; ++j) {
 
 			//tile wrapper
 			fprintf(stream, "\t\t\t{ \"type\": \"");
@@ -574,14 +576,14 @@ void print_kf_file(FILE* stream, int sub_x, int sub_y) {
 //			debug
 //			std::cout << "Getting " << i+offset_h << "," << j+offset_w << "  " << sub_y << "," << sub_x << std::endl;
 
-			int t = cmap[j+offset_h][i+offset_w];
+			int t = cmap[i+offset_h][j+offset_w];
 			print_kf_char_to_stream(t, stream);
 
 			//close tile wrapper
 			fprintf(stream, "\" }");
 
 			//check if last element then dont put ","
-			if (i != h_bounds - 1)
+			if (j != w_bounds - 1)
 				fprintf(stream, ",\n");
 			else
 				fprintf(stream, "\n");
@@ -589,7 +591,7 @@ void print_kf_file(FILE* stream, int sub_x, int sub_y) {
 		}
 		fprintf(stream, "\t\t]");
 		//check if last element then dont put ","
-		if (j != w_bounds - 1)
+		if (i != h_bounds - 1)
 			fprintf(stream, ",\n");
 		else
 			fprintf(stream, "\n");
