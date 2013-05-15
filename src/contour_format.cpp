@@ -488,68 +488,112 @@ const std::string get_kf_map_name(int x, int y, std::string grass,
 
 std::string kf_tile_header = "";
 
-void print_kf_char_to_stream(int t, FILE* stream) {
+void add_detail_tile(FILE* stream, int t, int x, int y) {
 
+	int xoffset, yoffset;
+	fprintf(stream, "\t\t{ \"type\": \"");
 	switch (t) {
-	case GRASS:
-		int random_grass_type;
-		random_grass_type = rand() % 4;
-		fprintf(stream, "GRASS%d", random_grass_type);
-		break;
-		//straights
+	//not used here
+//	case GRASS:
+//		int random_grass_type;
+//		random_grass_type = rand() % 4;
+//		fprintf(stream, "GRASS%d", random_grass_type);
+//		break;
+
+	//straights
 	case CLIFF_NS_EW:
 		fprintf(stream, "CLIFF_NS_EW");
+		xoffset = 8;
+		yoffset = -8;
 		break;
 	case CLIFF_NS_WE:
 		fprintf(stream, "CLIFF_NS_WE");
+		xoffset = 8;
+		yoffset = -8;
 		break;
 	case CLIFF_WE_NS:
 		fprintf(stream, "CLIFF_WE_NS");
+		xoffset = -8;
+		yoffset = 8;
 		break;
 	case CLIFF_WE_SN:
 		fprintf(stream, "CLIFF_WE_SN");
+		xoffset = -8;
+		yoffset = 8;
 		break;
 		//corners
 	case CLIFF_NE_NS:
 		fprintf(stream, "CLIFF_NE_NS");
+		xoffset = 8;
+		yoffset = 8;
 		break;
 	case CLIFF_NE_SN:
 		fprintf(stream, "CLIFF_NE_SN");
+		xoffset = 8;
+		yoffset = 8;
 		break;
 	case CLIFF_SW_NS:
 		fprintf(stream, "CLIFF_SW_NS");
+		xoffset = 8;
+		yoffset = 8;
 		break;
 	case CLIFF_SW_SN:
 		fprintf(stream, "CLIFF_SW_SN");
+		xoffset = 8;
+		yoffset = 8;
 		break;
 	case CLIFF_SE_NS:
 		fprintf(stream, "CLIFF_SE_NS");
+		xoffset = 8;
+		yoffset = 8;
 		break;
 	case CLIFF_SE_SN:
 		fprintf(stream, "CLIFF_SE_SN");
+		xoffset = 8;
+		yoffset = 8;
 		break;
 	case CLIFF_NW_NS:
 		fprintf(stream, "CLIFF_NW_NS");
+		xoffset = 8;
+		yoffset = 8;
 		break;
 	case CLIFF_NW_SN:
 		fprintf(stream, "CLIFF_NW_SN");
+		xoffset = 8;
+		yoffset = 8;
 		break;
 	default:
 		break;
 	}
+	fprintf(stream, "\", \"x\": %d, \"y\": %d, ", x, y);
+	fprintf(stream, "\"xoffset\": %d, \"yoffset\": %d }", xoffset, yoffset);
 
 }
 
-void detail_terrain_tiles(FILE* stream, int sub_x, int sub_y, int w_bounds, int h_bounds) {
+void detail_terrain_tiles(FILE* stream, int sub_x, int sub_y, int w_bounds,
+		int h_bounds) {
+	fprintf(stream, "\t\"background\": \n\t[");
 
 	for (int i = 0; i < h_bounds; ++i) {
-			for (int j = 0; j < w_bounds; ++j) {
+		for (int j = 0; j < w_bounds; ++j) {
+			int offset_w = (sub_map_w - 1) * sub_x;
+			int offset_h = (sub_map_h - 1) * sub_y;
 
-			}
+			//tile coordinates
+			int tile_x = j + offset_w;
+			int tile_y = i + offset_h;
+
+			add_detail_tile(stream, cmap[tile_y][tile_x], tile_x, tile_y);
+			if (i == h_bounds - 1 && j == w_bounds - 1)
+				fprintf(stream, "\n");
+			else
+				fprintf(stream, ",\n");
+
+		}
 	}
 
+	fprintf(stream, "\t],\n");
 }
-
 
 void add_large_background_tile(FILE* stream, int x, int y, int t) {
 	switch (t) {
@@ -628,8 +672,7 @@ void background_terrain_tiles(FILE* stream, int sub_x, int sub_y, int w_bounds,
 				}
 			}
 			//sort commas
-			if (i == h_bounds - 1
-					&& j == w_bounds - 1)
+			if (i == h_bounds - 1 && j == w_bounds - 1)
 				fprintf(stream, "\n");
 			else
 				fprintf(stream, ",\n");
