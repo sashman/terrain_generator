@@ -57,6 +57,10 @@
 
 #define KF_MAP_DIRECTORY "map/"
 
+#define LARGE_BACKGROUND_TILE_SIZE 4
+
+
+
 
 int get_val(int x, int y);
 

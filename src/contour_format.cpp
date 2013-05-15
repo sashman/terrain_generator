@@ -540,6 +540,104 @@ void print_kf_char_to_stream(int t, FILE* stream) {
 
 }
 
+void detail_terrain_tiles(FILE* stream, int sub_x, int sub_y, int w_bounds, int h_bounds) {
+
+	for (int i = 0; i < h_bounds; ++i) {
+			for (int j = 0; j < w_bounds; ++j) {
+
+			}
+	}
+
+}
+
+
+void add_large_background_tile(FILE* stream, int x, int y, int t) {
+	switch (t) {
+	case GRASS:
+		fprintf(stream, "GRASS%d", rand() % 4);
+		break;
+	default:
+		break;
+	}
+}
+
+void add_small_background_tile(FILE* stream, int x, int y, int t) {
+	switch (t) {
+	case GRASS:
+		fprintf(stream, "SMALL_GRASS%d", rand() % 4);
+		break;
+	default:
+		break;
+	}
+}
+
+void background_terrain_tiles(FILE* stream, int sub_x, int sub_y, int w_bounds,
+		int h_bounds) {
+	fprintf(stream, "\t\"background\": \n\t[");
+	//looping over large areas at a time to check if we can use large tiles
+	for (int i = 0; i < h_bounds; i + LARGE_BACKGROUND_TILE_SIZE) {
+		for (int j = 0; j < w_bounds; j + LARGE_BACKGROUND_TILE_SIZE) {
+			int offset_w = (sub_map_w - 1) * sub_x;
+			int offset_h = (sub_map_h - 1) * sub_y;
+
+			//tile coordinates
+			int tile_x = j + offset_w;
+			int tile_y = i + offset_h;
+
+			//using XOR calculate if there is at least one different tile
+			int diff = cmap[tile_y][tile_x];
+			for (int k = tile_y; k < tile_y + LARGE_BACKGROUND_TILE_SIZE; ++k) {
+				for (int l = tile_x; l < tile_x + LARGE_BACKGROUND_TILE_SIZE;
+						++l) {
+					diff ^= cmap[k][l];
+				}
+			}
+
+			if (diff == 0) {
+				//no difference
+				//add type
+				fprintf(stream, "\t\t{ \"type\": \"");
+				add_large_background_tile(stream, tile_x, tile_y,
+						cmap[tile_y][tile_x]);
+				//add coords and offset (offset is hardcoded for now)
+				fprintf(stream, "\", \"x\": %d, \"y\": %d, ", tile_x, tile_y);
+				fprintf(stream, "\"xoffset\": %d, \"yoffset\": %d }", 0, 0);
+
+			} else {
+				//different tiles
+				for (int k = tile_y; k < tile_y + LARGE_BACKGROUND_TILE_SIZE;
+						++k) {
+					for (int l = tile_x;
+							l < tile_x + LARGE_BACKGROUND_TILE_SIZE; ++l) {
+						//add type
+						fprintf(stream, "\t\t{ \"type\": \"");
+						add_small_background_tile(stream, l, k, cmap[k][l]);
+						//add coords and offset (offset is hardcoded for now)
+						fprintf(stream, "\", \"x\": %d, \"y\": %d, ", l, k);
+						fprintf(stream, "\"xoffset\": %d, \"yoffset\": %d }", 0,
+								0);
+
+						//sort commas
+						if (k == tile_y + LARGE_BACKGROUND_TILE_SIZE - 1
+								&& l == tile_x + LARGE_BACKGROUND_TILE_SIZE - 1)
+							fprintf(stream, "\n");
+						else
+							fprintf(stream, ",\n");
+
+					}
+				}
+			}
+			//sort commas
+			if (i == h_bounds - 1
+					&& j == w_bounds - 1)
+				fprintf(stream, "\n");
+			else
+				fprintf(stream, ",\n");
+		}
+	}
+	fprintf(stream, "\t],\n");
+}
+
 void print_kf_file(FILE* stream, int sub_x, int sub_y) {
 	//print wrapper
 	fprintf(stream, "{\"map\": {\n");
@@ -548,30 +646,33 @@ void print_kf_file(FILE* stream, int sub_x, int sub_y) {
 	fprintf(stream, "%s", get_kf_map_name(sub_x, sub_x, "grass", "").c_str());
 	fprintf(stream, "%s", kf_tile_header.c_str());
 
+	int w_bounds = sub_map_w ? sub_map_w : crop_height;
+	int h_bounds = sub_map_h ? sub_map_h : crop_width;
+
 	//conternt wrapper
-	fprintf(stream, "\"content\": \n");
+	fprintf(stream, "\"content\": \n{");
+
+	background_terrain_tiles(stream, sub_x, sub_y, w_bounds, h_bounds);
+	detail_terrain_tiles(stream, sub_x, sub_y, w_bounds, h_bounds);
+
+	fprintf(stream, "}");
 
 	//x coordinate
 	fprintf(stream, "\t[\n");
 
-	int h_bounds = sub_map_h ? sub_map_h : crop_width;
-	int w_bounds = sub_map_w ? sub_map_w : crop_height;
-
 	for (int i = 0; i < h_bounds; ++i) {
 
 		//y coordinate
-		fprintf(stream, "\t\t[\n ");
+		//fprintf(stream, "\t\t[\n ");
 		for (int j = 0; j < w_bounds; ++j) {
 
 			//tile wrapper
 			fprintf(stream, "\t\t\t{ \"type\": \"");
 
 			//value, calculate offset for it
-			int offset_h = (sub_map_h - 1) * sub_y;
-			int offset_w = (sub_map_w - 1) * sub_x;
 
-			int t = cmap[i+offset_h][j+offset_w];
-			print_kf_char_to_stream(t, stream);
+			//int t = cmap[i+offset_h][j+offset_w];
+			//print_kf_char_to_stream(t, stream);
 
 			//close tile wrapper
 			fprintf(stream, "\" }");
@@ -636,5 +737,4 @@ void print_kf(FILE* stream) {
 		}
 	}
 }
-
 
