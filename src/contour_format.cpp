@@ -559,10 +559,7 @@ void print_kf_file(FILE* stream, int sub_x, int sub_y) {
 
 	for (int i = 0; i < h_bounds; ++i) {
 
-		//fprintf(stream, "\t\"%d\": {\n", j);
-
 		//y coordinate
-		//fprintf(stream, "\t\t\"%d\": {\n ", j);
 		fprintf(stream, "\t\t[\n ");
 		for (int j = 0; j < w_bounds; ++j) {
 
@@ -572,9 +569,6 @@ void print_kf_file(FILE* stream, int sub_x, int sub_y) {
 			//value, calculate offset for it
 			int offset_h = (sub_map_h - 1) * sub_y;
 			int offset_w = (sub_map_w - 1) * sub_x;
-
-//			debug
-//			std::cout << "Getting " << i+offset_h << "," << j+offset_w << "  " << sub_y << "," << sub_x << std::endl;
 
 			int t = cmap[i+offset_h][j+offset_w];
 			print_kf_char_to_stream(t, stream);
@@ -605,7 +599,7 @@ void print_kf_file(FILE* stream, int sub_x, int sub_y) {
 }
 
 void print_kf(FILE* stream) {
-	//no bumaps
+	//no submaps
 	if (sub_map_h == 0 || sub_map_w == 0) {
 		if (stream == 0) {
 			stream = fopen(DEFAULT_CONTOUR_KF_FILE, "w");
