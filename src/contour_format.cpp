@@ -617,10 +617,18 @@ void add_small_background_tile(FILE* stream, int x, int y, int t) {
 
 void background_terrain_tiles(FILE* stream, int sub_x, int sub_y, int w_bounds,
 		int h_bounds) {
+	//for edge cases need to work out if there is LARGE_BACKGROUND_TILE_SIZE tile available
+	int large_tile_size_x;
+	int large_tile_size_y;
+
 	fprintf(stream, "\t\"background\": \n\t[");
 	//looping over large areas at a time to check if we can use large tiles
 	for (int i = 0; i < h_bounds; i + LARGE_BACKGROUND_TILE_SIZE) {
 		for (int j = 0; j < w_bounds; j + LARGE_BACKGROUND_TILE_SIZE) {
+
+			large_tile_size_x = LARGE_BACKGROUND_TILE_SIZE;
+			large_tile_size_y = LARGE_BACKGROUND_TILE_SIZE;
+
 			int offset_w = (sub_map_w - 1) * sub_x;
 			int offset_h = (sub_map_h - 1) * sub_y;
 
@@ -628,11 +636,18 @@ void background_terrain_tiles(FILE* stream, int sub_x, int sub_y, int w_bounds,
 			int tile_x = j + offset_w;
 			int tile_y = i + offset_h;
 
+			//set edges
+			if (tile_y + LARGE_BACKGROUND_TILE_SIZE >= h_bounds)
+				large_tile_size_y = tile_y + LARGE_BACKGROUND_TILE_SIZE
+						- h_bounds;
+			if (tile_x + LARGE_BACKGROUND_TILE_SIZE >= w_bounds)
+				large_tile_size_x = tile_x + LARGE_BACKGROUND_TILE_SIZE
+						- w_bounds;
+
 			//using XOR calculate if there is at least one different tile
 			int diff = cmap[tile_y][tile_x];
-			for (int k = tile_y; k < tile_y + LARGE_BACKGROUND_TILE_SIZE; ++k) {
-				for (int l = tile_x; l < tile_x + LARGE_BACKGROUND_TILE_SIZE;
-						++l) {
+			for (int k = tile_y; k < tile_y + large_tile_size_y; ++k) {
+				for (int l = tile_x; l < tile_x + large_tile_size_x; ++l) {
 					diff ^= cmap[k][l];
 				}
 			}
@@ -649,10 +664,8 @@ void background_terrain_tiles(FILE* stream, int sub_x, int sub_y, int w_bounds,
 
 			} else {
 				//different tiles
-				for (int k = tile_y; k < tile_y + LARGE_BACKGROUND_TILE_SIZE;
-						++k) {
-					for (int l = tile_x;
-							l < tile_x + LARGE_BACKGROUND_TILE_SIZE; ++l) {
+				for (int k = tile_y; k < tile_y + large_tile_size_y; ++k) {
+					for (int l = tile_x; l < tile_x + large_tile_size_x; ++l) {
 						//add type
 						fprintf(stream, "\t\t{ \"type\": \"");
 						add_small_background_tile(stream, l, k, cmap[k][l]);
@@ -662,8 +675,8 @@ void background_terrain_tiles(FILE* stream, int sub_x, int sub_y, int w_bounds,
 								0);
 
 						//sort commas
-						if (k == tile_y + LARGE_BACKGROUND_TILE_SIZE - 1
-								&& l == tile_x + LARGE_BACKGROUND_TILE_SIZE - 1)
+						if (k == tile_y + large_tile_size_y - 1
+								&& l == tile_x + large_tile_size_x - 1)
 							fprintf(stream, "\n");
 						else
 							fprintf(stream, ",\n");
@@ -694,48 +707,11 @@ void print_kf_file(FILE* stream, int sub_x, int sub_y) {
 
 	//conternt wrapper
 	fprintf(stream, "\"content\": \n{");
-
+	//background tiles, eg: GRASS, WATER
 	background_terrain_tiles(stream, sub_x, sub_y, w_bounds, h_bounds);
+	fprintf(stream, ",\n\n");
+	//detail tiles, eg: CLIFF
 	detail_terrain_tiles(stream, sub_x, sub_y, w_bounds, h_bounds);
-
-	fprintf(stream, "}");
-
-	//x coordinate
-	fprintf(stream, "\t[\n");
-
-	for (int i = 0; i < h_bounds; ++i) {
-
-		//y coordinate
-		//fprintf(stream, "\t\t[\n ");
-		for (int j = 0; j < w_bounds; ++j) {
-
-			//tile wrapper
-			fprintf(stream, "\t\t\t{ \"type\": \"");
-
-			//value, calculate offset for it
-
-			//int t = cmap[i+offset_h][j+offset_w];
-			//print_kf_char_to_stream(t, stream);
-
-			//close tile wrapper
-			fprintf(stream, "\" }");
-
-			//check if last element then dont put ","
-			if (j != w_bounds - 1)
-				fprintf(stream, ",\n");
-			else
-				fprintf(stream, "\n");
-
-		}
-		fprintf(stream, "\t\t]");
-		//check if last element then dont put ","
-		if (i != h_bounds - 1)
-			fprintf(stream, ",\n");
-		else
-			fprintf(stream, "\n");
-
-	}
-	fprintf(stream, "\t]\n");
 
 	//close content and map
 	fprintf(stream, "}\n}\n");
