@@ -615,6 +615,19 @@ void add_small_background_tile(FILE* stream, int x, int y, int t) {
 	}
 }
 
+bool diff_tiles(int tile_x, int tile_y, int large_tile_size_x,
+		int large_tile_size_y) {
+	int tile = cmap[tile_y][tile_x];
+	for (int k = tile_y; k < tile_y + large_tile_size_y; ++k) {
+		for (int l = tile_x; l < tile_x + large_tile_size_x; ++l) {
+			if ((tile ^ cmap[k][l]) != 0)
+				return true;
+		}
+	}
+	return false;
+
+}
+
 void background_terrain_tiles(FILE* stream, int sub_x, int sub_y, int w_bounds,
 		int h_bounds) {
 	//for edge cases need to work out if there is LARGE_BACKGROUND_TILE_SIZE tile available
@@ -645,14 +658,7 @@ void background_terrain_tiles(FILE* stream, int sub_x, int sub_y, int w_bounds,
 						- w_bounds;
 
 			//using XOR calculate if there is at least one different tile
-			int diff = cmap[tile_y][tile_x];
-			for (int k = tile_y; k < tile_y + large_tile_size_y; ++k) {
-				for (int l = tile_x; l < tile_x + large_tile_size_x; ++l) {
-					diff ^= cmap[k][l];
-				}
-			}
-
-			if (diff == 0) {
+			if (!diff_tiles(tile_x, tile_y, large_tile_size_x, large_tile_size_y)) {
 				//no difference
 				//add type
 				fprintf(stream, "\t\t{ \"type\": \"");
