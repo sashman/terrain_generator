@@ -474,10 +474,12 @@ void print_contour(FILE* stream) {
 
 const std::string get_kf_map_name(int x, int y, std::string grass,
 		std::string colour) {
+	int sub_map_count_h = crop_height / sub_map_h;
+	int sub_map_count_w = crop_width / sub_map_w;
 
 	std::stringstream ss;
-	ss << "\"total_x\":" << sub_map_w << "," << std::endl;
-	ss << "\"total_y\":" << sub_map_h << "," << std::endl;
+	ss << "\"total_x\":" << sub_map_count_w << "," << std::endl;
+	ss << "\"total_y\":" << sub_map_count_h << "," << std::endl;
 	ss << "\"x\":" << x << "," << std::endl;
 	ss << "\"y\":" << y << "," << std::endl;
 	//ss << "\"colour\":" << colour << "," << std::endl;
@@ -572,7 +574,7 @@ void add_detail_tile(FILE* stream, int t, int x, int y) {
 
 void detail_terrain_tiles(FILE* stream, int sub_x, int sub_y, int w_bounds,
 		int h_bounds) {
-	fprintf(stream, "\t\"background\": \n\t[");
+	fprintf(stream, "\t\"background\": \n\t[\n");
 
 	for (int i = 0; i < h_bounds; ++i) {
 		for (int j = 0; j < w_bounds; ++j) {
@@ -583,6 +585,8 @@ void detail_terrain_tiles(FILE* stream, int sub_x, int sub_y, int w_bounds,
 			int tile_x = j + offset_w;
 			int tile_y = i + offset_h;
 
+			if(cmap[tile_y][tile_x] >= GRASS) continue;
+
 			add_detail_tile(stream, cmap[tile_y][tile_x], tile_x, tile_y);
 			if (i == h_bounds - 1 && j == w_bounds - 1)
 				fprintf(stream, "\n");
@@ -592,7 +596,7 @@ void detail_terrain_tiles(FILE* stream, int sub_x, int sub_y, int w_bounds,
 		}
 	}
 
-	fprintf(stream, "\t],\n");
+	fprintf(stream, "\t]\n");
 }
 
 void add_large_background_tile(FILE* stream, int x, int y, int t) {
@@ -601,6 +605,7 @@ void add_large_background_tile(FILE* stream, int x, int y, int t) {
 		fprintf(stream, "GRASS%d", rand() % 4);
 		break;
 	default:
+		std::cout << "UNKNOW TYPE " << t << std::endl;
 		break;
 	}
 }
@@ -611,16 +616,28 @@ void add_small_background_tile(FILE* stream, int x, int y, int t) {
 		fprintf(stream, "SMALL_GRASS%d", rand() % 4);
 		break;
 	default:
+		std::cout << "UNKNOW TYPE " << t << std::endl;
 		break;
 	}
 }
 
+
+int get_terrain_type(int x, int y)
+{
+	//TODO: needs to be expanded for every terrain type
+	 //if(!point_above_sealevel(x,y)) return WATER;
+	 //else
+		 return GRASS;
+
+}
+
 bool diff_tiles(int tile_x, int tile_y, int large_tile_size_x,
 		int large_tile_size_y) {
-	int tile = cmap[tile_y][tile_x];
+	int tile = get_terrain_type(tile_x, tile_y);
 	for (int k = tile_y; k < tile_y + large_tile_size_y; ++k) {
 		for (int l = tile_x; l < tile_x + large_tile_size_x; ++l) {
-			if ((tile ^ cmap[k][l]) != 0)
+			//only check flat terrain types
+			if ((tile ^ get_terrain_type(l,k)) != 0)
 				return true;
 		}
 	}
@@ -634,10 +651,10 @@ void background_terrain_tiles(FILE* stream, int sub_x, int sub_y, int w_bounds,
 	int large_tile_size_x;
 	int large_tile_size_y;
 
-	fprintf(stream, "\t\"background\": \n\t[");
+	fprintf(stream, "\t\"background\": \n\t[\n");
 	//looping over large areas at a time to check if we can use large tiles
-	for (int i = 0; i < h_bounds; i + LARGE_BACKGROUND_TILE_SIZE) {
-		for (int j = 0; j < w_bounds; j + LARGE_BACKGROUND_TILE_SIZE) {
+	for (int i = 0; i < h_bounds; i += LARGE_BACKGROUND_TILE_SIZE) {
+		for (int j = 0; j < w_bounds; j += LARGE_BACKGROUND_TILE_SIZE) {
 
 			large_tile_size_x = LARGE_BACKGROUND_TILE_SIZE;
 			large_tile_size_y = LARGE_BACKGROUND_TILE_SIZE;
@@ -649,6 +666,7 @@ void background_terrain_tiles(FILE* stream, int sub_x, int sub_y, int w_bounds,
 			int tile_x = j + offset_w;
 			int tile_y = i + offset_h;
 
+
 			//set edges
 			if (tile_y + LARGE_BACKGROUND_TILE_SIZE >= h_bounds)
 				large_tile_size_y = tile_y + LARGE_BACKGROUND_TILE_SIZE
@@ -659,22 +677,24 @@ void background_terrain_tiles(FILE* stream, int sub_x, int sub_y, int w_bounds,
 
 			//using XOR calculate if there is at least one different tile
 			if (!diff_tiles(tile_x, tile_y, large_tile_size_x, large_tile_size_y)) {
+				//std::cout << "LARGE at " << tile_x << "," << tile_y << std::endl;
 				//no difference
 				//add type
 				fprintf(stream, "\t\t{ \"type\": \"");
 				add_large_background_tile(stream, tile_x, tile_y,
-						cmap[tile_y][tile_x]);
+						get_terrain_type(tile_x, tile_y));
 				//add coords and offset (offset is hardcoded for now)
 				fprintf(stream, "\", \"x\": %d, \"y\": %d, ", tile_x, tile_y);
 				fprintf(stream, "\"xoffset\": %d, \"yoffset\": %d }", 0, 0);
 
 			} else {
 				//different tiles
+				//std::cout << "SMALL at " << tile_x << "," << tile_y << std::endl;
 				for (int k = tile_y; k < tile_y + large_tile_size_y; ++k) {
 					for (int l = tile_x; l < tile_x + large_tile_size_x; ++l) {
 						//add type
 						fprintf(stream, "\t\t{ \"type\": \"");
-						add_small_background_tile(stream, l, k, cmap[k][l]);
+						add_small_background_tile(stream, l, k, get_terrain_type(l, k));
 						//add coords and offset (offset is hardcoded for now)
 						fprintf(stream, "\", \"x\": %d, \"y\": %d, ", l, k);
 						fprintf(stream, "\"xoffset\": %d, \"yoffset\": %d }", 0,
@@ -715,7 +735,7 @@ void print_kf_file(FILE* stream, int sub_x, int sub_y) {
 	fprintf(stream, "\"content\": \n{");
 	//background tiles, eg: GRASS, WATER
 	background_terrain_tiles(stream, sub_x, sub_y, w_bounds, h_bounds);
-	fprintf(stream, ",\n\n");
+	fprintf(stream, "\n");
 	//detail tiles, eg: CLIFF
 	detail_terrain_tiles(stream, sub_x, sub_y, w_bounds, h_bounds);
 
