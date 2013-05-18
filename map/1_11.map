@@ -208,7 +208,7 @@
 		{ "type": "CLIFF_SE_NS", "x": 49, "y": 372, "xoffset": 8, "yoffset": 8 },
 		{ "type": "CLIFF_WE_NS", "x": 50, "y": 372, "xoffset": -8, "yoffset": 8 },
 		{ "type": "CLIFF_SW_NS", "x": 51, "y": 372, "xoffset": 8, "yoffset": 8 },
-		{ "type": "CLIFF_NS_WE", "x": 56, "y": 372, "xoffset": 8, "yoffset": -8 },
+		{ "type": "CLIFF_NS_WE", "x": 56, "y": 372, "xoffset": 8, "yoffset": -8 }
 	]
 }
 }

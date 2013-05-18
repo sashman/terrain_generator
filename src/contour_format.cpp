@@ -589,7 +589,7 @@ void detail_terrain_tiles(FILE* stream, int sub_x, int sub_y, int w_bounds,
 				continue;
 
 			add_detail_tile(stream, cmap[tile_y][tile_x], tile_x, tile_y);
-
+			fprintf(stream, ",\n");
 		}
 	}
 	//sort commas
@@ -698,7 +698,7 @@ void background_terrain_tiles(FILE* stream, int sub_x, int sub_y, int w_bounds,
 						fprintf(stream, "\", \"x\": %d, \"y\": %d, ", l, k);
 						fprintf(stream, "\"xoffset\": %d, \"yoffset\": %d }", 0,
 								0);
-
+						fprintf(stream, ",\n");
 					}
 				}
 				//sort commas
