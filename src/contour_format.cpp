@@ -574,7 +574,7 @@ void add_detail_tile(FILE* stream, int t, int x, int y) {
 
 void detail_terrain_tiles(FILE* stream, int sub_x, int sub_y, int w_bounds,
 		int h_bounds) {
-	fprintf(stream, "\t\"background\": \n\t[\n");
+	fprintf(stream, "\t\"detail\": \n\t[\n");
 
 	for (int i = 0; i < h_bounds; ++i) {
 		for (int j = 0; j < w_bounds; ++j) {
@@ -737,7 +737,7 @@ void print_kf_file(FILE* stream, int sub_x, int sub_y) {
 	detail_terrain_tiles(stream, sub_x, sub_y, w_bounds, h_bounds);
 
 	//close content and map
-	fprintf(stream, "}\n}\n");
+	fprintf(stream, "}\n}\n}");
 
 }
 

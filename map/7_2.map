@@ -72,7 +72,7 @@
 		{ "type": "GRASS1", "x": 245, "y": 90, "xoffset": 0, "yoffset": 0 }
 	],
 
-	"background": 
+	"detail": 
 	[
 		{ "type": "CLIFF_SE_NS", "x": 230, "y": 66, "xoffset": 8, "yoffset": 8 },
 		{ "type": "CLIFF_SW_NS", "x": 232, "y": 66, "xoffset": 8, "yoffset": 8 },
@@ -124,5 +124,6 @@
 		{ "type": "CLIFF_NE_SN", "x": 244, "y": 81, "xoffset": 8, "yoffset": 8 },
 		{ "type": "CLIFF_NW_SN", "x": 246, "y": 81, "xoffset": 8, "yoffset": 8 }
 	]
+}
 }
 }
