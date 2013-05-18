@@ -585,16 +585,16 @@ void detail_terrain_tiles(FILE* stream, int sub_x, int sub_y, int w_bounds,
 			int tile_x = j + offset_w;
 			int tile_y = i + offset_h;
 
-			if(cmap[tile_y][tile_x] >= GRASS) continue;
+			if (cmap[tile_y][tile_x] >= GRASS)
+				continue;
 
 			add_detail_tile(stream, cmap[tile_y][tile_x], tile_x, tile_y);
-			if (i == h_bounds - 1 && j == w_bounds - 1)
-				fprintf(stream, "\n");
-			else
-				fprintf(stream, ",\n");
 
 		}
 	}
+	//sort commas
+	fseek(stream, -sizeof(char) * 2, SEEK_CUR);
+	fprintf(stream, "\n");
 
 	fprintf(stream, "\t]\n");
 }
@@ -621,13 +621,11 @@ void add_small_background_tile(FILE* stream, int x, int y, int t) {
 	}
 }
 
-
-int get_terrain_type(int x, int y)
-{
+int get_terrain_type(int x, int y) {
 	//TODO: needs to be expanded for every terrain type
-	 //if(!point_above_sealevel(x,y)) return WATER;
-	 //else
-		 return GRASS;
+	//if(!point_above_sealevel(x,y)) return WATER;
+	//else
+	return GRASS;
 
 }
 
@@ -637,7 +635,7 @@ bool diff_tiles(int tile_x, int tile_y, int large_tile_size_x,
 	for (int k = tile_y; k < tile_y + large_tile_size_y; ++k) {
 		for (int l = tile_x; l < tile_x + large_tile_size_x; ++l) {
 			//only check flat terrain types
-			if ((tile ^ get_terrain_type(l,k)) != 0)
+			if ((tile ^ get_terrain_type(l, k)) != 0)
 				return true;
 		}
 	}
@@ -666,7 +664,6 @@ void background_terrain_tiles(FILE* stream, int sub_x, int sub_y, int w_bounds,
 			int tile_x = j + offset_w;
 			int tile_y = i + offset_h;
 
-
 			//set edges
 			if (tile_y + LARGE_BACKGROUND_TILE_SIZE >= h_bounds)
 				large_tile_size_y = tile_y + LARGE_BACKGROUND_TILE_SIZE
@@ -676,7 +673,8 @@ void background_terrain_tiles(FILE* stream, int sub_x, int sub_y, int w_bounds,
 						- w_bounds;
 
 			//using XOR calculate if there is at least one different tile
-			if (!diff_tiles(tile_x, tile_y, large_tile_size_x, large_tile_size_y)) {
+			if (!diff_tiles(tile_x, tile_y, large_tile_size_x,
+					large_tile_size_y)) {
 				//std::cout << "LARGE at " << tile_x << "," << tile_y << std::endl;
 				//no difference
 				//add type
@@ -694,29 +692,28 @@ void background_terrain_tiles(FILE* stream, int sub_x, int sub_y, int w_bounds,
 					for (int l = tile_x; l < tile_x + large_tile_size_x; ++l) {
 						//add type
 						fprintf(stream, "\t\t{ \"type\": \"");
-						add_small_background_tile(stream, l, k, get_terrain_type(l, k));
+						add_small_background_tile(stream, l, k,
+								get_terrain_type(l, k));
 						//add coords and offset (offset is hardcoded for now)
 						fprintf(stream, "\", \"x\": %d, \"y\": %d, ", l, k);
 						fprintf(stream, "\"xoffset\": %d, \"yoffset\": %d }", 0,
 								0);
 
-						//sort commas
-						if (k == tile_y + large_tile_size_y - 1
-								&& l == tile_x + large_tile_size_x - 1)
-							fprintf(stream, "\n");
-						else
-							fprintf(stream, ",\n");
-
 					}
 				}
+				//sort commas
+				fseek(stream, -sizeof(char) * 2, SEEK_CUR);
+				fprintf(stream, "\n");
 			}
 			//sort commas
-			if (i == h_bounds - 1 && j == w_bounds - 1)
-				fprintf(stream, "\n");
-			else
-				fprintf(stream, ",\n");
+			fprintf(stream, ",\n");
 		}
 	}
+
+	//sort commas
+	fseek(stream, -sizeof(char) * 2, SEEK_CUR);
+	fprintf(stream, "\n");
+
 	fprintf(stream, "\t],\n");
 }
 
