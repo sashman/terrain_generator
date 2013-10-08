@@ -16,7 +16,7 @@ extern int crop_height;
 extern int crop_width;
 extern int** tmap;
 
-extern int snowtop_level;
+extern int snow_level;
 extern int sea_level;
 
 extern int n_rivers;

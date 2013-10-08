@@ -9,15 +9,17 @@
 #define TERRAIN_GENERATOR_HPP_
 
 #include <iostream>
+#include <fstream>
 #include <string.h>
 #include <stdio.h>
 #include <cmath>
 #include <getopt.h>
 #include <stdlib.h>
+#include "rapidjson/document.h"
 
 
 
-#define DEFAULT_CONFIG_FILE "config.yaml"
+#define DEFAULT_CONFIG_FILE "config.json"
 
 #define DEAFULT_TERRAIN_FILE "terrain.txt"
 

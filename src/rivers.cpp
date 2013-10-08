@@ -15,7 +15,7 @@ extern int crop_width;
 extern int** tmap;
 
 extern int sea_level;
-extern int snowtop_level;
+extern int snow_level;
 
 int n_rivers = DEFAULT_NO_OF_RIVERS;
 

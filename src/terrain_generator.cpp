@@ -7,9 +7,6 @@
 #include "terrain_generator.hpp"
 
 
-#include <yaml.h>
-
-
 enum OutFormat {
 	STANDRARD_HEIGHTS, STANDARD_XML, OPENGL_VIEW
 };
@@ -47,7 +44,7 @@ extern int random_offset;
 extern float offset_dr;
 
 extern int voronoi_size;
-extern int** voronoi_points;
+//extern int** voronoi_points;
 
 extern float voronoi_alpha;
 
@@ -61,7 +58,7 @@ extern int normalise_max;
 
 extern int sea_level;
 extern int sand_level;
-extern int snowtop_level;
+extern int snow_level;
 extern int cliff_difference;
 
 extern int n_rivers;
@@ -108,10 +105,52 @@ void print_usage(FILE* stream, int exit_code, char* program_name) {
 	exit(exit_code);
 }
 
+std::string get_file_contents(const char *filename)
+{
+  std::ifstream in(filename, std::ios::in | std::ios::binary);
+  if (in)
+  {
+    std::string contents;
+    in.seekg(0, std::ios::end);
+    contents.resize(in.tellg());
+    in.seekg(0, std::ios::beg);
+    in.read(&contents[0], contents.size());
+    in.close();
+    return(contents);
+  }
+  throw(errno);
+}
 
 
 void read_config(){
 
+	std::string json = get_file_contents(config_file.c_str());
+	rapidjson::Document d;
+	d.Parse<0>(json.c_str());
+
+	output_file = 		d["output_file"].GetString();
+	crop_width = 		d["height"].GetInt();
+	crop_height = 		d["width"].GetInt();
+	scale = 			d["scale"].GetInt();
+	seed = 				d["seed"].GetInt();
+	random_offset = 	d["offset"].GetInt();
+	offset_dr = 		d["rough"].GetDouble();
+	normalise = 		(strcmp(d["normalise"].GetString(), "true")==0);
+	normalise_min = 	d["normalise_min"].GetInt();
+	normalise_max = 	d["normalise_max"].GetInt();
+	sea_level = 		d["sea_level"].GetInt();
+	sand_level = 		d["sand_level"].GetInt();
+	snow_level = 		d["snow_level"].GetInt();
+	cliff_difference = 	d["cliff_height_difference"].GetInt();
+	n_rivers = 			d["number_of_river_sources"].GetInt();
+	max_branches = 		d["max_branches_per_source"].GetInt();
+	n_settlements = 	d["number_of_settlements"].GetInt();
+	min_distance = 		d["min_distance_between_settlements"].GetInt();
+	n_vegetation = 		d["number_of_vegetation"].GetInt();
+	root_radius = 		d["vegetation_root_radius"].GetInt();
+	generations = 		d["vegetation_generations"].GetInt();
+
+#if 0
 
 	yaml_parser_t parser;
 	yaml_token_t  token;
@@ -187,7 +226,7 @@ void read_config(){
 				else if(key_type.compare("normalise_max")==0) normalise_max = atoi((char*)token.data.scalar.value);
 				else if(key_type.compare("sea_level")==0) sea_level = atoi((char*)token.data.scalar.value);
 				else if(key_type.compare("sand_level")==0) sand_level = atoi((char*)token.data.scalar.value);
-				else if(key_type.compare("snow_level")==0) snowtop_level= atoi((char*)token.data.scalar.value);
+				else if(key_type.compare("snow_level")==0) snow_level= atoi((char*)token.data.scalar.value);
 				else if(key_type.compare("cliff_height_difference")==0) cliff_difference = atoi((char*)token.data.scalar.value);
 				else if(key_type.compare("number_of_river_sources")==0) n_rivers = atoi((char*)token.data.scalar.value);
 				else if(key_type.compare("max_branches_per_source")==0) max_branches = atoi((char*)token.data.scalar.value);
@@ -211,7 +250,10 @@ void read_config(){
 	  yaml_token_delete(&token);
 
 	yaml_parser_delete(&parser);
+#endif
+
 }
+
 
 
 
@@ -242,7 +284,7 @@ void generate(){
 			tmap_size = (1<<t)+1;
 		}
 
-		double start = clock();
+//		double start = clock();
 		double finish = 0;
 		//display info
 		if (verbose) {
@@ -290,7 +332,7 @@ void generate(){
 
 		if(!neg) clear_neg();
 
-		finish = clock() - start;
+//		finish = clock() - start;
 		if (verbose) std::cout << "Finished square diamond " << (finish/1000000) << std::endl;
 		double sqadia = (finish/1000000);
 
@@ -313,25 +355,25 @@ void generate(){
 
 		if(scale>0 && crop_height>256 && crop_width>256){
 
-			start = clock();
+//			start = clock();
 			if(verbose) std::cout << "Generating rivers" << std::endl;
 			rivers();
-			finish = clock() - start;
+//			finish = clock() - start;
 			if(verbose) std::cout << "Done " << (finish/1000000) << std::endl;
 			double rivers_time = (finish/1000000);
 			print_rivers(0);
 
-			start = clock();
+//			start = clock();
 			if(verbose) std::cout << "Generating vegetation" << std::endl;
 			vegetation(verbose);
-			finish = clock() - start;
+//			finish = clock() - start;
 			if(verbose) std::cout << "Done " << (finish/1000000) << std::endl;
 			double veg_time = (finish/1000000);
 			print_vegetation(0);
 
 			if(verbose) std::cout << "Generating settlements" << std::endl;
 			settlements();
-			finish = clock() - start;
+//			finish = clock() - start;
 			if(verbose) std::cout << "Done " << (finish/1000000) << std::endl;
 			double settlement_time = (finish/1000000);
 			print_settlements(0);
@@ -490,7 +532,7 @@ int main(int argc, char** argv) {
 
 		case 'a': /* random seed value */
 
-			srand ( time(NULL) );
+//			srand ( time(NULL) );
 
 			break;
 

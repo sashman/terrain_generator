@@ -41,7 +41,7 @@ int normalise_max = 150;
 
 int sea_level = DEFAULT_SEA_LEVEL;
 int sand_level = DEAFULT_SAND_LEVEL;
-int snowtop_level = DEFAULT_SNOW_TOP_LEVEL;
+int snow_level = DEFAULT_SNOW_TOP_LEVEL;
 int cliff_difference = 100;
 
 //constraint helper methods
@@ -54,7 +54,7 @@ bool point_above_sandlevel(int x, int y) {
 }
 
 bool point_below_snow_top_level(int x, int y) {
-	return tmap[y][x] < snowtop_level;
+	return tmap[y][x] < snow_level;
 }
 
 int get_val(int x, int y) {
@@ -365,7 +365,7 @@ void print_map_xml(FILE* stream) {
 					type = "water";
 				}else if(tmap[i][j]<=sand_level){
 					type = "sand";
-				}else if(tmap[i][j]<=snowtop_level){
+				}else if(tmap[i][j]<=snow_level){
 					type = "grass";
 				}else
 					type = "snow";
