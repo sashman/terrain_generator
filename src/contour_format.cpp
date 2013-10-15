@@ -1,5 +1,5 @@
 /*
- * contour_format2.cpp
+ * contour_format.cpp
  *
  *  Created on: 8 Jul 2012
  *      Author: sashman
@@ -498,7 +498,6 @@ void add_detail_tile(rapidjson::Value& tileObj, rapidjson::Document::AllocatorTy
 	int xoffset, yoffset;
 	std::string type;
 
-//	fprintf(stream, "\t\t{ \"type\": \"");
 	switch (t) {
 	//not used here
 //	case GRASS:
@@ -510,74 +509,63 @@ void add_detail_tile(rapidjson::Value& tileObj, rapidjson::Document::AllocatorTy
 	//straights
 	case CLIFF_NS_EW:
 		type = "CLIFF_NS_EW";
-//		fprintf(stream, );
 		xoffset = 8;
 		yoffset = -8;
 		break;
 	case CLIFF_NS_WE:
 		type = "CLIFF_NS_WE";
-//		fprintf(stream, "CLIFF_NS_WE");
 		xoffset = 8;
 		yoffset = -8;
 		break;
 	case CLIFF_WE_NS:
 		type = "CLIFF_WE_NS";
-//		fprintf(stream, "CLIFF_WE_NS");
 		xoffset = -8;
 		yoffset = 8;
 		break;
 	case CLIFF_WE_SN:
 		type = "CLIFF_WE_SN";
-//		fprintf(stream, "CLIFF_WE_SN");
 		xoffset = -8;
 		yoffset = 8;
 		break;
-		//corners
+		
+//=====corners=====
 	case CLIFF_NE_NS:
 		type = "CLIFF_NE_NS";
-//		fprintf(stream, "CLIFF_NE_NS");
 		xoffset = 8;
 		yoffset = 8;
 		break;
 	case CLIFF_NE_SN:
 		type = "CLIFF_NE_SN";
-//		fprintf(stream, "CLIFF_NE_SN");
 		xoffset = 8;
 		yoffset = 8;
 		break;
 	case CLIFF_SW_NS:
 		type = "CLIFF_SW_NS";
-//		fprintf(stream, "CLIFF_SW_NS");
 		xoffset = 8;
 		yoffset = 8;
 		break;
 	case CLIFF_SW_SN:
 		type = "CLIFF_SW_SN";
-//		fprintf(stream, "CLIFF_SW_SN");
 		xoffset = 8;
 		yoffset = 8;
 		break;
 	case CLIFF_SE_NS:
 		type = "CLIFF_SE_NS";
-//		fprintf(stream, "CLIFF_SE_NS");
 		xoffset = 8;
 		yoffset = 8;
 		break;
 	case CLIFF_SE_SN:
 		type = "CLIFF_SE_SN";
-//		fprintf(stream, "CLIFF_SE_SN");
 		xoffset = 8;
 		yoffset = 8;
 		break;
 	case CLIFF_NW_NS:
 		type = "CLIFF_NW_NS";
-//		fprintf(stream, "CLIFF_NW_NS");
 		xoffset = 8;
 		yoffset = 8;
 		break;
 	case CLIFF_NW_SN:
 		type = "CLIFF_NW_SN";
-//		fprintf(stream, "CLIFF_NW_SN");
 		xoffset = 8;
 		yoffset = 8;
 		break;
@@ -598,16 +586,12 @@ void add_detail_tile(rapidjson::Value& tileObj, rapidjson::Document::AllocatorTy
 	tileObj.AddMember("yoffset", yoffset, a);
 	tileObj.AddMember("xoffset", xoffset, a);
 
-//	fprintf(stream, "\", \"x\": %d, \"y\": %d, ", x, y);
-//	fprintf(stream, "\"xoffset\": %d, \"yoffset\": %d }", xoffset, yoffset);
-
 }
 
 void detail_terrain_tiles(rapidjson::Value &contentObj, rapidjson::Document::AllocatorType& a, int sub_x, int sub_y, int w_bounds,
 		int h_bounds) {
 
 	rapidjson::Value detailArray(rapidjson::kArrayType);
-//	fprintf(stream, "\t\"detail\": \n\t[\n");
 
 	for (int i = 0; i < h_bounds; ++i) {
 		for (int j = 0; j < w_bounds; ++j) {
@@ -626,16 +610,11 @@ void detail_terrain_tiles(rapidjson::Value &contentObj, rapidjson::Document::All
 
 			detailArray.PushBack(tileObj,a);
 
-//			fprintf(stream, ",\n");
 		}
 	}
 
 	contentObj.AddMember("detail", detailArray, a);
-	//sort commas
-//	fseek(stream, -sizeof(char) * 2, SEEK_CUR);
-//	fprintf(stream, "\n");
-//
-//	fprintf(stream, "\t]\n");
+
 }
 
 char* add_large_background_tile(int x, int y, int t) {
@@ -695,7 +674,6 @@ void background_terrain_tiles(rapidjson::Value &contentObj, rapidjson::Document:
 	int large_tile_size_x;
 	int large_tile_size_y;
 
-//	fprintf(stream, "\t\"background\": \n\t[\n");
 	//looping over large areas at a time to check if we can use large tiles
 	for (int i = 0; i < h_bounds; i += LARGE_BACKGROUND_TILE_SIZE) {
 		for (int j = 0; j < w_bounds; j += LARGE_BACKGROUND_TILE_SIZE) {
@@ -734,20 +712,15 @@ void background_terrain_tiles(rapidjson::Value &contentObj, rapidjson::Document:
 
 				tileObject.AddMember("x", tile_x, a);
 				tileObject.AddMember("y", tile_y, a);
+				//offset it 0, all background tiles are never offset
 				tileObject.AddMember("xoffset", 0, a);
 				tileObject.AddMember("yoffset", 0, a);
 				backgroundArray.PushBack(tileObject, a);
-				//no difference
-				//add type
-//				fprintf(stream, "\t\t{ \"type\": \"");
 
-				//add coords and offset (offset is hardcoded for now)
-//				fprintf(stream, "\", \"x\": %d, \"y\": %d, ", tile_x, tile_y);
-//				fprintf(stream, "\"xoffset\": %d, \"yoffset\": %d }", 0, 0);
+
 
 			} else {
 				//different tiles
-				//std::cout << "SMALL at " << tile_x << "," << tile_y << std::endl;
 				for (int k = tile_y; k < tile_y + large_tile_size_y; ++k) {
 					for (int l = tile_x; l < tile_x + large_tile_size_x; ++l) {
 
@@ -759,33 +732,14 @@ void background_terrain_tiles(rapidjson::Value &contentObj, rapidjson::Document:
 						tileObject.AddMember("yoffset", 0, a);
 						backgroundArray.PushBack(tileObject, a);
 
-//						//add type
-//						fprintf(stream, "\t\t{ \"type\": \"");
-//						add_small_background_tile(stream, l, k,
-//								get_terrain_type(l, k));
-//						//add coords and offset (offset is hardcoded for now)
-//						fprintf(stream, "\", \"x\": %d, \"y\": %d, ", l, k);
-//						fprintf(stream, "\"xoffset\": %d, \"yoffset\": %d }", 0,
-//								0);
-//						fprintf(stream, ",\n");
+
 					}
 				}
-				//sort commas
-//				fseek(stream, -sizeof(char) * 2, SEEK_CUR);
-//				fprintf(stream, "\n");
 			}
-			//sort commas
-//			fprintf(stream, ",\n");
 		}
 	}
 
 	contentObj.AddMember("background", backgroundArray, a);
-
-	//sort commas
-//	fseek(stream, -sizeof(char) * 2, SEEK_CUR);
-//	fprintf(stream, "\n");
-//
-//	fprintf(stream, "\t],\n");
 }
 
 void print_kf_file(FILE* stream, int sub_x, int sub_y) {
@@ -802,20 +756,6 @@ void print_kf_file(FILE* stream, int sub_x, int sub_y) {
 
 	int sub_map_count_h = crop_height / sub_map_h;
 	int sub_map_count_w = crop_width / sub_map_w;
-	/*
-	 *
-
-
-	std::stringstream ss;
-	ss << "\"total_x\":" << sub_map_count_w << "," << std::endl;
-	ss << "\"total_y\":" << sub_map_count_h << "," << std::endl;
-	ss << "\"x\":" << x << "," << std::endl;
-	ss << "\"y\":" << y << "," << std::endl;
-	//ss << "\"colour\":" << colour << "," << std::endl;
-
-	std::string out = ss.str();
-	return out;
-	 */
 
 	//adding map meta data
 
@@ -830,50 +770,27 @@ void print_kf_file(FILE* stream, int sub_x, int sub_y) {
 	rapidjson::Value contentObject(rapidjson::kObjectType);
 
 
-	//print wrapper
-//	fprintf(stream, "{\"map\": {\n");
-
-	//headers etc
-//	fprintf(stream, "%s", get_kf_map_name(sub_x, sub_x, "grass", "").c_str());
-//	fprintf(stream, "%s", kf_tile_header.c_str());
-
 	int w_bounds = sub_map_w ? sub_map_w : crop_height;
 	int h_bounds = sub_map_h ? sub_map_h : crop_width;
 
-	//conternt wrapper
-//	fprintf(stream, "\"content\": \n{");
 	//background tiles, eg: GRASS, WATER
 	background_terrain_tiles(contentObject, allocator, sub_x, sub_y, w_bounds, h_bounds);
 
-//	fprintf(stream, "\n");
 	//detail tiles, eg: CLIFF
 	detail_terrain_tiles(contentObject, allocator, sub_x, sub_y, w_bounds, h_bounds);
 
-	//close content and map
-//	fprintf(stream, "}\n}\n}");
 
 	mapObject.AddMember("content", contentObject, allocator);
 	mapDoc.AddMember("map", mapObject, allocator);
 
 
-
+	//Print JSON to file
 	rapidjson::StringBuffer strbuf;
 
-//	if(stream == 0)
-//	{
-//		printf("Error opening file\n");
-//		return;
-//	}
 	rapidjson::FileStream out_file(stream);
 	rapidjson::PrettyWriter<rapidjson::FileStream> writer(out_file);
 
 	mapDoc.Accept(writer);
-
-	// string str = buffer.GetString();
-//	printf("--\n%s\n--\n", strbuf.GetString());
-
-
-//	mapDoc.RemoveMember("map");
 
 }
 
