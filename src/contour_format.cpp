@@ -7,6 +7,8 @@
 
 #include "terrain_generator.hpp"
 #include <vector>;
+#include <set>;
+#include <utility>;
 #include <sstream>;
 
 
@@ -28,6 +30,8 @@ extern int sea_level;
 int** cmap;
 
 std::vector<int>** domain;
+
+std::set<std::string> padded;
 
 //Change according to tile types
 enum TILE_CASE {
@@ -490,11 +494,206 @@ const std::string get_kf_map_name(int x, int y, std::string grass,
 	return out;
 }
 
-std::string kf_tile_header = "";
 
-void add_detail_tile(rapidjson::Value& tileObj, rapidjson::Document::AllocatorType& a, int t, int x, int y) {
+void pad_north(rapidjson::Value& detailArray, rapidjson::Document::AllocatorType& a, int t, int x, int y) {
+
+	//create unique key for the padding
+	std::stringstream ss;
+	ss << x << "," << (y-1) << "-" << y;
+
+	//check if it exists
+	if (padded.count(ss.str()) != 0) {
+		//padding should not be encountered more than twice
+		padded.erase(ss.str());
+		return;
+	}
+
+	//if not encountered, add it
+	padded.insert(ss.str());
+
+	//check the dir of the slope on the padding
+	int xoffset = 8;
+	int yoffset = -8;
+	std::string type;
+	switch (t) {
+		case CLIFF_NE_NS:
+		case CLIFF_NW_SN:
+			type = "CLIFF_PADDING_NS_EW";
+			break;
+		case CLIFF_NE_SN:
+		case CLIFF_NW_NS:
+			type = "CLIFF_PADDING_NS_WE";
+			break;
+		default:
+			type = "UNKNOWN PADDING";
+			break;
+	}
 
 
+	//add to the tile array
+	rapidjson::Value tileObj(rapidjson::kObjectType);
+	rapidjson::Value typeString;
+	typeString.SetString(type.c_str(), a);
+	tileObj.AddMember("type", typeString ,a);
+	tileObj.AddMember("x", x, a);
+	tileObj.AddMember("y", y, a);
+	tileObj.AddMember("yoffset", yoffset, a);
+	tileObj.AddMember("xoffset", xoffset, a);
+
+	detailArray.PushBack(tileObj,a);
+
+}
+
+void pad_south(rapidjson::Value& detailArray, rapidjson::Document::AllocatorType& a, int t, int x, int y) {
+
+	//create unique key for the padding
+	std::stringstream ss;
+	ss << x << "," << (y) << "-" << y+1;
+
+	//check if it exists
+	if (padded.count(ss.str()) != 0) {
+		//padding should not be encountered more than twice
+		padded.erase(ss.str());
+		return;
+	}
+
+	//if not encountered, add it
+	padded.insert(ss.str());
+
+	//check the dir of the slope on the padding
+	int xoffset = 8;
+	int yoffset = 24;
+	std::string type;
+	switch (t) {
+		case CLIFF_SW_NS:
+		case CLIFF_SE_SN:
+			type = "CLIFF_PADDING_NS_EW";
+			break;
+		case CLIFF_SW_SN:
+		case CLIFF_SE_NS:
+			type = "CLIFF_PADDING_NS_WE";
+			break;
+		default:
+			type = "UNKNOWN PADDING";
+			break;
+	}
+
+
+	//add to the tile array
+	rapidjson::Value tileObj(rapidjson::kObjectType);
+	rapidjson::Value typeString;
+	typeString.SetString(type.c_str(), a);
+	tileObj.AddMember("type", typeString ,a);
+	tileObj.AddMember("x", x, a);
+	tileObj.AddMember("y", y, a);
+	tileObj.AddMember("yoffset", yoffset, a);
+	tileObj.AddMember("xoffset", xoffset, a);
+
+	detailArray.PushBack(tileObj,a);
+
+}
+
+void pad_west(rapidjson::Value& detailArray, rapidjson::Document::AllocatorType& a, int t, int x, int y) {
+
+	//create unique key for the padding
+	std::stringstream ss;
+	ss << (x-1) << "-" << x << "," << y;
+
+	//check if it exists
+	if (padded.count(ss.str()) != 0) {
+		//padding should not be encountered more than twice
+		padded.erase(ss.str());
+		return;
+	}
+
+	//if not encountered, add it
+	padded.insert(ss.str());
+
+	//check the dir of the slope on the padding
+	int xoffset = -8;
+	int yoffset = 8;
+	std::string type;
+	switch (t) {
+		case CLIFF_NW_SN:
+		case CLIFF_SW_SN:
+			type = "CLIFF_PADDING_WE_SN";
+			break;
+		case CLIFF_NW_NS:
+		case CLIFF_SW_NS:
+			type = "CLIFF_PADDING_WE_NS";
+			break;
+		default:
+			type = "UNKNOWN PADDING";
+			break;
+	}
+
+
+	//add to the tile array
+	rapidjson::Value tileObj(rapidjson::kObjectType);
+	rapidjson::Value typeString;
+	typeString.SetString(type.c_str(), a);
+	tileObj.AddMember("type", typeString ,a);
+	tileObj.AddMember("x", x, a);
+	tileObj.AddMember("y", y, a);
+	tileObj.AddMember("yoffset", yoffset, a);
+	tileObj.AddMember("xoffset", xoffset, a);
+
+	detailArray.PushBack(tileObj,a);
+
+}
+
+void pad_east(rapidjson::Value& detailArray, rapidjson::Document::AllocatorType& a, int t, int x, int y) {
+
+	//create unique key for the padding
+	std::stringstream ss;
+	ss << x << "-" << (x+1) << "," << y;
+
+	//check if it exists
+	if (padded.count(ss.str()) != 0) {
+		//padding should not be encountered more than twice
+		padded.erase(ss.str());
+		return;
+	}
+
+	//if not encountered, add it
+	padded.insert(ss.str());
+
+	//check the dir of the slope on the padding
+	int xoffset = 24;
+	int yoffset = 8;
+	std::string type;
+	switch (t) {
+		case CLIFF_NE_SN:
+		case CLIFF_SE_SN:
+			type = "CLIFF_PADDING_WE_SN";
+			break;
+		case CLIFF_NE_NS:
+		case CLIFF_SE_NS:
+			type = "CLIFF_PADDING_WE_NS";
+			break;
+		default:
+			type = "UNKNOWN PADDING";
+			break;
+	}
+
+
+	//add to the tile array
+	rapidjson::Value tileObj(rapidjson::kObjectType);
+	rapidjson::Value typeString;
+	typeString.SetString(type.c_str(), a);
+	tileObj.AddMember("type", typeString ,a);
+	tileObj.AddMember("x", x, a);
+	tileObj.AddMember("y", y, a);
+	tileObj.AddMember("yoffset", yoffset, a);
+	tileObj.AddMember("xoffset", xoffset, a);
+
+	detailArray.PushBack(tileObj,a);
+
+}
+
+void add_detail_tile(rapidjson::Value& detailArray, rapidjson::Document::AllocatorType& a, int t, int x, int y) {
+
+	rapidjson::Value tileObj(rapidjson::kObjectType);
 	int xoffset, yoffset;
 	std::string type;
 
@@ -533,41 +732,73 @@ void add_detail_tile(rapidjson::Value& tileObj, rapidjson::Document::AllocatorTy
 		type = "CLIFF_NE_NS";
 		xoffset = 8;
 		yoffset = 8;
+
+		pad_north(detailArray, a, t, x, y);
+		pad_east(detailArray, a, t, x, y);
+
 		break;
 	case CLIFF_NE_SN:
 		type = "CLIFF_NE_SN";
 		xoffset = 8;
 		yoffset = 8;
+
+		pad_north(detailArray, a, t, x, y);
+		pad_east(detailArray, a, t, x, y);
+
 		break;
 	case CLIFF_SW_NS:
 		type = "CLIFF_SW_NS";
 		xoffset = 8;
 		yoffset = 8;
+
+		pad_south(detailArray, a, t, x, y);
+		pad_west(detailArray, a, t, x, y);
+
 		break;
 	case CLIFF_SW_SN:
 		type = "CLIFF_SW_SN";
 		xoffset = 8;
 		yoffset = 8;
+
+		pad_south(detailArray, a, t, x, y);
+		pad_west(detailArray, a, t, x, y);
+
 		break;
 	case CLIFF_SE_NS:
 		type = "CLIFF_SE_NS";
 		xoffset = 8;
 		yoffset = 8;
+
+		pad_south(detailArray, a, t, x, y);
+		pad_east(detailArray, a, t, x, y);
+
 		break;
 	case CLIFF_SE_SN:
 		type = "CLIFF_SE_SN";
 		xoffset = 8;
 		yoffset = 8;
+
+		pad_south(detailArray, a, t, x, y);
+		pad_east(detailArray, a, t, x, y);
+
 		break;
 	case CLIFF_NW_NS:
 		type = "CLIFF_NW_NS";
 		xoffset = 8;
 		yoffset = 8;
+
+		pad_north(detailArray, a, t, x, y);
+		pad_west(detailArray, a, t, x, y);
+
 		break;
 	case CLIFF_NW_SN:
 		type = "CLIFF_NW_SN";
 		xoffset = 8;
 		yoffset = 8;
+
+		pad_north(detailArray, a, t, x, y);
+		pad_west(detailArray, a, t, x, y);
+
 		break;
 	default:
 		type = "UNKNOWN_TYPE";
@@ -585,6 +816,8 @@ void add_detail_tile(rapidjson::Value& tileObj, rapidjson::Document::AllocatorTy
 	tileObj.AddMember("y", y, a);
 	tileObj.AddMember("yoffset", yoffset, a);
 	tileObj.AddMember("xoffset", xoffset, a);
+
+	detailArray.PushBack(tileObj,a);
 
 }
 
@@ -605,10 +838,10 @@ void detail_terrain_tiles(rapidjson::Value &contentObj, rapidjson::Document::All
 			if (cmap[tile_y][tile_x] >= GRASS)
 				continue;
 
-			rapidjson::Value tileObj(rapidjson::kObjectType);
-			add_detail_tile(tileObj, a, cmap[tile_y][tile_x], tile_x, tile_y);
 
-			detailArray.PushBack(tileObj,a);
+			add_detail_tile(detailArray, a, cmap[tile_y][tile_x], tile_x, tile_y);
+
+//			detailArray.PushBack(tileObj,a);
 
 		}
 	}
@@ -810,12 +1043,13 @@ void print_kf(FILE* stream) {
 		int sub_map_count_h = crop_height / sub_map_h;
 		int sub_map_count_w = crop_width / sub_map_w;
 
+		int map_total = 0;
 		for (int i = 0; i < sub_map_count_h; i++) {
 			for (int j = 0; j < sub_map_count_w; ++j) {
 
 				std::ostringstream map_file;
 				map_file << KF_MAP_DIRECTORY << j << "_" << i << ".map";
-				std::cout << map_file.str() << std::endl;
+//				std::cout << map_file.str() << std::endl;
 
 				FILE* stream = 0;
 				if (stream == 0) {
@@ -828,8 +1062,10 @@ void print_kf(FILE* stream) {
 					fclose(stream);
 				}
 
+				map_total++;
 			}
 		}
+		std::cout << map_total << " maps created in " << KF_MAP_DIRECTORY <<std::endl;
 	}
 }
 

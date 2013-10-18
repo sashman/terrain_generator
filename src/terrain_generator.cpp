@@ -308,7 +308,7 @@ void generate(){
 		  * use for generating a random map every time
 		  //srand ( time(NULL) );
 		*/
-		srand ( 0 );
+		srand ( 12 );
 
 		//fill the array with values
 		square_diamond();

@@ -10,7 +10,7 @@
 
 #include <iostream>
 #include <fstream>
-#include <string.h>
+#include <string>
 #include <stdio.h>
 #include <cmath>
 #include <getopt.h>
