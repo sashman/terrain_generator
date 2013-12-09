@@ -61,7 +61,9 @@
 
 #define DEFAULT_CONTOUR_KF_FILE "contour_kf.map"
 
-#define KF_MAP_DIRECTORY "map/"
+//#define KF_MAP_DIRECTORY "map/"
+
+#define KF_MAP_DIRECTORY "C:\\Users\\sashman\\kingdomforge\\data\\map\\"
 
 #define LARGE_BACKGROUND_TILE_SIZE 4
 
