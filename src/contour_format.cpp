@@ -154,6 +154,11 @@ void reset_grass() {
 
 }
 
+/**
+ *
+ * int t - current threshold
+ *
+ */
 void fill_one_tile_gaps(int t) {
 
 	//horizontal gaps
@@ -208,8 +213,122 @@ void fill_one_tile_gaps(int t) {
 
 }
 
-void verify_one_tile_gaps(int t, bool verbose) {
+/**
+ *
+ * int t - current threshold
+ * int n - size of gap to fill in
+ *
+ */
+void fill_n_tile_gaps(int t, int n) {
+
 	//horizontal gaps
+	for (int i = 0; i < crop_height; ++i) {
+		for (int j = 0; j < crop_width - (n + 2); ++j) {
+
+			//if both sides are above threshold
+			if (above_threshold(tmap[i][j])
+					&& above_threshold(tmap[i][j + n + 1])) {
+				//check the in between tiles
+				bool gap = false;
+				for (int k = j + 1; k < j + n + 1; ++k) {
+					//detect gap
+					if (!gap && !above_threshold(tmap[i][k]))
+						gap = true;
+					//if gap detected, fill in tiles
+					if (gap) {
+						tmap[i][k] = t + nearest_round;
+					}
+				}
+			}
+		}
+	}
+
+	//vertical gaps
+	for (int i = 0; i < crop_height - (n + 2); ++i) {
+		for (int j = 0; j < crop_width; ++j) {
+
+			//if both sides are above threshold
+			if (above_threshold(tmap[i][j])
+					&& above_threshold(tmap[i + n + 1][j])) {
+				//check the in between tiles
+				bool gap = false;
+				for (int k = i + 1; k < i + n + 1; ++k) {
+					//detect gap
+					if (!gap && !above_threshold(tmap[k][j]))
+						gap = true;
+					//if gap detected, fill in tiles
+					if (gap) {
+						tmap[k][j] = t + nearest_round;
+					}
+				}
+			}
+		}
+	}
+
+
+	/*
+	 * Not filling diagonals
+	 *
+	//diagonal gaps
+	for (int i = 0; i < crop_height - (n + 2); ++i) {
+		for (int j = 0; j < crop_width - (n + 2); ++j) {
+			//n=2 examples
+//			 *
+//			 *
+//			 * ^ v v v
+//			 * v v v v
+//			 * v v v v
+//			 * v v v ^
+//			 *
+//			 * and
+//			 *
+//			 * v v v ^
+//			 * v v v v
+//			 * v v v v
+//			 * ^ v v v
+//			 *
+//			 *
+			//check edges
+
+			if (above_threshold(tmap[i][j])	&& above_threshold(tmap[i + n + 1][j + n + 1])) {
+				bool gap = false;
+				std::cout<<"\t"<< "x " << j << " y "<< i <<
+				" by "<< "x " << j+n+1 << " y "<< i+n+1 <<std::endl;
+				for (int k = j + 1; k < j + n + 1; ++k) {
+					std::cout<<"\t"<< "k=" << k <<std::endl;
+					//detect gap
+					if (!gap && !above_threshold(tmap[k][k]))
+						gap = true;
+					//if gap detected, fill in tiles
+					if (gap) {
+						tmap[k][k] = t + nearest_round;
+					}
+
+				}
+			}
+
+			if (above_threshold(tmap[i][j + n + 1])
+					&& above_threshold(tmap[i + n + 1][j])) {
+				bool gap = false;
+				for (int k = j + 1; k < j + n; ++k) {
+					//detect gap
+					if (!gap && !above_threshold(tmap[n - k + 1][k]))
+						gap = true;
+					//if gap detected, fill in tiles
+					if (gap) {
+						tmap[n - k + 1][k] = t + nearest_round;
+					}
+				}
+			}
+
+		}
+	}
+
+	*/
+}
+
+void verify_one_tile_gaps(int t, bool verbose) {
+//horizontal gaps
 	for (int i = 0; i < crop_height; ++i) {
 		for (int j = 0; j < crop_width - 3; ++j) {
 
@@ -238,7 +357,7 @@ void verify_one_tile_gaps(int t, bool verbose) {
 
 		}
 	}
-	//vertical gaps
+//vertical gaps
 	for (int i = 0; i < crop_height - 3; ++i) {
 		for (int j = 0; j < crop_width; ++j) {
 			if (!above_threshold(tmap[i + 1][j]) && above_threshold(tmap[i][j])
@@ -284,10 +403,9 @@ unsigned char rotate_case(std::vector<int> *n_case, bool verbose) {
 
 int undo_rotation(int id, int r, bool verbose) {
 
-	TILE_CASE convex_cliff_start 	= CLIFF_NW_SN;
-	TILE_CASE straight_cliff_start 	= CLIFF_WE_SN;
-	TILE_CASE concave_cliff_start 	= CLIFF_SE_SN;
-
+	TILE_CASE convex_cliff_start = CLIFF_NW_SN;
+	TILE_CASE straight_cliff_start = CLIFF_WE_SN;
+	TILE_CASE concave_cliff_start = CLIFF_SE_SN;
 
 	if (r > 3) {
 		if (verbose)
@@ -399,7 +517,7 @@ void contour_map(int _sub_map_h, int _sub_map_w, bool verbose) {
 	round_tmap();
 
 	max = tmap[0][0];
-	//set up contour map array
+//set up contour map array
 	cmap = new int*[crop_height];
 	for (int i = 0; i < crop_height; ++i) {
 		cmap[i] = new int[crop_width];
@@ -424,6 +542,12 @@ void contour_map(int _sub_map_h, int _sub_map_w, bool verbose) {
 		fill_one_tile_gaps(threshold);
 		fill_one_tile_gaps(threshold);
 		fill_one_tile_gaps(threshold);
+
+		//fill in gaps of 2
+		fill_n_tile_gaps(threshold, 4);
+		fill_n_tile_gaps(threshold, 4);
+
+
 
 		verify_one_tile_gaps(threshold, verbose);
 		//fill_one_tile_gaps(threshold);
@@ -503,7 +627,7 @@ const std::string get_kf_map_name(int x, int y, std::string grass,
 	ss << "\"total_y\":" << sub_map_count_h << "," << std::endl;
 	ss << "\"x\":" << x << "," << std::endl;
 	ss << "\"y\":" << y << "," << std::endl;
-	//ss << "\"colour\":" << colour << "," << std::endl;
+//ss << "\"colour\":" << colour << "," << std::endl;
 
 	std::string out = ss.str();
 	return out;
@@ -512,21 +636,21 @@ const std::string get_kf_map_name(int x, int y, std::string grass,
 void pad_north(rapidjson::Value& detailArray,
 		rapidjson::Document::AllocatorType& a, int t, int x, int y) {
 
-	//create unique key for the padding
+//create unique key for the padding
 	std::stringstream ss;
 	ss << x << "," << (y - 1) << "-" << y;
 
-	//check if it exists
+//check if it exists
 	if (padded.count(ss.str()) != 0) {
 		//padding should not be encountered more than twice
 		padded.erase(ss.str());
 		return;
 	}
 
-	//if not encountered, add it
+//if not encountered, add it
 	padded.insert(ss.str());
 
-	//check the dir of the slope on the padding
+//check the dir of the slope on the padding
 	int xoffset = 8;
 	int yoffset = -8;
 	std::string type;
@@ -544,7 +668,7 @@ void pad_north(rapidjson::Value& detailArray,
 		break;
 	}
 
-	//add to the tile array
+//add to the tile array
 	rapidjson::Value tileObj(rapidjson::kObjectType);
 	rapidjson::Value typeString;
 	typeString.SetString(type.c_str(), a);
@@ -561,21 +685,21 @@ void pad_north(rapidjson::Value& detailArray,
 void pad_south(rapidjson::Value& detailArray,
 		rapidjson::Document::AllocatorType& a, int t, int x, int y) {
 
-	//create unique key for the padding
+//create unique key for the padding
 	std::stringstream ss;
 	ss << x << "," << (y) << "-" << y + 1;
 
-	//check if it exists
+//check if it exists
 	if (padded.count(ss.str()) != 0) {
 		//padding should not be encountered more than twice
 		padded.erase(ss.str());
 		return;
 	}
 
-	//if not encountered, add it
+//if not encountered, add it
 	padded.insert(ss.str());
 
-	//check the dir of the slope on the padding
+//check the dir of the slope on the padding
 	int xoffset = 8;
 	int yoffset = 24;
 	std::string type;
@@ -593,7 +717,7 @@ void pad_south(rapidjson::Value& detailArray,
 		break;
 	}
 
-	//add to the tile array
+//add to the tile array
 	rapidjson::Value tileObj(rapidjson::kObjectType);
 	rapidjson::Value typeString;
 	typeString.SetString(type.c_str(), a);
@@ -610,21 +734,21 @@ void pad_south(rapidjson::Value& detailArray,
 void pad_west(rapidjson::Value& detailArray,
 		rapidjson::Document::AllocatorType& a, int t, int x, int y) {
 
-	//create unique key for the padding
+//create unique key for the padding
 	std::stringstream ss;
 	ss << (x - 1) << "-" << x << "," << y;
 
-	//check if it exists
+//check if it exists
 	if (padded.count(ss.str()) != 0) {
 		//padding should not be encountered more than twice
 		padded.erase(ss.str());
 		return;
 	}
 
-	//if not encountered, add it
+//if not encountered, add it
 	padded.insert(ss.str());
 
-	//check the dir of the slope on the padding
+//check the dir of the slope on the padding
 	int xoffset = -8;
 	int yoffset = 8;
 	std::string type;
@@ -642,7 +766,7 @@ void pad_west(rapidjson::Value& detailArray,
 		break;
 	}
 
-	//add to the tile array
+//add to the tile array
 	rapidjson::Value tileObj(rapidjson::kObjectType);
 	rapidjson::Value typeString;
 	typeString.SetString(type.c_str(), a);
@@ -659,21 +783,21 @@ void pad_west(rapidjson::Value& detailArray,
 void pad_east(rapidjson::Value& detailArray,
 		rapidjson::Document::AllocatorType& a, int t, int x, int y) {
 
-	//create unique key for the padding
+//create unique key for the padding
 	std::stringstream ss;
 	ss << x << "-" << (x + 1) << "," << y;
 
-	//check if it exists
+//check if it exists
 	if (padded.count(ss.str()) != 0) {
 		//padding should not be encountered more than twice
 		padded.erase(ss.str());
 		return;
 	}
 
-	//if not encountered, add it
+//if not encountered, add it
 	padded.insert(ss.str());
 
-	//check the dir of the slope on the padding
+//check the dir of the slope on the padding
 	int xoffset = 24;
 	int yoffset = 8;
 	std::string type;
@@ -691,7 +815,7 @@ void pad_east(rapidjson::Value& detailArray,
 		break;
 	}
 
-	//add to the tile array
+//add to the tile array
 	rapidjson::Value tileObj(rapidjson::kObjectType);
 	rapidjson::Value typeString;
 	typeString.SetString(type.c_str(), a);
@@ -713,14 +837,14 @@ void add_detail_tile(rapidjson::Value& detailArray,
 	std::string type;
 
 	switch (t) {
-	//not used here
+//not used here
 //	case GRASS:
 //		int random_grass_type;
 //		random_grass_type = rand() % 4;
 //		fprintf(stream, "GRASS%d", random_grass_type);
 //		break;
 
-	//straights
+//straights
 	case CLIFF_NS_EW:
 		type = "CLIFF_NS_EW";
 		xoffset = 8;
@@ -897,9 +1021,9 @@ char* get_str_small_background_tile(int x, int y, int t, char* out) {
 }
 
 int get_terrain_type(int i, int j) {
-	//TODO: needs to be expanded for every terrain type
-	//if(!point_above_sealevel(x,y)) return WATER;
-	//else
+//TODO: needs to be expanded for every terrain type
+//if(!point_above_sealevel(x,y)) return WATER;
+//else
 
 	if (point_above_sealevel(i, j))
 		return GRASS;
@@ -908,8 +1032,7 @@ int get_terrain_type(int i, int j) {
 
 }
 
-bool diff_tiles(int tile_x, int tile_y,
-		int large_tile_size_x,
+bool diff_tiles(int tile_x, int tile_y, int large_tile_size_x,
 		int large_tile_size_y) {
 
 	int tile = get_terrain_type(tile_y, tile_x);
@@ -936,19 +1059,21 @@ void background_terrain_tiles(rapidjson::Value &contentObj,
 	rapidjson::Value backgroundArray(rapidjson::kArrayType);
 	backgroundArray.Clear();
 
-	//for edge cases need to work out if there is LARGE_BACKGROUND_TILE_SIZE tile available
+//for edge cases need to work out if there is LARGE_BACKGROUND_TILE_SIZE tile available
 
 	int large_tile_size_y = LARGE_BACKGROUND_TILE_SIZE;
 
-	//localise bounds
+//localise bounds
 	h_bounds *= (sub_y + 1);
 	w_bounds *= (sub_x + 1);
 
-	//looping over large areas at a time to check if we can use large tiles
-	for (int i = 0; i < h_bounds && large_tile_size_y > 0; i += LARGE_BACKGROUND_TILE_SIZE) {
+//looping over large areas at a time to check if we can use large tiles
+	for (int i = 0; i < h_bounds && large_tile_size_y > 0; i +=
+			LARGE_BACKGROUND_TILE_SIZE) {
 
 		int large_tile_size_x = LARGE_BACKGROUND_TILE_SIZE;
-		for (int j = 0; j < w_bounds && large_tile_size_x > 0; j += LARGE_BACKGROUND_TILE_SIZE) {
+		for (int j = 0; j < w_bounds && large_tile_size_x > 0; j +=
+				LARGE_BACKGROUND_TILE_SIZE) {
 
 			int offset_w = (sub_map_w) * sub_x;
 			int offset_h = (sub_map_h) * sub_y;
@@ -1049,7 +1174,7 @@ void print_kf_file(FILE* stream, int sub_x, int sub_y) {
 	int sub_map_count_h = crop_height / sub_map_h;
 	int sub_map_count_w = crop_width / sub_map_w;
 
-	//adding map meta data
+//adding map meta data
 
 	mapObject.AddMember("total_x", sub_map_count_w, allocator);
 	mapObject.AddMember("total_y", sub_map_count_h, allocator);
@@ -1061,18 +1186,18 @@ void print_kf_file(FILE* stream, int sub_x, int sub_y) {
 	int w_bounds = sub_map_w ? sub_map_w : crop_width;
 	int h_bounds = sub_map_h ? sub_map_h : crop_height;
 
-	//background tiles, eg: GRASS, WATER
+//background tiles, eg: GRASS, WATER
 	background_terrain_tiles(contentObject, allocator, sub_x, sub_y, w_bounds,
 			h_bounds);
 
-	//detail tiles, eg: CLIFF
+//detail tiles, eg: CLIFF
 	detail_terrain_tiles(contentObject, allocator, sub_x, sub_y, w_bounds,
 			h_bounds);
 
 	mapObject.AddMember("content", contentObject, allocator);
 	mapDoc.AddMember("map", mapObject, allocator);
 
-	//Print JSON to file
+//Print JSON to file
 	rapidjson::StringBuffer strbuf;
 
 	rapidjson::FileStream out_file(stream);
@@ -1083,7 +1208,7 @@ void print_kf_file(FILE* stream, int sub_x, int sub_y) {
 }
 
 void print_kf(FILE* stream) {
-	//no submaps
+//no submaps
 	if (sub_map_h == 0 || sub_map_w == 0) {
 		if (stream == 0) {
 			stream = fopen(DEFAULT_CONTOUR_KF_FILE, "w");
