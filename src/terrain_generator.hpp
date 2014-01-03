@@ -11,10 +11,16 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include <stdio.h>
+#include <sstream>
+#include <vector>
+#include <set>
+#include <utility>
 #include <cmath>
+
+#include <stdio.h>
 #include <getopt.h>
 #include <stdlib.h>
+
 #include "rapidjson/document.h"
 #include "rapidjson/writer.h"
 #include "rapidjson/prettywriter.h"
@@ -131,4 +137,56 @@ public:
 
 void vegetation(bool verbose);
 void print_vegetation(FILE* stream);
+
+
+//Definition of tile types 1
+//=====================
+//  IMPORTANT: Do not change the order of the enums!
+//=====================
+enum TILE_CASE {
+
+	//Misc (not real types)
+	HIGH_GRASS,
+
+	//convex cliff corners
+
+	CLIFF_NW_SN, //north -> west turn, south->north increasing incline
+	CLIFF_NE_SN, //north -> east turn, south->north increasing incline
+	/*
+	 *         lower        | higher
+	 *         lower        \______
+	 *                 lower   lower
+	 */
+	CLIFF_SE_NS, //south -> east turn, north->south incline
+	CLIFF_SW_NS,
+
+	//concave cliff corners
+	CLIFF_SE_SN, //south -> east corner, south->north incline
+	/*
+	 *                       higher
+	 *                 higher   ____
+	 *                         /
+	 *                 higher  | lower
+	 */
+	CLIFF_SW_SN,
+	CLIFF_NW_NS,
+	CLIFF_NE_NS,
+
+	//cliff straights
+	CLIFF_WE_SN,
+	CLIFF_NS_WE,
+	CLIFF_WE_NS,
+	CLIFF_NS_EW, //along north->south, east->west increasing incline
+
+	//other
+	GRASS,
+	WATER
+
+	//count
+	,
+	TILE_COUNT
+};
+
+
+
 #endif /* TERRAIN_GENERATOR_HPP_ */
