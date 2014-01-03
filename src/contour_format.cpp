@@ -468,10 +468,13 @@ void set_contour_values(bool verbose) {
 						r++;
 						if (r > 3) {
 							if (verbose)
+							{
 								std::cout << "***BAD CASE! id = " << (int) id
 										<< " on threshold = " << threshold
 										<< " EXITING!" << std::endl;
-							//exit(0);
+								//exit(0);
+							}
+
 							break;
 						}
 					}
@@ -615,22 +618,6 @@ void print_contour(FILE* stream) {
 		}
 
 	}
-}
-
-const std::string get_kf_map_name(int x, int y, std::string grass,
-		std::string colour) {
-	int sub_map_count_h = crop_height / sub_map_h;
-	int sub_map_count_w = crop_width / sub_map_w;
-
-	std::stringstream ss;
-	ss << "\"total_x\":" << sub_map_count_w << "," << std::endl;
-	ss << "\"total_y\":" << sub_map_count_h << "," << std::endl;
-	ss << "\"x\":" << x << "," << std::endl;
-	ss << "\"y\":" << y << "," << std::endl;
-//ss << "\"colour\":" << colour << "," << std::endl;
-
-	std::string out = ss.str();
-	return out;
 }
 
 void pad_north(rapidjson::Value& detailArray,
