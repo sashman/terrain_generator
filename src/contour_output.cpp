@@ -1,4 +1,3 @@
-
 /*
  * contour_format.cpp
  *
@@ -22,14 +21,16 @@ extern int** cmap;
 std::set<std::string> padded;
 
 void pad_north(rapidjson::Value& detailArray,
-		rapidjson::Document::AllocatorType& a, int t, int x, int y) {
+		rapidjson::Document::AllocatorType& a, int t, int x, int y)
+{
 
 //create unique key for the padding
 	std::stringstream ss;
 	ss << x << "," << (y - 1) << "-" << y;
 
 //check if it exists
-	if (padded.count(ss.str()) != 0) {
+	if (padded.count(ss.str()) != 0)
+	{
 		//padding should not be encountered more than twice
 		padded.erase(ss.str());
 		return;
@@ -42,7 +43,8 @@ void pad_north(rapidjson::Value& detailArray,
 	int xoffset = 8;
 	int yoffset = -8;
 	std::string type;
-	switch (t) {
+	switch (t)
+	{
 	case CLIFF_NE_NS:
 	case CLIFF_NW_SN:
 		type = "CLIFF_PADDING_NS_EW";
@@ -71,14 +73,16 @@ void pad_north(rapidjson::Value& detailArray,
 }
 
 void pad_south(rapidjson::Value& detailArray,
-		rapidjson::Document::AllocatorType& a, int t, int x, int y) {
+		rapidjson::Document::AllocatorType& a, int t, int x, int y)
+{
 
 //create unique key for the padding
 	std::stringstream ss;
 	ss << x << "," << (y) << "-" << y + 1;
 
 //check if it exists
-	if (padded.count(ss.str()) != 0) {
+	if (padded.count(ss.str()) != 0)
+	{
 		//padding should not be encountered more than twice
 		padded.erase(ss.str());
 		return;
@@ -91,7 +95,8 @@ void pad_south(rapidjson::Value& detailArray,
 	int xoffset = 8;
 	int yoffset = 24;
 	std::string type;
-	switch (t) {
+	switch (t)
+	{
 	case CLIFF_SW_NS:
 	case CLIFF_SE_SN:
 		type = "CLIFF_PADDING_NS_EW";
@@ -120,14 +125,16 @@ void pad_south(rapidjson::Value& detailArray,
 }
 
 void pad_west(rapidjson::Value& detailArray,
-		rapidjson::Document::AllocatorType& a, int t, int x, int y) {
+		rapidjson::Document::AllocatorType& a, int t, int x, int y)
+{
 
 //create unique key for the padding
 	std::stringstream ss;
 	ss << (x - 1) << "-" << x << "," << y;
 
 //check if it exists
-	if (padded.count(ss.str()) != 0) {
+	if (padded.count(ss.str()) != 0)
+	{
 		//padding should not be encountered more than twice
 		padded.erase(ss.str());
 		return;
@@ -140,7 +147,8 @@ void pad_west(rapidjson::Value& detailArray,
 	int xoffset = -8;
 	int yoffset = 8;
 	std::string type;
-	switch (t) {
+	switch (t)
+	{
 	case CLIFF_NW_SN:
 	case CLIFF_SW_SN:
 		type = "CLIFF_PADDING_WE_SN";
@@ -169,14 +177,16 @@ void pad_west(rapidjson::Value& detailArray,
 }
 
 void pad_east(rapidjson::Value& detailArray,
-		rapidjson::Document::AllocatorType& a, int t, int x, int y) {
+		rapidjson::Document::AllocatorType& a, int t, int x, int y)
+{
 
 //create unique key for the padding
 	std::stringstream ss;
 	ss << x << "-" << (x + 1) << "," << y;
 
 //check if it exists
-	if (padded.count(ss.str()) != 0) {
+	if (padded.count(ss.str()) != 0)
+	{
 		//padding should not be encountered more than twice
 		padded.erase(ss.str());
 		return;
@@ -189,7 +199,8 @@ void pad_east(rapidjson::Value& detailArray,
 	int xoffset = 24;
 	int yoffset = 8;
 	std::string type;
-	switch (t) {
+	switch (t)
+	{
 	case CLIFF_NE_SN:
 	case CLIFF_SE_SN:
 		type = "CLIFF_PADDING_WE_SN";
@@ -218,13 +229,15 @@ void pad_east(rapidjson::Value& detailArray,
 }
 
 void add_detail_tile(rapidjson::Value& detailArray,
-		rapidjson::Document::AllocatorType& a, int t, int x, int y) {
+		rapidjson::Document::AllocatorType& a, int t, int x, int y, bool pad)
+{
 
 	rapidjson::Value tileObj(rapidjson::kObjectType);
 	int xoffset, yoffset;
 	std::string type;
 
-	switch (t) {
+	switch (t)
+	{
 //not used here
 //	case GRASS:
 //		int random_grass_type;
@@ -260,8 +273,11 @@ void add_detail_tile(rapidjson::Value& detailArray,
 		xoffset = 8;
 		yoffset = 8;
 
-		pad_north(detailArray, a, t, x, y);
-		pad_east(detailArray, a, t, x, y);
+		if (pad)
+		{
+			pad_north(detailArray, a, t, x, y);
+			pad_east(detailArray, a, t, x, y);
+		}
 
 		break;
 	case CLIFF_NE_SN:
@@ -269,8 +285,11 @@ void add_detail_tile(rapidjson::Value& detailArray,
 		xoffset = 8;
 		yoffset = 8;
 
-		pad_north(detailArray, a, t, x, y);
-		pad_east(detailArray, a, t, x, y);
+		if (pad)
+		{
+			pad_north(detailArray, a, t, x, y);
+			pad_east(detailArray, a, t, x, y);
+		}
 
 		break;
 	case CLIFF_SW_NS:
@@ -278,8 +297,11 @@ void add_detail_tile(rapidjson::Value& detailArray,
 		xoffset = 8;
 		yoffset = 8;
 
-		pad_south(detailArray, a, t, x, y);
-		pad_west(detailArray, a, t, x, y);
+		if (pad)
+		{
+			pad_south(detailArray, a, t, x, y);
+			pad_west(detailArray, a, t, x, y);
+		}
 
 		break;
 	case CLIFF_SW_SN:
@@ -287,8 +309,11 @@ void add_detail_tile(rapidjson::Value& detailArray,
 		xoffset = 8;
 		yoffset = 8;
 
-		pad_south(detailArray, a, t, x, y);
-		pad_west(detailArray, a, t, x, y);
+		if (pad)
+		{
+			pad_south(detailArray, a, t, x, y);
+			pad_west(detailArray, a, t, x, y);
+		}
 
 		break;
 	case CLIFF_SE_NS:
@@ -296,8 +321,11 @@ void add_detail_tile(rapidjson::Value& detailArray,
 		xoffset = 8;
 		yoffset = 8;
 
-		pad_south(detailArray, a, t, x, y);
-		pad_east(detailArray, a, t, x, y);
+		if (pad)
+		{
+			pad_south(detailArray, a, t, x, y);
+			pad_east(detailArray, a, t, x, y);
+		}
 
 		break;
 	case CLIFF_SE_SN:
@@ -305,8 +333,11 @@ void add_detail_tile(rapidjson::Value& detailArray,
 		xoffset = 8;
 		yoffset = 8;
 
-		pad_south(detailArray, a, t, x, y);
-		pad_east(detailArray, a, t, x, y);
+		if (pad)
+		{
+			pad_south(detailArray, a, t, x, y);
+			pad_east(detailArray, a, t, x, y);
+		}
 
 		break;
 	case CLIFF_NW_NS:
@@ -314,8 +345,11 @@ void add_detail_tile(rapidjson::Value& detailArray,
 		xoffset = 8;
 		yoffset = 8;
 
-		pad_north(detailArray, a, t, x, y);
-		pad_west(detailArray, a, t, x, y);
+		if (pad)
+		{
+			pad_north(detailArray, a, t, x, y);
+			pad_west(detailArray, a, t, x, y);
+		}
 
 		break;
 	case CLIFF_NW_SN:
@@ -323,8 +357,11 @@ void add_detail_tile(rapidjson::Value& detailArray,
 		xoffset = 8;
 		yoffset = 8;
 
-		pad_north(detailArray, a, t, x, y);
-		pad_west(detailArray, a, t, x, y);
+		if (pad)
+		{
+			pad_north(detailArray, a, t, x, y);
+			pad_west(detailArray, a, t, x, y);
+		}
 
 		break;
 	default:
@@ -339,8 +376,17 @@ void add_detail_tile(rapidjson::Value& detailArray,
 	tileObj.AddMember("type", typeString, a);
 	tileObj.AddMember("x", x, a);
 	tileObj.AddMember("y", y, a);
-	tileObj.AddMember("yoffset", yoffset, a);
-	tileObj.AddMember("xoffset", xoffset, a);
+	//using offest as 0 if no padding
+	if (pad)
+	{
+		tileObj.AddMember("yoffset", yoffset, a);
+		tileObj.AddMember("xoffset", xoffset, a);
+	}
+	else
+	{
+		tileObj.AddMember("yoffset", 0, a);
+		tileObj.AddMember("xoffset", 0, a);
+	}
 
 	detailArray.PushBack(tileObj, a);
 
@@ -348,7 +394,8 @@ void add_detail_tile(rapidjson::Value& detailArray,
 
 void detail_terrain_tiles(rapidjson::Value &contentObj,
 		rapidjson::Document::AllocatorType& a, int sub_x, int sub_y,
-		int w_bounds, int h_bounds) {
+		int w_bounds, int h_bounds)
+{
 
 	rapidjson::Value detailArray(rapidjson::kArrayType);
 	detailArray.Clear();
@@ -356,8 +403,10 @@ void detail_terrain_tiles(rapidjson::Value &contentObj,
 	int offset_w = (sub_map_w) * sub_x;
 	int offset_h = (sub_map_h) * sub_y;
 
-	for (int i = 0; i < h_bounds; ++i) {
-		for (int j = 0; j < w_bounds; ++j) {
+	for (int i = 0; i < h_bounds; ++i)
+	{
+		for (int j = 0; j < w_bounds; ++j)
+		{
 
 			//tile coordinates
 			int tile_x = j + offset_w;
@@ -367,7 +416,7 @@ void detail_terrain_tiles(rapidjson::Value &contentObj,
 				continue;
 
 			add_detail_tile(detailArray, a, cmap[tile_x][tile_y], tile_y,
-					tile_x);
+					tile_x, false);
 
 //			detailArray.PushBack(tileObj,a);
 
@@ -378,8 +427,10 @@ void detail_terrain_tiles(rapidjson::Value &contentObj,
 
 }
 
-char* get_str_large_background_tile(int x, int y, int t, char* out) {
-	switch (t) {
+char* get_str_large_background_tile(int x, int y, int t, char* out)
+{
+	switch (t)
+	{
 	case GRASS:
 		sprintf(out, "GRASS%d", rand() % 4);
 		break;
@@ -393,8 +444,10 @@ char* get_str_large_background_tile(int x, int y, int t, char* out) {
 	return out;
 }
 
-char* get_str_small_background_tile(int x, int y, int t, char* out) {
-	switch (t) {
+char* get_str_small_background_tile(int x, int y, int t, char* out)
+{
+	switch (t)
+	{
 	case GRASS:
 		sprintf(out, "SMALL_GRASS%d", rand() % 4);
 		break;
@@ -408,7 +461,8 @@ char* get_str_small_background_tile(int x, int y, int t, char* out) {
 	return out;
 }
 
-int get_terrain_type(int i, int j) {
+int get_terrain_type(int i, int j)
+{
 //TODO: needs to be expanded for every terrain type
 //if(!point_above_sealevel(x,y)) return WATER;
 //else
@@ -421,13 +475,17 @@ int get_terrain_type(int i, int j) {
 }
 
 bool diff_tiles(int tile_x, int tile_y, int large_tile_size_x,
-		int large_tile_size_y) {
+		int large_tile_size_y)
+{
 
 	int tile = get_terrain_type(tile_y, tile_x);
-	for (int k = tile_y; k < tile_y + large_tile_size_y; ++k) {
-		for (int l = tile_x; l < tile_x + large_tile_size_x; ++l) {
+	for (int k = tile_y; k < tile_y + large_tile_size_y; ++k)
+	{
+		for (int l = tile_x; l < tile_x + large_tile_size_x; ++l)
+		{
 			//only check flat terrain types
-			if ((tile ^ get_terrain_type(k, l)) != 0) {
+			if ((tile ^ get_terrain_type(k, l)) != 0)
+			{
 //				printf("[%d,%d] %d different form [%d,%d] %d\n", tile_x, tile_y, tile, l,k, get_terrain_type(k, l));
 				return true;
 			}
@@ -439,7 +497,8 @@ bool diff_tiles(int tile_x, int tile_y, int large_tile_size_x,
 
 void background_terrain_tiles(rapidjson::Value &contentObj,
 		rapidjson::Document::AllocatorType& a, int sub_x, int sub_y,
-		int w_bounds, int h_bounds) {
+		int w_bounds, int h_bounds)
+{
 	char outbuf[20];
 	int small_count = 0;
 	int large_count = 0;
@@ -457,11 +516,13 @@ void background_terrain_tiles(rapidjson::Value &contentObj,
 
 //looping over large areas at a time to check if we can use large tiles
 	for (int i = 0; i < h_bounds && large_tile_size_y > 0; i +=
-			LARGE_BACKGROUND_TILE_SIZE) {
+			LARGE_BACKGROUND_TILE_SIZE)
+	{
 
 		int large_tile_size_x = LARGE_BACKGROUND_TILE_SIZE;
 		for (int j = 0; j < w_bounds && large_tile_size_x > 0; j +=
-				LARGE_BACKGROUND_TILE_SIZE) {
+				LARGE_BACKGROUND_TILE_SIZE)
+		{
 
 			int offset_w = (sub_map_w) * sub_x;
 			int offset_h = (sub_map_h) * sub_y;
@@ -471,14 +532,16 @@ void background_terrain_tiles(rapidjson::Value &contentObj,
 			int tile_y = i + offset_h;
 
 			//set edges
-			if (tile_y + large_tile_size_y > h_bounds) {
+			if (tile_y + large_tile_size_y > h_bounds)
+			{
 //				std::cout << "large_tile_size_y(" << large_tile_size_y
 //						<< ")change:: " << "tile_y " << tile_y << " +"
 //						<< large_tile_size_y << " " << "h_bounds " << h_bounds
 //						<< std::endl;
 				large_tile_size_y = h_bounds - tile_y;
 			}
-			if (tile_x + large_tile_size_x > w_bounds) {
+			if (tile_x + large_tile_size_x > w_bounds)
+			{
 //				std::cout << "large_tile_size_x(" << large_tile_size_x
 //						<< ")change:: " << "tile_x " << tile_x << " +"
 //						<< large_tile_size_x << " " << "w_bounds " << w_bounds
@@ -486,11 +549,13 @@ void background_terrain_tiles(rapidjson::Value &contentObj,
 				large_tile_size_x = w_bounds - tile_x;
 			}
 			//skip if step is less than 1 tile
-			if (large_tile_size_y >= 1 && large_tile_size_x >= 1) {
+			if (large_tile_size_y >= 1 && large_tile_size_x >= 1)
+			{
 
 				//using XOR calculate if there is at least one different tile
 				if (!diff_tiles(tile_x, tile_y, large_tile_size_x,
-						large_tile_size_y)) {
+						large_tile_size_y))
+				{
 
 					rapidjson::Value tileObject(rapidjson::kObjectType);
 
@@ -510,7 +575,9 @@ void background_terrain_tiles(rapidjson::Value &contentObj,
 					backgroundArray.PushBack(tileObject, a);
 					large_count++;
 
-				} else {
+				}
+				else
+				{
 
 //					std::cout << "Small tile range " << large_tile_size_y << " "
 //							<< large_tile_size_x << " " << tile_y << "-"
@@ -523,9 +590,11 @@ void background_terrain_tiles(rapidjson::Value &contentObj,
 //							<< std::endl;
 //				small_count = 0;
 					//different tiles
-					for (int k = tile_y; k < tile_y + large_tile_size_y; ++k) {
+					for (int k = tile_y; k < tile_y + large_tile_size_y; ++k)
+					{
 						for (int l = tile_x; l < tile_x + large_tile_size_x;
-								++l) {
+								++l)
+						{
 
 							rapidjson::Value tileObject(rapidjson::kObjectType);
 							rapidjson::Value typeString;
@@ -550,7 +619,8 @@ void background_terrain_tiles(rapidjson::Value &contentObj,
 	contentObj.AddMember("background", backgroundArray, a);
 }
 
-void print_kf_file(FILE* stream, int sub_x, int sub_y) {
+void print_kf_file(FILE* stream, int sub_x, int sub_y)
+{
 
 	rapidjson::Document mapDoc;
 
@@ -595,37 +665,47 @@ void print_kf_file(FILE* stream, int sub_x, int sub_y) {
 
 }
 
-void print_kf(FILE* stream) {
+void print_kf(FILE* stream)
+{
 //no submaps
-	if (sub_map_h == 0 || sub_map_w == 0) {
-		if (stream == 0) {
+	if (sub_map_h == 0 || sub_map_w == 0)
+	{
+		if (stream == 0)
+		{
 			stream = fopen(DEFAULT_CONTOUR_KF_FILE, "w");
 		}
 		if (stream == NULL)
 			perror("Error opening file");
-		else {
+		else
+		{
 			print_kf_file(stream, 0, 0);
 		}
-	} else {
+	}
+	else
+	{
 
 		int sub_map_count_h = crop_height / sub_map_h;
 		int sub_map_count_w = crop_width / sub_map_w;
 
 		int map_total = 0;
-		for (int i = 0; i < sub_map_count_h; i++) {
-			for (int j = 0; j < sub_map_count_w; ++j) {
+		for (int i = 0; i < sub_map_count_h; i++)
+		{
+			for (int j = 0; j < sub_map_count_w; ++j)
+			{
 
 				std::ostringstream map_file;
 				map_file << KF_MAP_DIRECTORY << j << "_" << i << ".map";
 				std::cout << map_file.str() << std::endl;
 
 				FILE* stream = 0;
-				if (stream == 0) {
+				if (stream == 0)
+				{
 					stream = fopen(map_file.str().c_str(), "w");
 				}
 				if (stream == NULL || stream == 0)
 					perror("Error opening file");
-				else {
+				else
+				{
 					print_kf_file(stream, j, i);
 					fclose(stream);
 				}
