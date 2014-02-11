@@ -481,17 +481,19 @@ std::pair<int, int> fix_tile_case(int i, int j, std::vector<int> *n_case, int id
 	 std::cout<<std::endl;
 	 */
 
+	/*
 	for (std::vector<int>::iterator it = n_case->begin() ; it != n_case->end(); ++it)
 	{
 		above_threshold((int)*it) ? std::cout<< ". " : std::cout<< "~ ";
 	}
 	std::cout<<std::endl;
+	*/
 
 	//Hardcoded gap fixes
 	if(bad_set.count(id) > 0)
 	{
 		found = true;
-		std::cout << "part of bad set" << std::endl;
+//		std::cout << "part of bad set" << std::endl;
 		tmap[i][j + 1] = threshold + nearest_round;
 		backtrack.first = i - 1;
 		backtrack.second = j - 1;
@@ -502,7 +504,7 @@ std::pair<int, int> fix_tile_case(int i, int j, std::vector<int> *n_case, int id
 			&& above_threshold(tmap[i + 1][j + 1]))
 	{
 		found = true;
-		std::cout << "vertical gap right" << std::endl;
+//		std::cout << "vertical gap right" << std::endl;
 		tmap[i][j + 1] = threshold + nearest_round;
 	}
 
@@ -510,7 +512,7 @@ std::pair<int, int> fix_tile_case(int i, int j, std::vector<int> *n_case, int id
 			&& above_threshold(tmap[i + 1][j + 1]))
 	{
 		found = true;
-		std::cout << "horizontal gap below" << std::endl;
+//		std::cout << "horizontal gap below" << std::endl;
 		tmap[i + 1][j] = threshold + nearest_round;
 	}
 
@@ -518,7 +520,7 @@ std::pair<int, int> fix_tile_case(int i, int j, std::vector<int> *n_case, int id
 			&& above_threshold(tmap[i + 1][j]))
 	{
 		found = true;
-		std::cout << "vertical gap on top" << std::endl;
+//		std::cout << "vertical gap on top" << std::endl;
 		tmap[i][j] = threshold + nearest_round;
 		backtrack.first = i - 1;
 		backtrack.second = j - 1;
@@ -528,7 +530,7 @@ std::pair<int, int> fix_tile_case(int i, int j, std::vector<int> *n_case, int id
 			&& above_threshold(tmap[i][j + 1]))
 	{
 		found = true;
-		std::cout << "horizontal gap on top" << std::endl;
+//		std::cout << "horizontal gap on top" << std::endl;
 		tmap[i][j] = threshold + nearest_round;
 		backtrack.first = i - 1;
 		backtrack.second = j - 1;
@@ -538,7 +540,7 @@ std::pair<int, int> fix_tile_case(int i, int j, std::vector<int> *n_case, int id
 			&& above_threshold(tmap[i + 1][j - 1]))
 	{
 		found = true;
-		std::cout << "vertical gap left" << std::endl;
+//		std::cout << "vertical gap left" << std::endl;
 		tmap[i][j - 1] = threshold + nearest_round;
 		backtrack.first = i - 1;
 		backtrack.second = j - 2;
@@ -548,7 +550,7 @@ std::pair<int, int> fix_tile_case(int i, int j, std::vector<int> *n_case, int id
 			&& above_threshold(tmap[i - 1][j + 1]))
 	{
 		found = true;
-		std::cout << "horizontal gap above" << std::endl;
+//		std::cout << "horizontal gap above" << std::endl;
 		tmap[i - 1][j] = threshold + nearest_round;
 		backtrack.first = i - 2;
 		backtrack.second = j - 1;
@@ -557,7 +559,7 @@ std::pair<int, int> fix_tile_case(int i, int j, std::vector<int> *n_case, int id
 
 	if(!found)
 	{
-		std::cout<<"Still not fixed!"<<std::endl;
+//		std::cout<<"Still not fixed!"<<std::endl;
 		for (int k = i - 1; k <= i + 1; ++k)
 		{
 			for (int l = j - 1; l <= j + 1; ++l)
@@ -572,8 +574,8 @@ std::pair<int, int> fix_tile_case(int i, int j, std::vector<int> *n_case, int id
 		std::cout << std::endl;
 		exit(0);
 	}
-	std::cout << "Going back to " << backtrack.second << "," << backtrack.first
-			<< std::endl;
+//	std::cout << "Going back to " << backtrack.second << "," << backtrack.first
+//			<< std::endl;
 	return backtrack;
 }
 
@@ -649,16 +651,16 @@ void set_contour_values(bool verbose)
 								std::cout << "Fixing case " << (int) id
 										<< std::endl;
 
-								std::pair<int,int> backtrack = fix_tile_case(i, j, n_case, id);
-								i = backtrack.first;
-								j = backtrack.second;
 //#define EXIT_ON_BAD_CASE
 #ifdef EXIT_ON_BAD_CASE
 								std::cout << "EXITING!" << std::endl;
 								exit(0);
 #endif
-
 							}
+
+							std::pair<int,int> backtrack = fix_tile_case(i, j, n_case, id);
+							i = backtrack.first;
+							j = backtrack.second;
 
 							break;
 						}
@@ -692,9 +694,9 @@ void set_contour_values(bool verbose)
 					cmap[i][j] = undo_rotation(id, r, verbose);
 
 					//add random gaps in straights
-					if (cmap[i][j] >= CLIFF_WE_SN && cmap[i][j] <= CLIFF_NS_EW)
-						if (rand() % 10 == 0)
-							cmap[i][j] = GRASS;
+					//old way
+					//if (cmap[i][j] >= CLIFF_WE_SN && cmap[i][j] <= CLIFF_NS_EW)
+					//	if (rand() % 10 == 0) cmap[i][j] = GRASS;
 
 //					cmap[i][j] = WATER;
 					if (cmap[i][j] == -1)
