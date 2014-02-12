@@ -25,14 +25,18 @@ extern int sea_level;
 
 int** cmap;
 
-int convex_case_ids[] = {1};
-int straight_case_ids[] = {2,3,6,7};
-int concave_case_ids[] = {10,11,14,15,42,43,46,47};
-int bad_case_ids[] = {12,17,34,48,68,130,136};
-std::set<int>convex_set (convex_case_ids, convex_case_ids+1);
-std::set<int>straight_set (straight_case_ids, straight_case_ids+4);
-std::set<int>concave_set (concave_case_ids, concave_case_ids+8);
-std::set<int>bad_set (bad_case_ids, bad_case_ids+7);
+int convex_case_ids[] =
+{ 1 };
+int straight_case_ids[] =
+{ 2, 3, 6, 7 };
+int concave_case_ids[] =
+{ 10, 11, 14, 15, 42, 43, 46, 47 };
+int bad_case_ids[] =
+{ 12, 17, 34, 48, 68, 130, 136 };
+std::set<int> convex_set(convex_case_ids, convex_case_ids + 1);
+std::set<int> straight_set(straight_case_ids, straight_case_ids + 4);
+std::set<int> concave_set(concave_case_ids, concave_case_ids + 8);
+std::set<int> bad_set(bad_case_ids, bad_case_ids + 7);
 
 void round_tmap()
 {
@@ -467,7 +471,8 @@ int undo_rotation(int id, int r, bool verbose)
 }
 
 //return coords to go back to
-std::pair<int, int> fix_tile_case(int i, int j, std::vector<int> *n_case, int id)
+std::pair<int, int> fix_tile_case(int i, int j, std::vector<int> *n_case,
+		int id)
 {
 	bool found = false;
 	std::pair<int, int> backtrack(i, j);
@@ -482,15 +487,15 @@ std::pair<int, int> fix_tile_case(int i, int j, std::vector<int> *n_case, int id
 	 */
 
 	/*
-	for (std::vector<int>::iterator it = n_case->begin() ; it != n_case->end(); ++it)
-	{
-		above_threshold((int)*it) ? std::cout<< ". " : std::cout<< "~ ";
-	}
-	std::cout<<std::endl;
-	*/
+	 for (std::vector<int>::iterator it = n_case->begin() ; it != n_case->end(); ++it)
+	 {
+	 above_threshold((int)*it) ? std::cout<< ". " : std::cout<< "~ ";
+	 }
+	 std::cout<<std::endl;
+	 */
 
 	//Hardcoded gap fixes
-	if(bad_set.count(id) > 0)
+	if (bad_set.count(id) > 0)
 	{
 		found = true;
 //		std::cout << "part of bad set" << std::endl;
@@ -556,18 +561,18 @@ std::pair<int, int> fix_tile_case(int i, int j, std::vector<int> *n_case, int id
 		backtrack.second = j - 1;
 	}
 
-
-	if(!found)
+	if (!found)
 	{
 //		std::cout<<"Still not fixed!"<<std::endl;
 		for (int k = i - 1; k <= i + 1; ++k)
 		{
 			for (int l = j - 1; l <= j + 1; ++l)
 			{
-				if(k == i && j == l)
-					std::cout<<"  ";
+				if (k == i && j == l)
+					std::cout << "  ";
 				else
-					above_threshold(tmap[k][l]) ? std::cout << ". " : std::cout << "~ ";
+					above_threshold(tmap[k][l]) ?
+							std::cout << ". " : std::cout << "~ ";
 			}
 			std::cout << std::endl;
 		}
@@ -623,16 +628,14 @@ void set_contour_values(bool verbose)
 						std::cout << "---------" << std::endl;
 					int r = 0;
 
-
-
 					/*
-					while (id != 1 //  convex cliff
-							&& id != 2 && id != 3 && id != 6 && id != 7 // straight cliff
-							&& id != 10 && id != 11 && id != 15 && id != 43
-							&& id != 47)
-					*/
+					 while (id != 1 //  convex cliff
+					 && id != 2 && id != 3 && id != 6 && id != 7 // straight cliff
+					 && id != 10 && id != 11 && id != 15 && id != 43
+					 && id != 47)
+					 */
 					while (convex_set.count(id) == 0 &&		// convex cliffs
-							straight_set.count(id) == 0 &&  	// straight cliffs
+							straight_set.count(id) == 0 &&  // straight cliffs
 							concave_set.count(id) == 0)		// concave cliffs
 					{
 
@@ -658,7 +661,8 @@ void set_contour_values(bool verbose)
 #endif
 							}
 
-							std::pair<int,int> backtrack = fix_tile_case(i, j, n_case, id);
+							std::pair<int, int> backtrack = fix_tile_case(i, j,
+									n_case, id);
 							i = backtrack.first;
 							j = backtrack.second;
 
@@ -666,28 +670,35 @@ void set_contour_values(bool verbose)
 						}
 					}
 
-					if (verbose){
+					if (verbose)
+					{
 						std::cout << "-> " << (int) id << std::endl;
-						if(convex_set.count(id) != 0)
+						if (convex_set.count(id) != 0)
 						{
-							std::cout<<"Part of convex set" <<std::endl;
-							for(std::set<int>::iterator iter=convex_set.begin(); iter!=convex_set.end();++iter)
-								std::cout<<*iter<< " ";
-							std::cout<<std::endl;
+							std::cout << "Part of convex set" << std::endl;
+							for (std::set<int>::iterator iter =
+									convex_set.begin();
+									iter != convex_set.end(); ++iter)
+								std::cout << *iter << " ";
+							std::cout << std::endl;
 						}
-						if(straight_set.count(id) != 0)
+						if (straight_set.count(id) != 0)
 						{
-							std::cout<<"Part of straight set "<<std::endl;
-							for(std::set<int>::iterator iter=straight_set.begin(); iter!=straight_set.end();++iter)
-								std::cout<<*iter<< " ";
-							std::cout<<std::endl;
+							std::cout << "Part of straight set " << std::endl;
+							for (std::set<int>::iterator iter =
+									straight_set.begin();
+									iter != straight_set.end(); ++iter)
+								std::cout << *iter << " ";
+							std::cout << std::endl;
 						}
-						if(concave_set.count(id) != 0)
+						if (concave_set.count(id) != 0)
 						{
-							std::cout<<"Part of concave set "<<std::endl;
-							for(std::set<int>::iterator iter=concave_set.begin(); iter!=concave_set.end();++iter)
-								std::cout<<*iter<< " ";
-							std::cout<<std::endl;
+							std::cout << "Part of concave set " << std::endl;
+							for (std::set<int>::iterator iter =
+									concave_set.begin();
+									iter != concave_set.end(); ++iter)
+								std::cout << *iter << " ";
+							std::cout << std::endl;
 						}
 					}
 
@@ -695,8 +706,63 @@ void set_contour_values(bool verbose)
 
 					//add random gaps in straights
 					//old way
-					//if (cmap[i][j] >= CLIFF_WE_SN && cmap[i][j] <= CLIFF_NS_EW)
 					//	if (rand() % 10 == 0) cmap[i][j] = GRASS;
+
+					//for a series of 3 straights
+					//1 in x chance to create a gap
+					int chance = 10;
+					//3 in a row indicies must be measured backwards
+					if (cmap[i][j] >= CLIFF_WE_SN && cmap[i][j] <= CLIFF_NS_EW)
+					{
+
+						switch (cmap[i][j])
+						{
+						case CLIFF_WE_SN:
+							if (cmap[i][j - 1] == CLIFF_WE_SN
+									&& cmap[i][j - 2] == CLIFF_WE_SN
+									&& (rand() % chance == 0))
+							{
+
+								cmap[i][j - 2] = CLIFF_NW_SN;
+								cmap[i][j - 1] = GRASS;
+								cmap[i][j] = CLIFF_NE_SN;
+							}
+							break;
+						case CLIFF_WE_NS:
+							if (cmap[i][j - 1] == CLIFF_WE_NS
+									&& cmap[i][j - 2] == CLIFF_WE_NS
+									&& (rand() % chance == 0))
+							{
+								cmap[i][j - 2] = CLIFF_SW_NS;
+								cmap[i][j - 1] = GRASS;
+								cmap[i][j] = CLIFF_SE_NS;
+							}
+							break;
+						case CLIFF_NS_WE:
+							if (cmap[i-1][j] == CLIFF_NS_WE
+									&& cmap[i-2][j] == CLIFF_NS_WE
+									&& (rand() % chance == 0))
+							{
+								cmap[i-2][j] = CLIFF_NE_SN;
+								cmap[i-1][j] = GRASS;
+								cmap[i][j] = CLIFF_SE_NS;
+							}
+							break;
+						case CLIFF_NS_EW:
+							if (cmap[i-1][j] == CLIFF_NS_EW
+									&& cmap[i-2][j] == CLIFF_NS_EW
+									&& (rand() % chance == 0))
+							{
+								cmap[i-2][j] = CLIFF_NW_SN;
+								cmap[i-1][j] = GRASS;
+								cmap[i][j] = CLIFF_SW_NS;
+							}
+							break;
+						default:
+							break;
+						}
+
+					}
 
 //					cmap[i][j] = WATER;
 					if (cmap[i][j] == -1)
