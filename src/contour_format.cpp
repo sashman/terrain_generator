@@ -476,29 +476,12 @@ std::pair<int, int> fix_tile_case(int i, int j, std::vector<int> *n_case,
 {
 	bool found = false;
 	std::pair<int, int> backtrack(i, j);
-	/* debug
-	 for (int k = i-1; k <= i+1; ++k) {
-	 for (int l = j-1; l <= j+1; ++l) {
-	 above_threshold(tmap[k][l]) ? std::cout<< ". " : std::cout<< "~ ";
-	 }
-	 std::cout<<std::endl;
-	 }
-	 std::cout<<std::endl;
-	 */
 
-	/*
-	 for (std::vector<int>::iterator it = n_case->begin() ; it != n_case->end(); ++it)
-	 {
-	 above_threshold((int)*it) ? std::cout<< ". " : std::cout<< "~ ";
-	 }
-	 std::cout<<std::endl;
-	 */
 
 	//Hardcoded gap fixes
 	if (bad_set.count(id) > 0)
 	{
 		found = true;
-//		std::cout << "part of bad set" << std::endl;
 		tmap[i][j + 1] = threshold + nearest_round;
 		backtrack.first = i - 1;
 		backtrack.second = j - 1;
@@ -509,7 +492,6 @@ std::pair<int, int> fix_tile_case(int i, int j, std::vector<int> *n_case,
 			&& above_threshold(tmap[i + 1][j + 1]))
 	{
 		found = true;
-//		std::cout << "vertical gap right" << std::endl;
 		tmap[i][j + 1] = threshold + nearest_round;
 	}
 
@@ -517,7 +499,6 @@ std::pair<int, int> fix_tile_case(int i, int j, std::vector<int> *n_case,
 			&& above_threshold(tmap[i + 1][j + 1]))
 	{
 		found = true;
-//		std::cout << "horizontal gap below" << std::endl;
 		tmap[i + 1][j] = threshold + nearest_round;
 	}
 
@@ -525,7 +506,6 @@ std::pair<int, int> fix_tile_case(int i, int j, std::vector<int> *n_case,
 			&& above_threshold(tmap[i + 1][j]))
 	{
 		found = true;
-//		std::cout << "vertical gap on top" << std::endl;
 		tmap[i][j] = threshold + nearest_round;
 		backtrack.first = i - 1;
 		backtrack.second = j - 1;
@@ -535,7 +515,6 @@ std::pair<int, int> fix_tile_case(int i, int j, std::vector<int> *n_case,
 			&& above_threshold(tmap[i][j + 1]))
 	{
 		found = true;
-//		std::cout << "horizontal gap on top" << std::endl;
 		tmap[i][j] = threshold + nearest_round;
 		backtrack.first = i - 1;
 		backtrack.second = j - 1;
@@ -545,7 +524,6 @@ std::pair<int, int> fix_tile_case(int i, int j, std::vector<int> *n_case,
 			&& above_threshold(tmap[i + 1][j - 1]))
 	{
 		found = true;
-//		std::cout << "vertical gap left" << std::endl;
 		tmap[i][j - 1] = threshold + nearest_round;
 		backtrack.first = i - 1;
 		backtrack.second = j - 2;
@@ -555,7 +533,6 @@ std::pair<int, int> fix_tile_case(int i, int j, std::vector<int> *n_case,
 			&& above_threshold(tmap[i - 1][j + 1]))
 	{
 		found = true;
-//		std::cout << "horizontal gap above" << std::endl;
 		tmap[i - 1][j] = threshold + nearest_round;
 		backtrack.first = i - 2;
 		backtrack.second = j - 1;
@@ -563,7 +540,6 @@ std::pair<int, int> fix_tile_case(int i, int j, std::vector<int> *n_case,
 
 	if (!found)
 	{
-//		std::cout<<"Still not fixed!"<<std::endl;
 		for (int k = i - 1; k <= i + 1; ++k)
 		{
 			for (int l = j - 1; l <= j + 1; ++l)
