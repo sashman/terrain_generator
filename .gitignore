@@ -9,7 +9,21 @@
 *.exe
 *.o
 *.so
+Default/*
+bin/*
 
 # backup files #
 ################
 *~
+
+# output data #
+###############
+map/
+*.txt
+
+
+# eclipse #
+###########
+.settings
+.cproject
+.project
