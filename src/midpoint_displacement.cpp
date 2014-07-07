@@ -9,7 +9,8 @@
  */
 
 #include "terrain_generator.hpp"
-#include <limits.h>
+
+
 
 int tmap_size = DEFAULT_SIZE;
 int crop_height = 0;
