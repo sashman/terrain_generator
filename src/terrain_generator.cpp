@@ -103,16 +103,7 @@ void print_usage(FILE* stream, int exit_code, char* program_name)
 					"                             recommended for realistic terrain. (0.0 < v < 1.0)\n"
 					"      --erosion <value>      Number of erosion iterations over the terrain. Must be a positive integer.\n"
 					"  -n  --negative             Allow for negative height values.\n"
-					"  -s  --standard             Use standard output to be written to a file (used as default output).\n"
-					"                             width, height and a set of height values all separated by a space.\n"
-					"  -g  --graphical            Display the height map using a 3D OpenGL view.\n"
-					"  -x  --xml                  Use the following xml output to be written to a file:\n"
-					"                           <map width=int height=int>\n"
-					"                           [<tile x=int y=int>\n"
-					"                           <height>int</height>\n"
-					"							<type>string</type>\n"
-					"                           </tile>\n]+"
-					"                           </map>\n");
+					"");
 	exit(exit_code);
 }
 
@@ -164,7 +155,6 @@ void read_json_config()
 	generations = d["vegetation_generations"].GetInt();
 
 }
-
 
 //TODO:
 //TODO:  Use libnoise http://libnoise.sourceforge.net/tutorials/index.html !!!
@@ -319,15 +309,12 @@ int main(int argc, char** argv)
 	int next_option;
 
 	/* A string listing valid short options letters.  */
-	const char* const short_options = "hc:sxgvna:";
+	const char* const short_options = "hc:vna:";
 	/* An array describing valid long options.  */
 	const struct option long_options[] =
 	{
 	{ "help", 0, NULL, 'h' },
 	{ "config", 1, NULL, 'c' },
-	{ "standard", 0, NULL, 's' },
-	{ "xml", 0, NULL, 'x' },
-	{ "graphic", 0, NULL, 'g' },
 	{ "verbose", 0, NULL, 'v' },
 	{ "height", 1, NULL, 'e' },
 	{ "width", 1, NULL, 'w' },
@@ -352,129 +339,117 @@ int main(int argc, char** argv)
 	{
 
 		next_option = getopt_long(argc, argv, short_options, long_options,
-				NULL);
+		NULL);
+
 		switch (next_option)
 		{
+
+
+		case 'c': //config file
+
+			if (strcmp(config_file.c_str(), optarg) != 0)
+			{
+				config_file = optarg;
+				read_json_config();
+			}
+
+			break;
+
+		case 'v': /* -v or --verbose */
+			verbose = 1;
+			break;
+
+		case 'e': /* --height use next argument as crop height */
+
+			crop_height = atoi(optarg);
+			if (crop_height < 1)
+				print_usage(stderr, 1, program_name);
+
+			break;
+
+		case 'w': /* --width use next argument as crop width */
+
+			crop_width = atoi(optarg);
+			if (crop_width < 1)
+				print_usage(stderr, 1, program_name);
+
+			break;
+
+		case 'r': /* --rough roughness ratio */
+
+			offset_dr = atof(optarg);
+			if (offset_dr < 0 || offset_dr > 1)
+			{
+				print_usage(stderr, 1, program_name);
+			}
+
+			break;
+
+		case 'd': /* --seed value */
+
+			seed = atoi(optarg);
+			if (seed < 0)
+				print_usage(stderr, 1, program_name);
+
+			break;
+
+		case 'f': /* --offset value */
+
+			random_offset = atoi(optarg);
+			if (random_offset < 0)
+				print_usage(stderr, 1, program_name);
+
+			break;
+
+		case 'p': /* --plate  vonornoi interpolation value */
+
+			voronoi_alpha = atof(optarg);
+			if (voronoi_alpha < 0 || voronoi_alpha > 1)
+			{
+				print_usage(stderr, 1, program_name);
+			}
+
+			break;
+
+		case 'o': /* --erosion number of erosion iterations */
+
+			erosion_steps = atoi(optarg);
+			if (erosion_steps < 0)
+				print_usage(stderr, 1, program_name);
+
+			break;
+
+		case 'n': /* allow negative values */
+
+			neg = true;
+			break;
+
+		case 'a': /* random seed value */
+
+			//TODO: Add random seed as argument
+//			srand ( time(NULL) );
+			break;
+
 		case 'h': /* -h or --help */
 			/* User has requested usage information.  Print it to standard
 			 output, and exit with exit code zero (normal termination).  */
 			print_usage(stdout, 0, program_name);
 			break;
 
-			case 'c': //config file
+		case '?': /* The user specified an invalid option.  */
+			/* Print usage information to standard error, and exit with exit
+			 code one (indicating abnormal termination).  */
+			print_usage(stderr, 1, program_name);
+			break;
 
-					if(strcmp(config_file.c_str(),optarg) != 0)
-					{
-						config_file = optarg;
-						read_json_config();
-					}
+		case -1: /* Done with options.  */
+			break;
 
-					break;
-					case 's': /* -s --standard */
-
-					//Use default output format
-					//do nothing
-					break;
-
-					case 'x': /* -x --xml*/
-
-					//Use xml output format
-					output_format = STANDARD_XML;
-					break;
-
-					case 'g': /* -g --graphical*/
-
-					//Display the map as 3d opengl representation
-					output_format = OPENGL_VIEW;
-					break;
-
-					case 'v': /* -v or --verbose */
-					verbose = 1;
-					break;
-
-					case 'e': /* --height use next argument as crop height */
-
-					crop_height = atoi(optarg);
-					if(crop_height < 1)
-					print_usage(stderr, 1, program_name);
-
-					break;
-
-					case 'w': /* --width use next argument as crop width */
-
-					crop_width = atoi(optarg);
-					if(crop_width < 1)
-					print_usage(stderr, 1, program_name);
-
-					break;
-
-					case 'r': /* --rough roughness ratio */
-
-					offset_dr = atof(optarg);
-					if(offset_dr<0 || offset_dr>1)
-					{
-						print_usage(stderr, 1, program_name);
-					}
-
-					break;
-
-					case 'd': /* --seed value */
-
-					seed = atoi(optarg);
-					if(seed<0)
-					print_usage(stderr, 1, program_name);
-
-					break;
-
-					case 'f': /* --offset value */
-
-					random_offset = atoi(optarg);
-					if(random_offset<0)
-					print_usage(stderr, 1, program_name);
-
-					break;
-
-					case 'p': /* --plate  vonornoi interpolation value */
-
-					voronoi_alpha = atof(optarg);
-					if(voronoi_alpha<0 || voronoi_alpha>1)
-					{
-						print_usage(stderr, 1, program_name);
-					}
-
-					break;
-
-					case 'o': /* --erosion number of erosion iterations */
-
-					erosion_steps = atoi(optarg);
-					if(erosion_steps<0)
-					print_usage(stderr, 1, program_name);
-
-					break;
-
-					case 'n': /* allow negative values */
-
-					neg = true;
-					break;
-
-					case 'a': /* random seed value */
-
-//			srand ( time(NULL) );
-					break;
-
-					case '?': /* The user specified an invalid option.  */
-					/* Print usage information to standard error, and exit with exit
-					 code one (indicating abnormal termination).  */
-					print_usage(stderr, 1, program_name);
-					break;
-					case -1: /* Done with options.  */
-					break;
-
-					default: /* Something else: unexpected.  */
-					abort();
-					break;
-				}
-			} while (next_option != -1);
+		default: /* Something else: unexpected.  */
+			abort();
+			break;
+		}
+	} while (next_option != -1);
 
 	generate();
 
