@@ -28,6 +28,10 @@ extern int tmap_size;
 extern int crop_height;
 extern int crop_width;
 
+
+extern int octaves;
+extern double frequency;
+
 //store the random, TODO: allow for the user to provide the seed
 int random_seed = 0;
 //used to determine the relative size of 1 pixel to the output
@@ -140,6 +144,8 @@ void read_json_config()
 	output_file = d["output_file"].GetString();
 	crop_width = d["height"].GetInt();
 	crop_height = d["width"].GetInt();
+	octaves = d["octaves"].GetInt();
+	frequency = d["frequency"].GetDouble();
 	scale = d["scale"].GetInt();
 	seed = d["seed"].GetInt();
 	random_offset = d["offset"].GetInt();

@@ -14,6 +14,8 @@ int crop_height = 0;
 int crop_width = 0;
 int** tmap;
 
+int octaves = 6;
+double frequency = 1.0;
 int seed = 10;
 int random_offset = 40;
 float offset_dr = .8; //offset decrease ratio
@@ -63,6 +65,10 @@ void create_height_map()
 
 	module::Perlin perlinModule;
 
+	perlinModule.SetOctaveCount(octaves);
+	perlinModule.SetFrequency(frequency);
+	perlinModule.SetPersistence(offset_dr);
+
 	utils::NoiseMap heightMap;
 	utils::NoiseMapBuilderPlane heightMapBuilder;
 
@@ -86,7 +92,13 @@ void create_height_map()
 	writer.WriteDestFile();
 
 	char msg[50];
-	sprintf(msg, "Created heightmap: %d %s %d", heightMap.GetWidth(),"x",heightMap.GetHeight());
+	sprintf(msg, "Created heightmap: %d %s %d", heightMap.GetWidth(), "x", heightMap.GetHeight());
+	log(std::string(msg));
+	sprintf(msg, "Octaves: %d", perlinModule.GetOctaveCount());
+	log(std::string(msg));
+	sprintf(msg, "Frequency: %.2f", perlinModule.GetFrequency());
+	log(std::string(msg));
+	sprintf(msg, "Persistence: %.2f", perlinModule.GetPersistence());
 	log(std::string(msg));
 
 }
