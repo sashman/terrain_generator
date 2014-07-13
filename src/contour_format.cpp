@@ -769,7 +769,7 @@ void set_contour_values(bool verbose)
 
 }
 
-void contour_map(int _sub_map_h, int _sub_map_w, bool verbose)
+void contour_map(int _sub_map_h, int _sub_map_w)
 {
 	sub_map_h = _sub_map_h;
 	sub_map_w = _sub_map_w;

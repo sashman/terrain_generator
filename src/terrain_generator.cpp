@@ -161,12 +161,15 @@ void generate()
 
 	create_height_map();
 
-	/*
-	 std::cout << "Drawing contours" << std::endl;
-	 contour_map(32, 32, verbose);
-	 print_contour(0);
-	 print_kf(0);
-	 */
+	if (!neg)
+		clear_neg();
+
+	print_map(fopen(output_file.c_str(), "w"));
+
+	log("Drawing contours");
+	contour_map(32, 32);
+	print_contour(0);
+	print_kf(0);
 
 }
 

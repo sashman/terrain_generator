@@ -12,19 +12,13 @@ using namespace noise;
 int tmap_size = DEFAULT_SIZE;
 int crop_height = 0;
 int crop_width = 0;
-int** tmap;
+float** tmap;
 
 int octaves = 6;
 double frequency = 1.0;
 int seed = 10;
 int random_offset = 40;
 float offset_dr = .8; //offset decrease ratio
-
-//set of voronoi points
-int voronoi_size = 100; //(int)(DEFAULT_VORONOI_SIZE*((float)tmap_size/(float)512));
-int** voronoi_points;
-
-float voronoi_alpha = 0.33;
 
 //erosion
 int thermal_talus = random_offset / 40; //4/tmap_size;
@@ -101,4 +95,47 @@ void create_height_map()
 	sprintf(msg, "Persistence: %.2f", perlinModule.GetPersistence());
 	log(std::string(msg));
 
+	//init map array
+	tmap = new float*[crop_height];
+	for (int i = 0; i < crop_height; ++i)
+	{
+		tmap[i] = new float[crop_width];
+		for (int j = 0; j < crop_width; j++)
+			tmap[i][j] = heightMap.GetValue(j, i);
+	}
+
+
 }
+
+void print_map(FILE* stream) {
+	if (stream == 0) {
+		stream = fopen(DEAFULT_RIVERS_FILE, "w");
+	}
+	if (stream == NULL)
+		perror("Error opening file");
+	else {
+
+		fprintf(stream, "%i %i ", crop_width, crop_height);
+		for (int i = 0; i < crop_height; ++i) {
+			for (int j = 0; j < crop_width; ++j) {
+				fprintf(stream, "%.2f ", tmap[i][j]);
+			}
+			fprintf(stream, "\n");
+		}
+		fprintf(stream, "\n");
+
+	}
+}
+
+//replace all negative values with 0
+void clear_neg() {
+
+	for (int i = 0; i < crop_height; ++i) {
+		for (int j = 0; j < crop_width; ++j) {
+			if (tmap[i][j] < 0)
+				tmap[i][j] = 0;
+		}
+	}
+
+}
+

@@ -108,6 +108,10 @@ bool point_above_sandlevel(int x, int y);
 
 bool point_below_snow_top_level(int x, int y);
 
+void print_map(FILE* stream);
+
+void clear_neg() ;
+
 void settlements();
 void print_settlements(FILE* stream);
 
@@ -115,7 +119,7 @@ void rivers();
 
 void print_rivers(FILE* stream);
 
-void contour_map(int sub_map_h, int sub_map_w, bool verbose);
+void contour_map(int sub_map_h, int sub_map_w);
 void print_contour(FILE* stream);
 void print_kf(FILE* stream);
 
