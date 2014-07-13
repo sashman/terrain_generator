@@ -30,6 +30,7 @@
 
 #include "noise/noise.h"
 #include "noise/noisegen.h"
+#include "noiseutils.h"
 
 
 
@@ -79,6 +80,9 @@
 
 
 
+extern int verbose;
+
+void log(std::string msg);
 
 int get_val(int x, int y);
 
@@ -88,6 +92,8 @@ int get_dia_avg(int x, int y, int l);
 
 int square_diamond();
 
+void create_height_map();
+
 void voronoi();
 
 void erosion();
@@ -95,12 +101,6 @@ void erosion();
 void clear_neg();
 
 void normalise_map();
-
-//standard print
-void print_map(FILE* stream);
-
-//xml print
-void print_map_xml(FILE* stream);
 
 bool point_above_sealevel(int x, int y);
 

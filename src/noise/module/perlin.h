@@ -180,6 +180,7 @@ namespace noise
         /// noise::module::DEFAULT_PERLIN_SEED.
         Perlin ();
 
+
         /// Returns the frequency of the first octave.
         ///
         /// @returns The frequency of the first octave.

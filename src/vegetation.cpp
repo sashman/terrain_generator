@@ -224,7 +224,7 @@ void refine_veg(){
 
 }
 
-void vegetation(bool verbose) {
+void vegetation() {
 
 	//create a list of river tiles
 	calculate_water_tiles();

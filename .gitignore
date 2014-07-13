@@ -20,6 +20,10 @@ bin/*
 ###############
 map/
 *.txt
+*.bmp
+*.jpg
+*.jpeg
+*.png
 
 
 # eclipse #
@@ -27,3 +31,7 @@ map/
 .settings/
 .cproject
 .project
+
+# misc #
+########
+*.old

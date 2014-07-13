@@ -85,26 +85,31 @@ extern int generations;
 //TODO: Update usage string
 void print_usage(FILE* stream, int exit_code, char* program_name)
 {
-	fprintf(stream,
-			"A program to generate terrain and features with variable formats.\n\n");
+	fprintf(stream, "A program to generate terrain and features with variable formats.\n\n");
 	fprintf(stream, "Usage:  %s [options]\n", program_name);
-	fprintf(stream,
-			"  -h  --help                 Display this usage information.\n"
-					"  -c  --config <filename>    Use custom config file.\n"
-					"  -v  --verbose              Print verbose messages.\n"
-					"      --height <value>       Crop the map down to specified positive integer height.\n"
-					"      --width <value>        Crop the map down to specified positive integer width.\n"
-					"      --rough <value>        Define smoothness of the terrain as a float (0.0 < v < 1.0).\n"
-					"                             Lower values produce smoother terrain, smaller difference in adjacent tiles.\n"
-					"      --seed <value>         Set the initial positive integer height for the algorithm to be generate values from.\n"
-					"      --offset <value>       Set the initial offset positive integer height (seed+offset=max possible height).\n"
-					"      --plate <value>        Set the fraction of the tectonic plates appearance.\n"
-					"                             Higher values will give a more 'ripped apart' look, values too close to 1 are not\n"
-					"                             recommended for realistic terrain. (0.0 < v < 1.0)\n"
-					"      --erosion <value>      Number of erosion iterations over the terrain. Must be a positive integer.\n"
-					"  -n  --negative             Allow for negative height values.\n"
-					"");
+	fprintf(stream, "  -?  --help                 Display this usage information.\n"
+			"  -c  --config <filename>    Use custom config file.\n"
+			"  -v  --verbose              Print verbose messages.\n"
+			"  -h  --height <value>       Crop the map down to specified positive integer height.\n"
+			"  -w  --width <value>        Crop the map down to specified positive integer width.\n"
+			"      --rough <value>        Define smoothness of the terrain as a float (0.0 < v < 1.0).\n"
+			"                             Lower values produce smoother terrain, smaller difference in adjacent tiles.\n"
+			"      --seed <value>         Set the initial positive integer height for the algorithm to be generate values from.\n"
+			"      --offset <value>       Set the initial offset positive integer height (seed+offset=max possible height).\n"
+			"      --plate <value>        Set the fraction of the tectonic plates appearance.\n"
+			"                             Higher values will give a more 'ripped apart' look, values too close to 1 are not\n"
+			"                             recommended for realistic terrain. (0.0 < v < 1.0)\n"
+			"      --erosion <value>      Number of erosion iterations over the terrain. Must be a positive integer.\n"
+			"  -n  --negative             Allow for negative height values.\n"
+			"");
 	exit(exit_code);
+}
+
+void log(std::string msg)
+{
+
+	if(verbose)
+		std::cout<<msg<<std::endl;
 }
 
 //helper method used to return a string of the file contents
@@ -162,144 +167,14 @@ void read_json_config()
 void generate()
 {
 
-	//set crop height and width
-	if (crop_height < 1)
-		crop_height = tmap_size;
-	if (crop_width < 1)
-		crop_width = tmap_size;
+	create_height_map();
 
-	//if a crop value is set
-	//set tmap_size to fit the cropped values
-	int max_size = std::max(crop_height, crop_width);
-	int max_size_tmp = max_size - 1;
-
-	if ((max_size_tmp & (max_size_tmp - 1)) == 0)
-	{
-		//leave set size as highest crop value
-		tmap_size = max_size;
-	}
-	else
-	{
-		//find smallest value such that (value is power of 2) + 1 and value > max_size
-		int t = ceil(log2(max_size)) + 1;
-		tmap_size = (1 << t) + 1;
-	}
-
-	double finish = 0;
-	//display info
-	if (verbose)
-	{
-		std::cout << "Using " << config_file << std::endl;
-		std::cout << "Staring square diamond" << std::endl;
-		std::cout << "Size: " << crop_width << " x " << crop_height
-				<< " original size " << tmap_size << std::endl;
-		std::cout << "Starting seed value " << seed << std::endl;
-		std::cout << "Starting random offset " << random_offset << std::endl;
-		std::cout << "Random offset decrease ratio " << offset_dr << std::endl;
-
-	}
-
-	//init map array
-	tmap = new int*[tmap_size];
-	for (int i = 0; i < tmap_size; ++i)
-	{
-		tmap[i] = new int[tmap_size];
-		for (int j = 0; j < tmap_size; j++)
-			tmap[i][j] = 0;
-	}
-
-//	initialize random seed:
-//	use for generating a random map every time
-//  srand ( time(NULL) );
-	//harcoded for now as produces a nice map for testing
-	srand(12);
-
-	//fill the array with values
-	square_diamond();
-
-	//interpolate voronoi diagram
-	//TODO: add noise to voronoi
-	if (verbose)
-	{
-		std::cout << "Voronoi points " << voronoi_size << std::endl;
-		/*
-		 for (int i = 0; i < voronoi_size; ++i) {
-		 std::cout << "\t" << voronoi_points[i][0] << "," << voronoi_points[i][1] << std::endl;
-		 }
-		 */
-	}
-	voronoi();
-
-	erosion();
-
-	if (!neg)
-		clear_neg();
-
-//		finish = clock() - start;
-	if (verbose)
-		std::cout << "Finished square diamond " << (finish / 1000000)
-				<< std::endl;
-	double sqadia = (finish / 1000000);
-
-	if (normalise)
-	{
-		if (verbose)
-			std::cout << "Normalising with value range " << normalise_min << "-"
-					<< normalise_max << std::endl;
-		normalise_map();
-	}
-
-	if (output_format == STANDRARD_HEIGHTS)
-	{
-		print_map(fopen(output_file.c_str(), "w"));
-	}
-	else if (output_format == STANDARD_XML)
-	{
-		print_map_xml(fopen(output_file.c_str(), "w"));
-	}
-
-	if (scale > 0 && crop_height > 256 && crop_width > 256)
-	{
-
-//			start = clock();
-		if (verbose)
-			std::cout << "Generating rivers" << std::endl;
-		rivers();
-//			finish = clock() - start;
-		if (verbose)
-			std::cout << "Done " << (finish / 1000000) << std::endl;
-		double rivers_time = (finish / 1000000);
-		print_rivers(0);
-
-//			start = clock();
-		if (verbose)
-			std::cout << "Generating vegetation" << std::endl;
-		vegetation(verbose);
-//			finish = clock() - start;
-		if (verbose)
-			std::cout << "Done " << (finish / 1000000) << std::endl;
-		double veg_time = (finish / 1000000);
-		print_vegetation(0);
-
-		if (verbose)
-			std::cout << "Generating settlements" << std::endl;
-		settlements();
-//			finish = clock() - start;
-		if (verbose)
-			std::cout << "Done " << (finish / 1000000) << std::endl;
-		double settlement_time = (finish / 1000000);
-		print_settlements(0);
-
-		std::cout << crop_height << "\t"
-				<< (sqadia + rivers_time + veg_time + settlement_time) << "\t"
-				<< sqadia << "\t " << rivers_time << "\t" << veg_time << "\t"
-				<< settlement_time << std::endl;
-	}
-
-	std::cout << "Drawing contours" << std::endl;
-	contour_map(32, 32, verbose);
-	print_contour(0);
-	print_kf(0);
+	/*
+	 std::cout << "Drawing contours" << std::endl;
+	 contour_map(32, 32, verbose);
+	 print_contour(0);
+	 print_kf(0);
+	 */
 
 }
 
@@ -309,14 +184,14 @@ int main(int argc, char** argv)
 	int next_option;
 
 	/* A string listing valid short options letters.  */
-	const char* const short_options = "hc:vna:";
+	const char* const short_options = "h:w:c:vna:";
 	/* An array describing valid long options.  */
 	const struct option long_options[] =
 	{
-	{ "help", 0, NULL, 'h' },
+	{ "help", 0, NULL, '?' },
 	{ "config", 1, NULL, 'c' },
 	{ "verbose", 0, NULL, 'v' },
-	{ "height", 1, NULL, 'e' },
+	{ "height", 1, NULL, 'h' },
 	{ "width", 1, NULL, 'w' },
 	{ "rough", 1, NULL, 'r' },
 	{ "seed", 1, NULL, 'd' },
@@ -344,7 +219,6 @@ int main(int argc, char** argv)
 		switch (next_option)
 		{
 
-
 		case 'c': //config file
 
 			if (strcmp(config_file.c_str(), optarg) != 0)
@@ -359,7 +233,7 @@ int main(int argc, char** argv)
 			verbose = 1;
 			break;
 
-		case 'e': /* --height use next argument as crop height */
+		case 'h': /* --height use next argument as crop height */
 
 			crop_height = atoi(optarg);
 			if (crop_height < 1)
@@ -430,16 +304,12 @@ int main(int argc, char** argv)
 //			srand ( time(NULL) );
 			break;
 
-		case 'h': /* -h or --help */
+
+		case '?':
+			/* -h or --help */
 			/* User has requested usage information.  Print it to standard
 			 output, and exit with exit code zero (normal termination).  */
 			print_usage(stdout, 0, program_name);
-			break;
-
-		case '?': /* The user specified an invalid option.  */
-			/* Print usage information to standard error, and exit with exit
-			 code one (indicating abnormal termination).  */
-			print_usage(stderr, 1, program_name);
 			break;
 
 		case -1: /* Done with options.  */
