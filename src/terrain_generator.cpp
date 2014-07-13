@@ -28,29 +28,18 @@ extern int tmap_size;
 extern int crop_height;
 extern int crop_width;
 
-
+//perlin noise properties
+//see http://libnoise.sourceforge.net/tutorials/tutorial4.html
 extern int octaves;
 extern double frequency;
+//the "roughness" value, the change in random_offset for the next iteration
+extern float offset_dr;
 
 //store the random, TODO: allow for the user to provide the seed
 int random_seed = 0;
 //used to determine the relative size of 1 pixel to the output
 //not used
 int scale = 1;
-
-//for more explanation on the below values see Midpoint displacement algorithm (http://www.gameprogrammer.com/fractal.html)
-//the starting point of the corners of the height map
-extern int seed;
-//the max value of the next offset
-extern int random_offset;
-//the "roughness" value, the change in random_offset for the next iteration
-extern float offset_dr;
-
-//number of voronoi points to be used
-extern int voronoi_size;
-
-//the fraction used as the strength of the voronoi values, when interpolating with the height map
-extern float voronoi_alpha;
 
 //number of times the height map should be eroded
 extern int erosion_steps;
@@ -98,12 +87,7 @@ void print_usage(FILE* stream, int exit_code, char* program_name)
 			"  -w  --width <value>        Crop the map down to specified positive integer width.\n"
 			"      --rough <value>        Define smoothness of the terrain as a float (0.0 < v < 1.0).\n"
 			"                             Lower values produce smoother terrain, smaller difference in adjacent tiles.\n"
-			"      --seed <value>         Set the initial positive integer height for the algorithm to be generate values from.\n"
-			"      --offset <value>       Set the initial offset positive integer height (seed+offset=max possible height).\n"
-			"      --plate <value>        Set the fraction of the tectonic plates appearance.\n"
-			"                             Higher values will give a more 'ripped apart' look, values too close to 1 are not\n"
-			"                             recommended for realistic terrain. (0.0 < v < 1.0)\n"
-			"      --erosion <value>      Number of erosion iterations over the terrain. Must be a positive integer.\n"
+			"  -s  --randomseed <value>   The seed used to generate random numbers.\n"
 			"  -n  --negative             Allow for negative height values.\n"
 			"");
 	exit(exit_code);
@@ -112,8 +96,8 @@ void print_usage(FILE* stream, int exit_code, char* program_name)
 void log(std::string msg)
 {
 
-	if(verbose)
-		std::cout<<msg<<std::endl;
+	if (verbose)
+		std::cout << msg << std::endl;
 }
 
 //helper method used to return a string of the file contents
@@ -147,8 +131,6 @@ void read_json_config()
 	octaves = d["octaves"].GetInt();
 	frequency = d["frequency"].GetDouble();
 	scale = d["scale"].GetInt();
-	seed = d["seed"].GetInt();
-	random_offset = d["offset"].GetInt();
 	offset_dr = d["rough"].GetDouble();
 	normalise = (strcmp(d["normalise"].GetString(), "true") == 0);
 	normalise_min = d["normalise_min"].GetInt();
@@ -173,6 +155,10 @@ void read_json_config()
 void generate()
 {
 
+	std::stringstream ss;
+	ss << "Random seed: " << random_seed;
+	log(ss.str());
+
 	create_height_map();
 
 	/*
@@ -190,7 +176,7 @@ int main(int argc, char** argv)
 	int next_option;
 
 	/* A string listing valid short options letters.  */
-	const char* const short_options = "h:w:c:vna:";
+	const char* const short_options = "h:w:c:vns:";
 	/* An array describing valid long options.  */
 	const struct option long_options[] =
 	{
@@ -200,12 +186,8 @@ int main(int argc, char** argv)
 	{ "height", 1, NULL, 'h' },
 	{ "width", 1, NULL, 'w' },
 	{ "rough", 1, NULL, 'r' },
-	{ "seed", 1, NULL, 'd' },
-	{ "offset", 1, NULL, 'f' },
-	{ "plate", 1, NULL, 'p' },
-	{ "erosion", 1, NULL, 'o' },
 	{ "negative", 0, NULL, 'n' },
-	{ "randomseed", 1, NULL, 'a' },
+	{ "randomseed", 1, NULL, 's' },
 	{ NULL, 0, NULL, 0 } /* Required at end of array.  */
 	};
 
@@ -213,6 +195,7 @@ int main(int argc, char** argv)
 	 The name is stored in argv[0].  */
 	char* program_name = argv[0];
 
+	//read config fist so the args can override it
 	if (fopen(config_file.c_str(), "r"))
 		read_json_config();
 
@@ -265,51 +248,16 @@ int main(int argc, char** argv)
 
 			break;
 
-		case 'd': /* --seed value */
-
-			seed = atoi(optarg);
-			if (seed < 0)
-				print_usage(stderr, 1, program_name);
-
-			break;
-
-		case 'f': /* --offset value */
-
-			random_offset = atoi(optarg);
-			if (random_offset < 0)
-				print_usage(stderr, 1, program_name);
-
-			break;
-
-		case 'p': /* --plate  vonornoi interpolation value */
-
-			voronoi_alpha = atof(optarg);
-			if (voronoi_alpha < 0 || voronoi_alpha > 1)
-			{
-				print_usage(stderr, 1, program_name);
-			}
-
-			break;
-
-		case 'o': /* --erosion number of erosion iterations */
-
-			erosion_steps = atoi(optarg);
-			if (erosion_steps < 0)
-				print_usage(stderr, 1, program_name);
-
-			break;
-
 		case 'n': /* allow negative values */
 
 			neg = true;
 			break;
 
-		case 'a': /* random seed value */
+		case 's': /* random seed value */
 
-			//TODO: Add random seed as argument
-//			srand ( time(NULL) );
+			random_seed = atof(optarg);
+			srand(random_seed);
 			break;
-
 
 		case '?':
 			/* -h or --help */
